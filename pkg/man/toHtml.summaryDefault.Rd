@@ -1,0 +1,17 @@
+\name{toHtml.summaryDefault}
+\alias{toHtml.summaryDefault}
+\title{toHTML}
+\usage{
+  toHtml.summaryDefault(x, cap = "", ...)
+}
+\arguments{
+  \item{x}{a data.frame}
+
+  \item{cap}{caption}
+
+  \item{cat}{}
+}
+\description{
+  wraps a summary table into a data.frame
+}
+

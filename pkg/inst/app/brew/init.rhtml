@@ -1,0 +1,7 @@
+<% 
+  res <- Response$new()
+  res$header('Content-type','application/json')
+  json <- list(bbx=list(xmin=min(datsub$lon), xmax=max(datsub$lon)))
+  res$write(cat(toJSON(json)))
+  res$finish()
+%>

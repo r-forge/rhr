@@ -1,0 +1,105 @@
+List of 12
+ $ fileName             : chr "ortungen2.csv"
+ $ config               :List of 9
+  ..$ ncores            : num 1
+  ..$ epsg              : num 4326
+  ..$ outUnit           : chr "m2"
+  ..$ internetConnection: logi TRUE
+  ..$ expKML            : num 0
+  ..$ useGM             : num 0
+  ..$ skip              : num 0
+  ..$ sep               : chr "coma"
+  ..$ sepDec            : chr ","
+ $ mapFields            :List of 5
+  ..$ id  : chr "collar"
+  ..$ lat : chr "y"
+  ..$ lon : chr "x"
+  ..$ date:List of 2
+  .. ..$ date      : chr "tag"
+  .. ..$ dateFormat: chr "ymd"
+  ..$ time:List of 2
+  .. ..$ time      : chr "zeit"
+  .. ..$ timeFormat: chr "hms"
+ $ animal               :List of 2
+  ..$ ids    :List of 2
+  .. ..$ : num 2
+  .. ..$ : num 1
+  ..$ include:List of 2
+  .. ..$ : num 1
+  .. ..$ : num 1
+ $ spBbx                :List of 4
+  ..$ xmin: num 3549500
+  ..$ xmax: num 3562500
+  ..$ ymin: num 5990200
+  ..$ ymax: num 6e+06
+ $ spBbxRestricted      :List of 4
+  ..$ xmin: num 3549500
+  ..$ xmax: num 3562500
+  ..$ ymin: num 5990200
+  ..$ ymax: num 6e+06
+ $ temporalBbx          :List of 2
+  ..$ tmin: chr "2013-01-03 08:00:00"
+  ..$ tmax: chr "2013-01-03 08:00:00"
+ $ temporalBbxRestricted:List of 2
+  ..$ tmin: chr "2013-01-03 08:00:00"
+  ..$ tmax: chr "2013-01-03 08:00:00"
+ $ n                    :List of 2
+  ..$ initialN   : num 117
+  ..$ restrictedN:List of 4
+  .. ..$ id       : NULL
+  .. ..$ lat      : NULL
+  .. ..$ lon      : NULL
+  .. ..$ timestamp: NULL
+ $ preAnalysis          :List of 3
+  ..$ siteFidelity:List of 1
+  .. ..$ n: num 100
+  ..$ ttsi        :List of 3
+  .. ..$ interval : num 18000
+  .. ..$ tolerance: num 600
+  .. ..$ type     : chr "con"
+  ..$ asymptote   :List of 7
+  .. ..$ nIter     : num 10
+  .. ..$ minNPts   : num 50
+  .. ..$ increment : num 50
+  .. ..$ estimator : chr "mcp"
+  .. ..$ level     : num 95
+  .. ..$ nTimes    : num 5
+  .. ..$ tolTotArea: num 95
+ $ estimator            :List of 4
+  ..$ ca   :List of 1
+  .. ..$ res: num 100
+  ..$ mcp  :List of 1
+  .. ..$ level: num 95
+  ..$ kde  :List of 7
+  .. ..$ resolution    : num 100
+  .. ..$ buffer        : num 1000
+  .. ..$ level         : num 95
+  .. ..$ bandwidth     : chr "href"
+  .. ..$ bandwidthValue: num 100
+  .. ..$ xrange        :List of 2
+  .. .. ..$ 1:List of 2
+  .. .. .. ..$ : num 3551300
+  .. .. .. ..$ : num 3563500
+  .. .. ..$ 2:List of 2
+  .. .. .. ..$ : num 3548500
+  .. .. .. ..$ : num 3552200
+  .. ..$ yrange        :List of 2
+  .. .. ..$ 1:List of 2
+  .. .. .. ..$ : num 5989700
+  .. .. .. ..$ : num 6e+06
+  .. .. ..$ 2:List of 2
+  .. .. .. ..$ : num 6e+06
+  .. .. .. ..$ : num 6e+06
+  ..$ locoh:List of 4
+  .. ..$ type  : chr "k"
+  .. ..$ n     : logi TRUE
+  .. ..$ nValue: chr "10"
+  .. ..$ level : chr "95"
+ $ todo                 :List of 7
+  ..$ doSiteFidelity: logi FALSE
+  ..$ doTTSI        : logi FALSE
+  ..$ doAsymptote   : logi FALSE
+  ..$ doMCP         : logi FALSE
+  ..$ doKDE         : logi FALSE
+  ..$ doLocoh       : logi TRUE
+  ..$ doCA          : logi FALSE

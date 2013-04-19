@@ -1,0 +1,44 @@
+Package: rhr
+Type: Package
+Title: Package to calculate home range analysis and reproduce all steps
+Version: 0.01
+Date: 2012-07-09
+Author: Johannes Signer
+Maintainer: <jmsigner@gmail.com>
+Description: Follow different steps to calculate homeranges
+License: GPL v3
+Depends:
+    Rcpp,
+    raster,
+    rgeos,
+    sp,
+    Rook,
+    RJSONIO,
+    grid,
+    ggplot2,
+    gridExtra,
+    KernSmooth,
+    lubridate,
+    stringr,
+    RCurl,
+    plyr,
+    rgdal,
+    reshape2,
+    ggmap,
+    mapproj,
+    plotKML
+LinkingTo: Rcpp
+Collate:
+    'fidelity.R'
+    'zzz.R'
+    'rhrArea.R'
+    'rhrEstimator.R'
+    'rhrEstMCP.R'
+    'rhrEstimatorCharacteristic.R'
+    'pBrhrEstimator.R'
+    'rhrEstKDE.R'
+    'rhrEstLoCoH.R'
+    'rhrCoreArea.R'
+    'rhrSchoener.R'
+    'rhrGUI.R'
+    'rhrHelperFunctions.R'

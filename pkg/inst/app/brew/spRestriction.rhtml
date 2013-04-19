@@ -1,0 +1,33 @@
+<%
+
+which <- req$POST()[['which']]
+lonmin <- req$POST()[['lonmin']]
+lonmax <- req$POST()[['lonmax']]
+latmin <- req$POST()[['latmin']]
+latmax <- req$POST()[['latmax']]
+res <- Response$new()
+
+if (which == "init") {
+
+  res$write(printSpRestriction(datrm, datsub))
+
+} else if (which == "sub") {
+	datsub <- datrm[datrm$lat >= latmin & datrm$lat <= latmax & datrm$lon >= lonmin & datrm$lon <= lonmax, ]
+  res$write(printSpRestriction(datrm, datsub))
+} else if (which == "reset") {
+	datsub <- datrm
+	res$write(printSpRestriction(datrm, datsub))
+}
+
+  config$spBbxRstricted$xmin <- min(datsub$lon)
+  config$spBbxRestricted$xmax <- max(datsub$lon)
+  config$spBbxRestricted$ymin <- min(datsub$lat)
+  config$spBbxRestricted$ymax <- max(datsub$lat)
+  config$n$restrictedN <- nrow(datsub)
+
+
+res$write(cat('<input type="button" id="spRestrictionApply" value="Apply Spatial Restriction">'))
+res$write(cat('<input type="button" id="spRestrictionReset" name="spRestrictionReset" value="Reset">'))
+res$finish()
+
+%>

@@ -1,0 +1,7 @@
+# Start the site:
+library(gridExtra)
+library(Rook)
+s <- Rhttpd$new()
+s$add(app="config.R", name="rhr")
+s$start(quiet=TRUE)
+s$browse("rhr")

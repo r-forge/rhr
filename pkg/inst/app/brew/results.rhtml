@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bootstrap 101 Template</title>
+    <!-- Bootstrap -->
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+
+      .map-fixed {
+        padding: 9x 0;
+        position: fixed;
+        width : 20%;
+      }
+    </style>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- <script src="http://code.jquery.com/jquery-latest.js"></script> -->
+    <script src="../js/jquery18.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/jquery.validate.min.js"></script>
+    <script src="../js/rhrResults.js"></script>
+
+  </head>
+  <body>
+
+    <!-- Navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Reproduciple home range</a>
+          <div class="nav-collapse collapse">
+            <p class="navbar-text pull-right">
+            Uni G&oumlttingen </p>
+            <ul class="nav">
+              <li><a href="index.rhtml">about</a></li>
+              <li><a href="load.rhtml">pre</a></li>
+              <li class="active"><a href="#">results</a></li>
+              <li><a href="#post">post</a></li>
+              <li><a href="#help">?rhr</a></li>
+
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <!--
+    ============================================ -->
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="map-fixed">
+            <ul class="nav nav-list bs-docs-sidenav">
+              <li class="nav-header">Content</li>
+              <li><a href="#sdata">Select Data</a></li>
+              <li><a href="#sanimal">Select animal(s)</a></li>
+              <li><a href="#stime">Select time span</a></li>
+              <li><a href="#sanalysis">Select analysis</a></li>
+              <li><a href="#soutpu">Output</a></li>
+              <li><a href="#run">Run</a></li>
+            </ul>
+          </div>
+        </div> <!-- /span3 -->
+
+
+
+        <div class="span9">
+
+
+
+          <!-- Load Data
+          ============================================================== -->
+          <section id="sdata">
+          <div class="page-header">
+            <h1>Summary</h1>
+          </div>
+	  <h2>n</h2>
+	  <%= config$n$initialN %> points were contained in the data set. For the analysis we considered <%= config$n$restrictedN %>.
+
+	 </div>
+        </body>
+      </html>

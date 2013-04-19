@@ -1,0 +1,6 @@
+<%
+  res <- Response$new()
+  res$write(cat('<div class="alert">Everything is good :)</div>'))
+  res$write(print(xtable(head(datrm, 15)), type="html"))
+  res$finish()
+%>

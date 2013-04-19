@@ -1,0 +1,22 @@
+<% 
+ res <- Rook::Response$new()
+ print(req$POST()[['path']])
+ cat('<div class="alert alert-error">Something went wrong: No input file selected</div>')
+%>
+
+<!---- % 
+        res <- Rook::Response$new()
+          if (!is.null(req$POST())) {
+           name <- req$POST()[['path']]
+           if (!is.null(name)) {
+             dat <- read.csv(name$tempfile)
+             f <- c(names(dat), NA)
+	     cat('<div class="alert alert-success"><b>Data</b> successfully loaded</div>')
+           } else {
+             cat('<div class="alert alert-error">Something went wrong: No input file selected</div>')
+             f <- "no data loaded"
+           }
+         } else {
+	   f <- "no data loaded"
+	 }
+%-- -->

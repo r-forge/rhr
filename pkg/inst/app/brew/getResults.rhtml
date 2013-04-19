@@ -1,0 +1,9 @@
+<% 
+  # push newest version of config from server to client
+  res <- Response$new()
+  if (!is.null(results)) {
+    res$write(cat(toJSON(config)))
+  } 
+  res$write(cat("1"))
+  res$finish()
+%>

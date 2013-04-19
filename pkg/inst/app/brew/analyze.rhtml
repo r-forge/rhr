@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Results</title>
+    <!-- Bootstrap -->
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+
+      .map-fixed {
+        padding: 9x 0;
+        position: fixed;
+        width : 20%;
+      }
+    </style>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- <script src="http://code.jquery.com/jquery-latest.js"></script> -->
+    <script src="../js/jquery18.min.js"></script>
+    <script src="../js/jszip.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/jquery.validate.min.js"></script>
+    <script src="../js/rhrResults.js"></script>
+
+  </head>
+  <body>
+
+    <!-- Navbar -->
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Reproduciple home range</a>
+          <div class="nav-collapse collapse">
+            <p class="navbar-text pull-right">
+            Uni G&oumlttingen </p>
+            <ul class="nav">
+              <li><a href="load.rhtml">Setup</a></li>
+              <li class="active"><a href="#">Results</a></li>
+              <li><a href="about.rhtml">About</a></li>
+
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <!--
+    ============================================ -->
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span3">
+          <div class="map-fixed">
+            <ul class="nav nav-list bs-docs-sidenav">
+              <li class="nav-header">Content</li>
+              <li><a href="#sFidelity">Site Fidelity</a></li>
+              <li><a href="#sTTSI">Time To Statistical Independence</a></li>
+              <li><a href="#sAsym">Asymptote</a></li>
+              <li><a href="#sMCP">Minimum Convex Polygon</a></li>
+              <li><a href="#sKDE">Kernel Density Estimation</a></li>
+              <li><a href="#sLocoh">Local Convex Hull</a></li>
+              <li><a href="#sCA">Core Area</a></li>
+              <li><a href="#sParam">Report</a></li>
+            </ul>
+          </div>
+        </div> <!-- /span3 -->
+
+
+
+        <div class="span9">
+
+
+
+          <!-- Load Data
+          ============================================================== -->
+          <div class="hero-unit">
+            <h1>Results</h1>
+	  </div>
+
+          <section id="sFidelity">
+	   <div id="rPrep"></div>
+          <h2>Site fidelity</h2>
+	   <div id="rFidelity"></div>
+	  </section>
+
+          <section id="sTTSI">
+          <h2>Time to statistical Independence</h2>
+	   <div id="rTTSI"></div>
+	  </section>
+
+          <section id="sMCP">
+          <h2>Minimum Convex Polygon</h2>
+	   <div id="rMCP"></div>
+	  </section>
+
+          <section id="sKDE">
+          <h2>Kernel Density Estimation</h2>
+	   <div id="rKDE"></div>
+	  </section>
+
+          <section id="sLocoh">
+          <h2>Local Convex Hull</h2>
+	   <div id="rLocoh"></div>
+	  </section>
+
+          <section id="sAsym">
+          <h2>Asymptote</h2>
+	   <div id="rAsymptote"></div>
+	  </section>
+
+          <section id="sCA">
+          <h2>Core Area</h2>
+	   <div id="rCA"></div>
+	  </section>
+
+          <section id="sParam">
+          <h2>Parameter values used</h2>
+	   <div id="rParams"></div>
+	  </section>
+	  
+	   <div id="rPost"></div>
+	  
+            <footer>
+            <p>&copy; Johannes Signer 2012</p>
+            </footer>
+
+          </div><!--/.fluid-container-->
+
+          </div>
+          </div>
+
+        </body>
+      </html>

@@ -1,0 +1,40 @@
+<% 
+  library(parallel)
+  res <- Response$new()
+  config <- list(fileName=NA, 
+            config=list(
+            ncores=1,
+	    epsg=4326,
+	    outUnit="m2",
+            internetConnection=ifelse(class(try(getURL("www.google.com"))) == "try-error", FALSE, TRUE),
+	    expKML=0,
+	    useGM=0,
+	    skip=0,
+	    sep="coma",
+	    sepDec=","),
+                 mapFields=list(
+                   id=NA, 
+                   lat=NA, 
+                   lon=NA, 
+                   date=list(date=NA, dateFormat=NA), 
+                   time=list(time=NA, timeFormat=NA)), 
+                 animal=list(ids=NA, include=NA),
+                 spBbx=list(xmin=NA, xmax=NA, ymin=NA, ymax=NA), 
+                 spBbxRestricted=list(xmin=NA, xmax=NA, ymin=NA, ymax=NA), 
+                 temporalBbx=list(tmin=NA, tmax=NA), 
+                 temporalBbxRestricted=list(tmin=NA, tmax=NA), 
+                 n=list(initialN=NA, restrictedN=NA), 
+                 preAnalysis=list(siteFidelity=list(n=100), 
+                   ttsi=list(interval=5 * 60 * 60, tolerance=10 * 60, type="con" ), 
+                   asymptote=list(nIter=10, minNPts=50, increment=50, estimator=c("mcp"), level=95,
+                     nTimes=5, tolTotArea=95)), 
+                 estimator=list(ca=list(res=100),
+                   mcp=list(level=95), 
+                   kde=list(resolution=100, buffer=1000, level=95, bandwidth="href", bandwidthValue=100), 
+                   locoh=list(type="k", n=FALSE, nValue=10, level=95)), 
+                 todo=list(doSiteFidelity=FALSE, doTTSI=FALSE, doAsymptote=FALSE, doMCP=FALSE, doKDE=FALSE, doLocoh=FALSE, doCA=FALSE)
+
+                )
+  res$write(cat(toJSON(config)))
+  res$finish()
+%>

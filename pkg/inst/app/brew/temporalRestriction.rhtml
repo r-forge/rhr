@@ -1,0 +1,27 @@
+<%
+
+which <- req$POST()[['which']]
+timemin <- ymd_hms(req$POST()[['timemin']])
+timemax <- ymd_hms(req$POST()[['timemax']])
+res <- Response$new()
+
+if (which == "init") {
+	 res$write(printTemporalRestriction(datrm, datsub))
+
+} else if (which == "sub") {
+	datsub <- datrm[datrm$timestamp >= timemin & datrm$timestamp <= timemax, ]
+  	res$write(printTemporalRestriction(datrm, datsub))
+} else if (which == "reset") {
+	datsub <- datrm
+	res$write(printTemporalRestriction(datrm, datsub))
+}
+
+  config$temporalBbxRestricted$tmin <- as.character(min(datsub$timestamp))
+  config$temporalBbxRestricted$tmax <- as.character(max(datsub$timestamp))
+  config$n$restrictedN <- nrow(datsub)
+
+res$write(cat('<input type="button" id="temporalRestrictionApply" value="Apply Temporal Restriction">'))
+res$write(cat('<input type="button" id="temporalRestrictionReset" value="Reset">'))
+res$finish()
+
+%>

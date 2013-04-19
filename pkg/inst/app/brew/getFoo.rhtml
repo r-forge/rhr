@@ -1,0 +1,6 @@
+<% 
+  # push newest version of config from server to client
+  res <- Response$new()
+  res$write(cat(toJSON(list(i=1123))))
+  res$finish()
+%>

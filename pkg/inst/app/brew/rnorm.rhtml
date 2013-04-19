@@ -1,0 +1,19 @@
+<%
+# str(req$POST())
+x <- as.numeric(req$POST()[['n']])
+options(hverbose=FALSE,verbose=FALSE)
+plotname <- paste('plot.', x, '.png',sep='')
+filename <- file.path(imagepath,plotname)
+if (!file.exists(filename)){
+    
+        x = rnorm(x)
+
+        png(filename=filename, width=600, height=600)
+        hist(x)
+	dev.off()
+}
+%>
+
+<img src="<%=paste(imageurl,plotname,sep='')%>">
+<a href="<%=paste(imageurl,plotname,sep='')%>"> down </a>
+

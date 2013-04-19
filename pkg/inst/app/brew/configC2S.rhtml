@@ -1,0 +1,12 @@
+<% 
+  # push newest version of config from server to client
+  if (!is.null(req$POST())) {
+        # set simplify to false, so list are not coerced to vectors
+        config <- fromJSON(req$POST()[['config']], simplify=FALSE)
+  }
+
+  save(config, file="config.Rdata")
+  sink("foo2.txt")
+  str(config)  
+ sink()
+%>
