@@ -7,11 +7,9 @@
 #' @param min.pts min.pts
 #' @return object of class \code{SpatialPolygonsDataFrame}
 #' @export
-#' @author Johannes Signer modified code from \code{adehabitatHR::mcp}
-#' @examples
-#' cat("hello world")
+#' @author Johannes Signer 
 
-rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3, ts=NULL) {
+rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3) {
 
   # input checking
   # type:
@@ -49,16 +47,6 @@ rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3, ts=NULL) {
     # 3. take n nearest
     n <- n - 1 # to be consistent with adehabitatHR
     abc1 <- lapply(ind, function(i) ind[order(sqrt((as.numeric(ts) - as.numeric(ts[i]))^2))][1:n])
-  } else if (type == "tf") {
-    # 1. time dist
-    # 2. order by dist
-    # 3. take n nearest
-    n <- n - 1 # to be consistent with adehabitatHR
-    abc1 <- lapply(ind, function(i) {
-      tmp <- as.numeric(ts) - as.numeric(ts[i])
-      
-      ind[][1:n]})
-  
   } else if (type == "r") {
     # 1. calc dist
     # 2. take all pts with dist <= n

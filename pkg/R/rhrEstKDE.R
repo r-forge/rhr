@@ -1,8 +1,13 @@
 #' Kernel Density Estimation (KDE)
 #'
-#' @param xy SpatialPointsDataFrame, holding fixes for the animal and time frame that the MCP should be calculated
-#' @param percent percentage of closest points to the centroid that are used to calculated MCP
-#' @param return.rast returns the hat matrix with kernel densities as an object of class raster
+#' @param xy data.frame with two columns. The first column contains x coordinaes and the second column contains y coordinates
+#' @param h bandwidth, either a string ("href", "lscv") or an actual value
+#' @param xrange the xrange for the out grid
+#' @param yrange the yrange for the out grid 
+#' @param resolution the resolution for the out grid 
+#' @param lscv.n number of iterations for lscv
+#' @param tol the tolerace for lscv 
+#' @param return.raster returns the hat matrix with kernel densities as an object of class raster
 #' @return object of class \code{RhrEstimatorKDE}
 #' @export
 #' @author Johannes Signer 

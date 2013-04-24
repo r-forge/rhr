@@ -1,7 +1,7 @@
 #' Minimum Convex Polygon (MCP)
 #'
-#' @param xy: SpatialPointsDataFrame, holding fixes for the animal and time frame that the MCP should be calculated
-#' @param levels: a vector with the percentage of closest points to the centroid that are used to calculated MCP
+#' @param xy SpatialPointsDataFrame, holding fixes for the animal and time frame that the MCP should be calculated
+#' @param levels a vector with the percentage of closest points to the centroid that are used to calculated MCP
 #' @return object of class \code{SpatialPolygonsDataFrame}
 #' @export
 #' @author Johannes Signer modified code from \code{adehabitatHR::mcp}

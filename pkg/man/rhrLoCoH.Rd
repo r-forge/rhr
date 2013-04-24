@@ -2,8 +2,7 @@
 \alias{rhrLoCoH}
 \title{Local Convex Hull (LoCoH)}
 \usage{
-  rhrLoCoH(xy, type = "k", n = 10, level = 95, min.pts = 3,
-    ts = NULL)
+  rhrLoCoH(xy, type = "k", n = 10, level = 95, min.pts = 3)
 }
 \arguments{
   \item{xy}{a data frame with 2 columns. The first column
@@ -27,11 +26,7 @@
 \description{
   Local Convex Hull (LoCoH)
 }
-\examples{
-cat("hello world")
-}
 \author{
-  Johannes Signer modified code from
-  \code{adehabitatHR::mcp}
+  Johannes Signer
 }
 

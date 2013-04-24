@@ -9,7 +9,7 @@
 
   \item{cap}{caption}
 
-  \item{cat}{}
+  \item{...}{additional arguments}
 }
 \description{
   wraps a summary table into a data.frame

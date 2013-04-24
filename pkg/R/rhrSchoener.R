@@ -2,7 +2,7 @@
 #'
 #' @param dat a data.frame with 3 columns. The first column contains x-coordinates, the second column contains y coordinates and the third column contains a timestamp as \code{POSIXct}. 
 #' @param interval The interval in seconds
-#' @param tolerace The tolerance of the interval, i.e. interval +- tolerance
+#' @param tolerance The tolerance of the interval, i.e. interval +- tolerance
 #' @param type either all (for all reachable points within time interval), strict (for stricly consecutive points) or cons (for relaxed consecutive points).
 #' @return \code{vector} vector of length three. V is Schoeners v, n the number of points and m the number of point pairs considered to calculated t2.
 #' @useDynLib rhr

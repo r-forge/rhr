@@ -53,24 +53,27 @@ rhrCoreAreaBase <- function(r) {
   # pctrange <- sapply(prob, function(x) sum(prob >= x) /length(prob))
 
  # to move to src
-
-cppFunction('
-  NumericVector pd(NumericVector prob) {
-    int n = prob.size();
-    NumericVector out(n);
-
-    for(int i = 0; i < n; ++i) {
-      int sum = 0;
-      for (int j = 0; j < n; ++j) {
-        if ( prob[j] >= prob[i]) {
-          sum += 1;
-        }
-      }
-      out[i] = (double)sum/n;
-    }
-    return out;
+  pd <- function(prob) {
+    .Call("pdcpp", prob, PACKAGE="rhr")
   }
-')
+
+#cppFunction('
+#  NumericVector pd(NumericVector prob) {
+#    int n = prob.size();
+#    NumericVector out(n);
+#
+#    for(int i = 0; i < n; ++i) {
+#      int sum = 0;
+#      for (int j = 0; j < n; ++j) {
+#        if ( prob[j] >= prob[i]) {
+#          sum += 1;
+#        }
+#      }
+#      out[i] = (double)sum/n;
+#    }
+#    return out;
+#  }
+#')
 
 
 

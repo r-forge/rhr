@@ -12,7 +12,7 @@
 
   \item{interval}{The interval in seconds}
 
-  \item{tolerace}{The tolerance of the interval, i.e.
+  \item{tolerance}{The tolerance of the interval, i.e.
   interval +- tolerance}
 
   \item{type}{either all (for all reachable points within

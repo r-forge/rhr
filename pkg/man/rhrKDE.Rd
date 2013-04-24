@@ -7,13 +7,24 @@
     return.raster = FALSE)
 }
 \arguments{
-  \item{xy}{SpatialPointsDataFrame, holding fixes for the
-  animal and time frame that the MCP should be calculated}
+  \item{xy}{data.frame with two columns. The first column
+  contains x coordinaes and the second column contains y
+  coordinates}
 
-  \item{percent}{percentage of closest points to the
-  centroid that are used to calculated MCP}
+  \item{h}{bandwidth, either a string ("href", "lscv") or
+  an actual value}
 
-  \item{return.rast}{returns the hat matrix with kernel
+  \item{xrange}{the xrange for the out grid}
+
+  \item{yrange}{the yrange for the out grid}
+
+  \item{resolution}{the resolution for the out grid}
+
+  \item{lscv.n}{number of iterations for lscv}
+
+  \item{tol}{the tolerace for lscv}
+
+  \item{return.raster}{returns the hat matrix with kernel
   densities as an object of class raster}
 }
 \value{

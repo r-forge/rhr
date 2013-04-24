@@ -5,6 +5,7 @@
 #' Starts an interactive GUI
 #' @param dat a data frame with the tracking data
 #' @param outdir directory where results are saved
+#' @param ... fruther arguments
 #' @export
 rhrGUI <- function(dat=NULL, outdir=getwd(), ...){
 

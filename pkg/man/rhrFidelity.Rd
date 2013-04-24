@@ -28,14 +28,4 @@ rhrFidelity(dat, n=500)
 \author{
   Johannes Signer
 }
-\references{
-  \itemize{ \item{Munger, J. (1984). Home ranges of horned
-  lizards (Phrynosoma): circumscribed and exclusive?
-  Oecologia, 62(3), 351–360.} \item{Spencer, S., Cameron,
-  G., and Swihart, R. (1990). Operationally defining home
-  range: temporal dependence exhibited by hispid cotton
-  rats. Ecology, 71(5), 1817 – 1822.} \item{White, G. C.,
-  and Garrott, R. A. (1990). Analysis of Wildlife
-  Radio-Tracking Data (p. 383). Academic Press.} }
-}
 

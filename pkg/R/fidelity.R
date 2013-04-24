@@ -6,12 +6,6 @@
 #' @useDynLib rhr
 #' @export
 #' @author Johannes Signer
-#' @references
-#' \itemize{
-#'  \item{Munger, J. (1984). Home ranges of horned lizards (Phrynosoma): circumscribed and exclusive? Oecologia, 62(3), 351–360.}
-#'  \item{Spencer, S., Cameron, G., and Swihart, R. (1990). Operationally defining home range: temporal dependence exhibited by hispid cotton rats. Ecology, 71(5), 1817 – 1822.}
-#'  \item{White, G. C., and Garrott, R. A. (1990). Analysis of Wildlife Radio-Tracking Data (p. 383). Academic Press.}
-#' }
 #' @examples
 #' dat <- data.frame(x=runif(1000, 0, 100), y=runif(1000, 0, 100))
 #' rhrFidelity(dat, n=500)
@@ -32,16 +26,15 @@ rhrFidelity <- function(dat, n=100) {
   return(res)
 }
 
-#' Site fidelity multiple animals
+#' Base function to calculate msd and li
 #'
-#' @param dat a data.frame with 3 or 4 columns. The first column contains x-coordinates, the second column contains y coordinates and the third column contains a timestamp as \code{POSIXct}. If data is for more than one animal, the fourth column should provide ids. In case that there are only three 
-#' @param n the number of montecarlo simulation
-#' @return object of class \code{RhrFidelity}
+#' @param x x-coordinates
+#' @param y y-coordinates
+#' @param n the number of coordinates
+#' @return a list
 #' @useDynLib rhr
 #' @export
 #' @author Johannes Signer
-#' @examples
-#' cat("hello world")
 
 
 fidelityBase <- function(x, y, n) {
@@ -76,7 +69,7 @@ cumdist <- function(x,y) {
 }
 
 # ---------------------------------------------------------------------------- #
-# Everything in C
+# Everything in Cpp
 
 random_walk <- function(sx, sy, d, rA) {
   n   <- length(d)

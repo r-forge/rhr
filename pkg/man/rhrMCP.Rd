@@ -5,10 +5,10 @@
   rhrMCP(xy, levels = 95)
 }
 \arguments{
-  \item{xy:}{SpatialPointsDataFrame, holding fixes for the
+  \item{xy}{SpatialPointsDataFrame, holding fixes for the
   animal and time frame that the MCP should be calculated}
 
-  \item{levels:}{a vector with the percentage of closest
+  \item{levels}{a vector with the percentage of closest
   points to the centroid that are used to calculated MCP}
 }
 \value{

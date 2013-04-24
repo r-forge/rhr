@@ -32,14 +32,16 @@ rhrArea.RhrEstimatorMCP <- function(est, ...) {
 
 #' Area for Kernel Density Estimation
 #' 
-#' @param xy An object of class \code{SpatialPointsDataFrame}
+#' @param est an object returned from the function rhrKDE
 #' @param level The level of the UD at which area is calculated
 #' @param ud returns only the utility distribution as raster
 #' @param raster returns a rasterstack with a raster for each level
+#' @param matrix returns a matrix with predictions
+#' @param contour returns contour lines
 #' @export
 #' @return The area
 
-rhrArea.RhrEstimatorKDE <- function(est, level=95, ud=FALSE, raster=FALSE, matrix=FALSE, contour=FALSE, ...) {
+rhrArea.RhrEstimatorKDE <- function(est, level=95, ud=FALSE, raster=FALSE, matrix=FALSE, contour=FALSE) {
 
   # list for results
   res <- list()

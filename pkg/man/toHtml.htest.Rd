@@ -7,7 +7,9 @@
 \arguments{
   \item{x}{htest}
 
-  \item{cat}{}
+  \item{cap}{caption}
+
+  \item{...}{additional arguments}
 }
 \description{
   wraps a htest object to html

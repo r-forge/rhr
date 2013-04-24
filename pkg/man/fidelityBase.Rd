@@ -1,27 +1,21 @@
 \name{fidelityBase}
 \alias{fidelityBase}
-\title{Site fidelity multiple animals}
+\title{Base function to calculate msd and li}
 \usage{
   fidelityBase(x, y, n)
 }
 \arguments{
-  \item{dat}{a data.frame with 3 or 4 columns. The first
-  column contains x-coordinates, the second column contains
-  y coordinates and the third column contains a timestamp
-  as \code{POSIXct}. If data is for more than one animal,
-  the fourth column should provide ids. In case that there
-  are only three}
+  \item{x}{x-coordinates}
 
-  \item{n}{the number of montecarlo simulation}
+  \item{y}{y-coordinates}
+
+  \item{n}{the number of coordinates}
 }
 \value{
-  object of class \code{RhrFidelity}
+  a list
 }
 \description{
-  Site fidelity multiple animals
-}
-\examples{
-cat("hello world")
+  Base function to calculate msd and li
 }
 \author{
   Johannes Signer

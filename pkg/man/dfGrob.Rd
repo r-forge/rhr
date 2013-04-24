@@ -6,6 +6,12 @@
 }
 \arguments{
   \item{x}{a data.frame}
+
+  \item{start}{where to start, default is 0.03}
+
+  \item{stop}{where to stop, default is 0.97}
+
+  \item{digits}{to how many digists numbers are rounded}
 }
 \description{
   Create a grid representation for an object of class

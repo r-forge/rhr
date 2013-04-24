@@ -1,6 +1,12 @@
 #' printSpRestriction
 #' 
 #' helper function for the gui
+#' @param datrm original dataset
+#' @param datsub subsetted dataset
+#' @param latmin min y
+#' @param latmax max y
+#' @param lonmin min x
+#' @param lonmax max x 
 #' @export
 
 printSpRestriction <- function(datrm, datsub, latmin, latmax, lonmin, lonmax) {
@@ -29,6 +35,10 @@ printSpRestriction <- function(datrm, datsub, latmin, latmax, lonmin, lonmax) {
 #' printTemporalRestriction
 #' 
 #' helper function for the gui
+#' @param datrm original dataset
+#' @param datsub subsetted dataset
+#' @param tmin min time
+#' @param tmax max time
 #' @export
 
 printTemporalRestriction <- function(datrm, datsub, tmin, tmax) {
@@ -122,6 +132,7 @@ imgs <- function(address, cap="", cat=TRUE) {
 #'
 #' Wraps a string as a paragraph
 #' @param x a string
+#' @param ... additional arguments, none implemented
 #' @export
 
 p <- function(x, ...) {
@@ -144,6 +155,7 @@ code <- function(x) {
 #'
 #' converts an R object to a data.frame
 #' @param x a R object
+#' @param ... additional arguments
 #' @export
 
 toHtml <- function(x, ...) {
@@ -155,7 +167,8 @@ toHtml <- function(x, ...) {
 #'
 #' wraps a data.frame into a html table
 #' @param x a data.frame
-#' @param cat
+#' @param cat cat the result
+#' @param ... additional arguments
 #' @export
 
 toHtml.data.frame <- function(x, cat=TRUE, ...) {
@@ -180,7 +193,7 @@ toHtml.data.frame <- function(x, cat=TRUE, ...) {
 #' wraps a summary table into a data.frame
 #' @param x a data.frame
 #' @param cap caption
-#' @param cat
+#' @param ... additional arguments
 #' @export
 
 toHtml.summaryDefault <- function(x, cap="", ...) {
@@ -192,7 +205,8 @@ toHtml.summaryDefault <- function(x, cap="", ...) {
 #'
 #' wraps a htest object to html
 #' @param x htest
-#' @param cat
+#' @param cap caption
+#' @param ... additional arguments
 #' @export
 
 toHtml.htest <- function(x, cap=NULL, ...) {
@@ -290,7 +304,6 @@ alertError <- function(x, cat=TRUE) {
 #' @param res from ttsi
 #' @param path where the plot should be safed
 #' @param toFirst2 only plot until critical value of 2 is first reached
-#' @param returnGrob retun a grob 
 #' @export
 
 plotTTSI <- function(res, path=NULL, toFirst2=FALSE) {
@@ -441,6 +454,9 @@ ttestGrob <- function(x) {
 #' 
 #' Create a grid representation for an object of class data.frame
 #' @param x a data.frame
+#' @param start where to start, default is 0.03
+#' @param stop where to stop, default is 0.97
+#' @param digits to how many digists numbers are rounded
 #' @export
 
 dfGrob <- function(x, start=0.03, stop=0.97, digits=2) {
