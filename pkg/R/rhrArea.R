@@ -39,7 +39,7 @@ rhrArea.RhrEstimatorMCP <- function(est, ...) {
 #' @export
 #' @return The area
 
-rhrArea.RhrEstimatorKDE <- function(est, level=95, ud=FALSE, raster=FALSE, matrix=FALSE, contour=FALSE) {
+rhrArea.RhrEstimatorKDE <- function(est, level=95, ud=FALSE, raster=FALSE, matrix=FALSE, contour=FALSE, ...) {
 
   # list for results
   res <- list()

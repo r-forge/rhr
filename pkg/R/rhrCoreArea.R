@@ -28,7 +28,7 @@ rhrCoreArea.RhrEstimatorMCP <- function(est, ...) {
 #' @export
 #' @return The area
 
-rhrCoreArea.RhrEstimatorKDE <- function(est) {
+rhrCoreArea.RhrEstimatorKDE <- function(est, ...) {
 
   nr <- ceiling(diff(range(est$xrange)) / est$resolution)
   nc <- ceiling(diff(range(est$yrange)) / est$resolution)

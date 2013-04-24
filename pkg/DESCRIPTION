@@ -6,7 +6,7 @@ Date: 2012-07-09
 Author: Johannes Signer
 Maintainer: <jmsigner@gmail.com>
 Description: Follow different steps to calculate homeranges
-License: GPL v3
+License: GPL-3
 Depends:
     Rcpp,
     raster,

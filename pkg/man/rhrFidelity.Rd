@@ -9,8 +9,7 @@
   first column contains the x-coordinates, the second
   column contains the y-coordinates}
 
-  \item{n}{the number of bootstrap iterations
-  \cite{rodgers2007a}.}
+  \item{n}{the number of bootstrap iterations.}
 }
 \value{
   object of class \code{RhrFidelity}, which is a list of
@@ -33,10 +32,10 @@ rhrFidelity(dat, n=500)
   \itemize{ \item{Munger, J. (1984). Home ranges of horned
   lizards (Phrynosoma): circumscribed and exclusive?
   Oecologia, 62(3), 351–360.} \item{Spencer, S., Cameron,
-  G., & Swihart, R. (1990). Operationally defining home
+  G., and Swihart, R. (1990). Operationally defining home
   range: temporal dependence exhibited by hispid cotton
-  rats. Ecology, 71(5), 1817 – 1822.} \item{White, G. C., &
-  Garrott, R. A. (1990). Analysis of Wildlife
+  rats. Ecology, 71(5), 1817 – 1822.} \item{White, G. C.,
+  and Garrott, R. A. (1990). Analysis of Wildlife
   Radio-Tracking Data (p. 383). Academic Press.} }
 }
 

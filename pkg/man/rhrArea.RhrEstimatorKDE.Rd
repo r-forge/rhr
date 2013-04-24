@@ -3,7 +3,7 @@
 \title{Area for Kernel Density Estimation}
 \usage{
   rhrArea.RhrEstimatorKDE(est, level = 95, ud = FALSE,
-    raster = FALSE, matrix = FALSE, contour = FALSE)
+    raster = FALSE, matrix = FALSE, contour = FALSE, ...)
 }
 \arguments{
   \item{xy}{An object of class
