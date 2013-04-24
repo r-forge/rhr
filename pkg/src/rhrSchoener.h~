@@ -1,0 +1,8 @@
+#ifndef _rhr_RHRSCHOENER_H
+#define _rhr_RHRSCHOENER_H
+
+#include <Rcpp.h>
+
+RcppExport SEXP rcpp_rhrSchoener();
+
+#endif

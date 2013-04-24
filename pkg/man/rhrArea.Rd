@@ -2,10 +2,10 @@
 \alias{rhrArea}
 \title{Generic Function to calculate area of a RhrEstimator*}
 \usage{
-  rhrArea(est, ...)
+  rhrArea(x, ...)
 }
 \arguments{
-  \item{est}{a RhrEstimator* object}
+  \item{x}{a RhrEstimator* object}
 
   \item{...}{further parameters passed to the area
   function}

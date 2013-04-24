@@ -1,22 +1,23 @@
 #' Generic Function to calculate area of a RhrEstimator*
 #' 
-#' @param est a RhrEstimator* object
+#' @param x a RhrEstimator* object
 #' @param ... further parameters passed to the area function
 #' @export
 #' @return The area
 
-rhrCoreArea <- function(est, ...) {
-  UseMethod("rhrCoreArea", est)
+rhrCoreArea <- function(x, ...) {
+  UseMethod("rhrCoreArea", x)
 }
 
 #' Core Area for Minimum Convex Polygon
 #' 
-#' @param est a RhrEstimatorMCP object
+#' @param x a RhrEstimatorMCP object
 #' @param ... further parameters passed to the area function
 #' @export
+#' @method rhrCoreArea RhrEstimatorMCP
 #' @return The area
 
-rhrCoreArea.RhrEstimatorMCP <- function(est, ...) {
+rhrCoreArea.RhrEstimatorMCP <- function(x, ...) {
   
  stop("Does not makes sense")
 
@@ -24,11 +25,14 @@ rhrCoreArea.RhrEstimatorMCP <- function(est, ...) {
 
 #' Core Area for Kernel Density Estimation
 #' 
-#' @param est Kernel density estimation
+#' @param x Kernel density estimation
+#' @param ... further parameters passed to the area function
+#' @method rhrCoreArea RhrEstimatorKDE
 #' @export
 #' @return The area
 
-rhrCoreArea.RhrEstimatorKDE <- function(est, ...) {
+rhrCoreArea.RhrEstimatorKDE <- function(x, ...) {
+  est <- x
 
   nr <- ceiling(diff(range(est$xrange)) / est$resolution)
   nc <- ceiling(diff(range(est$yrange)) / est$resolution)

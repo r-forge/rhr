@@ -2,10 +2,10 @@
 \alias{rhrArea.RhrEstimatorMCP}
 \title{Area for Minimum Convex Polygon}
 \usage{
-  rhrArea.RhrEstimatorMCP(est, ...)
+  \method{rhrArea}{RhrEstimatorMCP} (x, ...)
 }
 \arguments{
-  \item{est}{a RhrEstimatorMCP object}
+  \item{x}{a RhrEstimatorMCP object}
 
   \item{...}{further parameters passed to the area
   function}

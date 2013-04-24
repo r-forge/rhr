@@ -2,7 +2,7 @@
 \alias{toHtml.data.frame}
 \title{toHTML}
 \usage{
-  toHtml.data.frame(x, cat = TRUE, ...)
+  \method{toHTML}{data.frame} (x, cat = TRUE, ...)
 }
 \arguments{
   \item{x}{a data.frame}

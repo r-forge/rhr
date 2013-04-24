@@ -42,3 +42,4 @@ Collate:
     'rhrSchoener.R'
     'rhrGUI.R'
     'rhrHelperFunctions.R'
+    'datSH-data.R'

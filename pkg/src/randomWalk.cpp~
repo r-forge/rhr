@@ -1,0 +1,35 @@
+#include <Rcpp.h>
+#include <cmath>
+
+RcppExport SEXP randomWalkcpp(SEXP ssx, SEXP ssy, SEXP ssinA, SEXP ccosA, SEXP dd, SEXP rrx, SEXP rry) {
+BEGIN_RCPP
+  // sx: start x 
+  // sy: start y 
+  // n: number of rows
+  // rA: random angles
+  // ry: ry
+  // rx: rx
+  Rcpp::NumericVector sx(ssx);
+  Rcpp::NumericVector sy(ssy);
+  Rcpp::NumericVector sinA(ssinA);
+  Rcpp::NumericVector cosA(ccosA);
+  Rcpp::NumericVector dd(dd);
+  Rcpp::NumericVector rx(rrx);
+  Rcpp::NumericVector ry(rry);
+
+  int n = sx.size();
+  int i;  // counting variable used within the loop
+
+  rx[0] = sx[0];
+  ry[0] = sy[0];
+
+  for (i = 1; i < n; i++) {
+
+    rx[i] = rx[i-1] + cosA[i-1] * d[i];
+    ry[i] = ry[i-1] + sinA[i-1] * d[i];
+   
+  }
+  
+  return Rcpp::NumericVector::create(rx,ry);
+END_RCPP
+}

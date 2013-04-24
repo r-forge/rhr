@@ -1,24 +1,22 @@
 #' Generic Function to calculate area of a RhrEstimator*
 #' 
-#' @param x a RhrEstimator* object
+#' @param est a RhrEstimator* object
 #' @param ... further parameters passed to the area function
 #' @export
 #' @return The area
 
-rhrArea <- function(x, ...) {
-  UseMethod("rhrArea", x)
+rhrArea <- function(est, ...) {
+  UseMethod("rhrArea", est)
 }
 
 #' Area for Minimum Convex Polygon
 #' 
-#' @param x a RhrEstimatorMCP object
+#' @param est a RhrEstimatorMCP object
 #' @param ... further parameters passed to the area function
-#' @method rhrArea RhrEstimatorMCP
 #' @export
 #' @return The area
 
-rhrArea.RhrEstimatorMCP <- function(x, ...) {
-  est <- x
+rhrArea.RhrEstimatorMCP <- function(est, ...) {
   warning("this function is depricated")
   
   poly.area <- function(xy) {
@@ -34,19 +32,15 @@ rhrArea.RhrEstimatorMCP <- function(x, ...) {
 
 #' Area for Kernel Density Estimation
 #' 
-#' @param x an object returned from the function rhrKDE
+#' @param xy An object of class \code{SpatialPointsDataFrame}
 #' @param level The level of the UD at which area is calculated
 #' @param ud returns only the utility distribution as raster
 #' @param raster returns a rasterstack with a raster for each level
-#' @param matrix returns a matrix with predictions
-#' @param contour returns contour lines
-#' @method rhrArea RhrEstimatorKDE
 #' @export
 #' @return The area
 
-rhrArea.RhrEstimatorKDE <- function(x, level=95, ud=FALSE, raster=FALSE, matrix=FALSE, contour=FALSE) {
+rhrArea.RhrEstimatorKDE <- function(est, level=95, ud=FALSE, raster=FALSE, matrix=FALSE, contour=FALSE) {
 
-  est <- x
   # list for results
   res <- list()
 
@@ -113,9 +107,6 @@ rhrArea.RhrEstimatorKDE <- function(x, level=95, ud=FALSE, raster=FALSE, matrix=
     
     # split by polygon
     con <- lapply(con, function(x) split(x, x$comp))
-
-    # make sure there are at least 2 points
-    con <- lapply(con, function(x) Filter(function(x) nrow(x) > 2, x))
 
     # Make spatial polyon
     # Complete ring and create each Polygon

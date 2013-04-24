@@ -2,11 +2,12 @@
 \alias{rhrArea.RhrEstimatorKDE}
 \title{Area for Kernel Density Estimation}
 \usage{
-  rhrArea.RhrEstimatorKDE(est, level = 95, ud = FALSE,
-    raster = FALSE, matrix = FALSE, contour = FALSE)
+  \method{rhrArea}{RhrEstimatorKDE} (x, level = 95,
+    ud = FALSE, raster = FALSE, matrix = FALSE,
+    contour = FALSE)
 }
 \arguments{
-  \item{est}{an object returned from the function rhrKDE}
+  \item{x}{an object returned from the function rhrKDE}
 
   \item{level}{The level of the UD at which area is
   calculated}

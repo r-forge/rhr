@@ -2,7 +2,7 @@
 \alias{toHtml.htest}
 \title{toHTML}
 \usage{
-  toHtml.htest(x, cap = NULL, ...)
+  \method{toHTML}{htest} (x, cap = NULL, ...)
 }
 \arguments{
   \item{x}{htest}

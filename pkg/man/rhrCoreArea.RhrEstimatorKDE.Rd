@@ -2,10 +2,13 @@
 \alias{rhrCoreArea.RhrEstimatorKDE}
 \title{Core Area for Kernel Density Estimation}
 \usage{
-  rhrCoreArea.RhrEstimatorKDE(est, ...)
+  \method{rhrCoreArea}{RhrEstimatorKDE} (x, ...)
 }
 \arguments{
-  \item{est}{Kernel density estimation}
+  \item{x}{Kernel density estimation}
+
+  \item{...}{further parameters passed to the area
+  function}
 }
 \value{
   The area

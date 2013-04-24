@@ -169,7 +169,7 @@ toHtml <- function(x, ...) {
 #' @param x a data.frame
 #' @param cat cat the result
 #' @param ... additional arguments
-#' @export
+#' @method toHTML data.frame
 
 toHtml.data.frame <- function(x, cat=TRUE, ...) {
   out <- "<table class='table table-striped'><tr>"
@@ -194,7 +194,7 @@ toHtml.data.frame <- function(x, cat=TRUE, ...) {
 #' @param x a data.frame
 #' @param cap caption
 #' @param ... additional arguments
-#' @export
+#' @method toHTML summaryDefault
 
 toHtml.summaryDefault <- function(x, cap="", ...) {
   out <- paste0("<table class='table table-striped'><caption align='bottom'>", cap, "</caption><tr><th>Min</th><th>1st Qu</th><th>Median</th><th>Mean</th><th>3rd Qu</th><th>Max</th></tr><tr>")
@@ -207,7 +207,7 @@ toHtml.summaryDefault <- function(x, cap="", ...) {
 #' @param x htest
 #' @param cap caption
 #' @param ... additional arguments
-#' @export
+#' @method toHTML htest
 
 toHtml.htest <- function(x, cap=NULL, ...) {
   if (is.null(cap)) {

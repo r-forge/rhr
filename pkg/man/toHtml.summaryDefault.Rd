@@ -2,7 +2,7 @@
 \alias{toHtml.summaryDefault}
 \title{toHTML}
 \usage{
-  toHtml.summaryDefault(x, cap = "", ...)
+  \method{toHTML}{summaryDefault} (x, cap = "", ...)
 }
 \arguments{
   \item{x}{a data.frame}
