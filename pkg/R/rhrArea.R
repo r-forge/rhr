@@ -40,11 +40,12 @@ rhrArea.RhrEstimatorMCP <- function(x, ...) {
 #' @param raster returns a rasterstack with a raster for each level
 #' @param matrix returns a matrix with predictions
 #' @param contour returns contour lines
+#' @param ... further parameters passed to the area function
 #' @method rhrArea RhrEstimatorKDE
 #' @export
 #' @return The area
 
-rhrArea.RhrEstimatorKDE <- function(x, level=95, ud=FALSE, raster=FALSE, matrix=FALSE, contour=FALSE) {
+rhrArea.RhrEstimatorKDE <- function(x, level=95, ud=FALSE, raster=FALSE, matrix=FALSE, contour=FALSE, ...) {
 
   est <- x
   # list for results

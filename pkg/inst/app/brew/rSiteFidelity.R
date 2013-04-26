@@ -7,7 +7,7 @@ if (config$todo$doSiteFidelity) {
 
   #sfs <- sfLapply(split(data.frame(lon=rnorm(1e4), lat=rnorm(1e4)), sample(c(0,1), 1e4, T)), function(x) rhrFidelity(x[, c('lon', 'lat')], n=200))
 
-  sfs <- sfLapply(datSub, function(x) rhrFidelity(x[, c('lon', 'lat')], n=as.numeric(config$preAnalysis$siteFidelity$n)))
+  sfs <- lapply(datSub, function(x) rhrFidelity(x[, c('lon', 'lat')], n=as.numeric(config$preAnalysis$siteFidelity$n)))
 
 #  sfStop()
   

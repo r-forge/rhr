@@ -29,7 +29,7 @@ if (config$todo$doAsymptote) {
     # MCP
 
     if ("mcp" %in% asym$estimator) {
-      resAsym[[i]]$mcp <- do.call("rbind", sfLapply(ns, function(n) data.frame(rhrEstimator(x[sample(1:nrow(x), n), c('lon', 'lat')], estimator="mcp", levels=asym$level)$estimatorData)))
+      resAsym[[i]]$mcp <- do.call("rbind", lapply(ns, function(n) data.frame(rhrEstimator(x[sample(1:nrow(x), n), c('lon', 'lat')], estimator="mcp", levels=asym$level)$estimatorData)))
 
       # Calculate where the asymptote was reached
       # Area with all points:
@@ -110,7 +110,7 @@ if (config$todo$doAsymptote) {
       config$estimator$kde$xrange <- lapply(datSub, function(x) range(x[, "lon"]) + rep(as.numeric(kde['buffer']), 2) * c(-1, 1))
       config$estimator$kde$yrange <- lapply(datSub, function(x) range(x[, "lat"]) + rep(as.numeric(kde['buffer']), 2) * c(-1, 1))
 
-      resAsym[[i]]$kde <- do.call("rbind", sfLapply(ns, function(n) rhrEstimatorCharacteristic(
+      resAsym[[i]]$kde <- do.call("rbind", lapply(ns, function(n) rhrEstimatorCharacteristic(
         rhrEstimator(xy=x[sample(1:nrow(x), n), c('lon', 'lat')],
                      estimator="kde",
                      h=h,

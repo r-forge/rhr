@@ -116,17 +116,17 @@ img <- function(address, cap="") {
   cat(paste0("<table border='0' align='left', width='100%''><tr><td><img src='", address, "'></td><td></td><tr><td>", cap, "</td><td></td></tr></table><br>"))
 }
 
-imgs <- function(address, cap="", cat=TRUE) {
-  out <- ""
-  out <- paste0(out, paste0("<table border='0' align='left', width='100%''>"), collapse="\n")
-  out <- paste0(out, paste0("<tr><td><img src='", address, "'></td><td>", cap, "</td></tr>"), collapse="\n")
-  out <- paste0(out, paste0("</table><br>"), collapse="\n")
-  if (cat) {
-    return(cat(out))
-  } else {
-    return(out)
-  }
-}
+# imgs <- function(address, cap="", cat=TRUE) {
+#   out <- ""
+#   out <- paste0(out, paste0("<table border='0' align='left', width='100%''>"), collapse="\n")
+#   out <- paste0(out, paste0("<tr><td><img src='", address, "'></td><td>", cap, "</td></tr>"), collapse="\n")
+#   out <- paste0(out, paste0("</table><br>"), collapse="\n")
+#   if (cat) {
+#     return(cat(out))
+#   } else {
+#     return(out)
+#   }
+# }
 
 #' p
 #'
@@ -139,13 +139,12 @@ p <- function(x, ...) {
   cat(paste0("<p>", x, "</p>"))
 }
 
-badd <- function(b, x) {
-  if (is.list(x)) {
-    paste(b, paste(unlist(x), collapse="\n"), sep="\n")
-  } else {
-    paste(b, x, sep="\n")
-  }
-}
+#' code
+#'
+#' Wraps a string as inline code
+#' @param x a string
+#' @param ... additional arguments, none implemented
+#' @export
 
 code <- function(x) {
   paste0("<pre>", x, "</pre>")
@@ -154,24 +153,27 @@ code <- function(x) {
 #' toHTML
 #'
 #' converts an R object to a data.frame
-#' @param x a R object
-#' @param ... additional arguments
-#' @export
 
-toHtml <- function(x, ...) {
-  UseMethod("toHtml", x)
+#' @title toHTML: convert R objects as html
+#' @param x a R object
+#' @param cap caption
+#' @param cat warp output with cat
+#' @param ... additional arguments
+#' @rdname toHTML
+#' @export toHTML
+
+toHTML <- function(x, ...) {
+  UseMethod("toHTML", x)
 }
 
 
-#' toHTML
+#' @return \code{NULL}
 #'
-#' wraps a data.frame into a html table
-#' @param x a data.frame
-#' @param cat cat the result
-#' @param ... additional arguments
+#' @rdname toHTML
 #' @method toHTML data.frame
+#' @S3method toHTML data.frame
 
-toHtml.data.frame <- function(x, cat=TRUE, ...) {
+toHTML.data.frame <- function(x, cat=TRUE, ...) {
   out <- "<table class='table table-striped'><tr>"
   h <- paste0("<th>", names(x), "</th>", collapse="")
   out <- paste0(out, h, "</tr>")
@@ -188,28 +190,25 @@ toHtml.data.frame <- function(x, cat=TRUE, ...) {
 
 }
 
-#' toHTML
-#'
-#' wraps a summary table into a data.frame
-#' @param x a data.frame
-#' @param cap caption
-#' @param ... additional arguments
-#' @method toHTML summaryDefault
 
-toHtml.summaryDefault <- function(x, cap="", ...) {
+#' @return \code{NULL}
+#'
+#' @rdname toHTML
+#' @method toHTML summaryDefault
+#' @S3method toHTML summaryDefault
+
+toHTML.summaryDefault <- function(x, cap="", ...) {
   out <- paste0("<table class='table table-striped'><caption align='bottom'>", cap, "</caption><tr><th>Min</th><th>1st Qu</th><th>Median</th><th>Mean</th><th>3rd Qu</th><th>Max</th></tr><tr>")
   cat(paste0(out, paste0("<td>", x, "</td>", collapse=""), "</tr>", "</table>"))
 }
 
-#' toHTML
+#' @return \code{NULL}
 #'
-#' wraps a htest object to html
-#' @param x htest
-#' @param cap caption
-#' @param ... additional arguments
+#' @rdname toHTML
 #' @method toHTML htest
+#' @S3method toHTML htest
 
-toHtml.htest <- function(x, cap=NULL, ...) {
+toHTML.htest <- function(x, cap=NULL, ...) {
   if (is.null(cap)) {
     cap <- paste0("Table: ", x$method, ": ", x$data.name) 
   }
@@ -218,39 +217,36 @@ toHtml.htest <- function(x, cap=NULL, ...) {
   cat(paste0(out, paste0("<td>", v, "</td>", collapse=""), "</tr>", "</table>"))
 }
 
-toHtml.numeric <- function(x, ...) {
-  print("bar")
-}
 
-chtml <- function(header="From R", bd="Test", template=NULL, outfile="") {
-  if (is.null(template) | !file.exists(template)) {
-    stop("no template found")
-  }
+# chtml <- function(header="From R", bd="Test", template=NULL, outfile="") {
+#   if (is.null(template) | !file.exists(template)) {
+#     stop("no template found")
+#   }
+# 
+#   bdtmp <- readChar(template, file.info(template)$size)
+#   bdtmp <- gsub("<!--header-->", x=bdtmp, replacement=header)
+#   bdtmp <- sub("<!--body-->", x=bdtmp, replacement=bd)
+#   cat(bdtmp, file=outfile)
+# }
 
-  bdtmp <- readChar(template, file.info(template)$size)
-  bdtmp <- gsub("<!--header-->", x=bdtmp, replacement=header)
-  bdtmp <- sub("<!--body-->", x=bdtmp, replacement=bd)
-  cat(bdtmp, file=outfile)
-}
-
-accordion <- function(el, id="accor01") {
-  # el - is a list - each intery is an other list which is 1 accordion
-  #  each entry need to have a heading and a body
-  out <- paste0('<div class="accordion" id="', id, '">')
-
-  tmp <- lapply(el, function(x) paste0('<div class="accordion-group">
-  <div class="accordion-heading">
-  <a class="accordion-toggle" data-toggle="collapse" data-parent="#', id, '" href="#', gsub(" ", "", x[[1]]), '">', x[[1]], 
-  '</a> </div>
-  <div id="', gsub(" ", "", x[[1]]), '" class="accordion-body collapse">
-  <div class="accordion-inner">', x[[2]], ' </div> </div> </div>'))
-
-  tmp <- do.call("c", tmp)
-  out <- paste0(out, tmp, collapse="\n")
-
-  out <- paste0(out, "</div>", collapse="\n")
-  cat(out)
-}
+# accordion <- function(el, id="accor01") {
+#   # el - is a list - each intery is an other list which is 1 accordion
+#   #  each entry need to have a heading and a body
+#   out <- paste0('<div class="accordion" id="', id, '">')
+# 
+#   tmp <- lapply(el, function(x) paste0('<div class="accordion-group">
+#   <div class="accordion-heading">
+#   <a class="accordion-toggle" data-toggle="collapse" data-parent="#', id, '" href="#', gsub(" ", "", x[[1]]), '">', x[[1]], 
+#   '</a> </div>
+#   <div id="', gsub(" ", "", x[[1]]), '" class="accordion-body collapse">
+#   <div class="accordion-inner">', x[[2]], ' </div> </div> </div>'))
+# 
+#   tmp <- do.call("c", tmp)
+#   out <- paste0(out, tmp, collapse="\n")
+# 
+#   out <- paste0(out, "</div>", collapse="\n")
+#   cat(out)
+# }
 
 # issue alert
 #' alert
@@ -360,6 +356,7 @@ plotTTSI <- function(res, path=NULL, toFirst2=FALSE) {
 #  str -  a string of the form ",,12,,2,2,3,1,,2,22,,,,123,,2"
 #  low - lower bound, usually 1
 #  upper - lower bound, usually 100
+
 #' rhrCorrectLevels
 #' 
 #' correct Levels at which a home range should be calculated

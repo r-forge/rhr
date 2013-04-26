@@ -1,6 +1,7 @@
 \name{alert}
 \alias{alert}
-\title{alert}
+\title{#   <a class="accordion-toggle" data-toggle="collapse" data-parent=", id, '" href="#', gsub(" ", "", x[[1]]), '">', x[[1]],
+alert}
 \usage{
   alert(x, cat = TRUE)
 }

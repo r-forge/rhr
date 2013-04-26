@@ -4,7 +4,7 @@
 \usage{
   \method{rhrArea}{RhrEstimatorKDE} (x, level = 95,
     ud = FALSE, raster = FALSE, matrix = FALSE,
-    contour = FALSE)
+    contour = FALSE, ...)
 }
 \arguments{
   \item{x}{an object returned from the function rhrKDE}
@@ -21,6 +21,9 @@
   \item{matrix}{returns a matrix with predictions}
 
   \item{contour}{returns contour lines}
+
+  \item{...}{further parameters passed to the area
+  function}
 }
 \value{
   The area
