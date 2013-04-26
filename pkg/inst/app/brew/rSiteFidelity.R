@@ -47,12 +47,12 @@ if (config$todo$doSiteFidelity) {
     res$write(img(paste0(imageurl, plotSF0[i]), cap=paste0("Distribution for simulated values of MSD and LI for ", ids[i], ". The red dot indicated the value for MSD and LI from the real trajectory")))
 
     res$write(p(paste0("Summary of the simulations for MSD and LI for ", ids[i], ".")))
-    res$write(toHtml(summary(sfs[[i]]$li.sim), cap="Linearity"))
-    res$write(toHtml(summary(sfs[[i]]$msd.sim), cpa="MSD"))
+    res$write(toHTML(summary(sfs[[i]]$li.sim), cap="Linearity"))
+    res$write(toHTML(summary(sfs[[i]]$msd.sim), cpa="MSD"))
 
     res$write(p("Below t-test to support the the boxplots"))
-    res$write(toHtml(t.test(sfs[[i]]$li.sim, mu=sfs[[i]]$li.dat), cap=""))
-    res$write(toHtml(t.test(sfs[[i]]$msd.sim, mu=sfs[[i]]$msd.dat), cap=""))
+    res$write(toHTML(t.test(sfs[[i]]$li.sim, mu=sfs[[i]]$li.dat), cap=""))
+    res$write(toHTML(t.test(sfs[[i]]$msd.sim, mu=sfs[[i]]$msd.dat), cap=""))
   }
 } else {
   res$write(alert("Site fidelity not requested"))

@@ -171,7 +171,7 @@ if (config$todo$doKDE) {
     tt$area <- formatC(round(tt$area, 2), big.mark=",", format="f", drop0trailing = TRUE)
     names(tt) <- c("Level", "Area")
 
-    res$write(toHtml(tt))
+    res$write(toHTML(tt))
   }
 } else {
   res$write(alert("KDE not requested"))

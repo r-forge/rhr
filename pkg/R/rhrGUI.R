@@ -34,13 +34,13 @@ rhrGUI <- function(dat=NULL, outdir=getwd(), ...){
   dir.create(file.path(tempdir(),'data'), showWarnings=FALSE)
   dir.create(file.path(tempdir(),'doc'), showWarnings=FALSE)
   
-  if (is.null(.e$s)){
+  #if (!exists(".e")){
     .e$s <- Rhttpd$new()
-  } else { 
-    warning("Previouse session is now closed")
-    .e$s$stop()
-    .e$s$remove(all=TRUE)
-  }
+  #} else { 
+  #  warning("Previouse session is now closed")
+  #  .e$s$stop()
+  #  .e$s$remove(all=TRUE)
+  #}
 
   
   app <- Builder$new( Static$new( urls = c('/css','/img','/images','/js'),

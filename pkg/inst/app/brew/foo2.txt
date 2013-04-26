@@ -1,5 +1,5 @@
 List of 12
- $ fileName             : chr "ortungen2.csv"
+ $ fileName             : chr "test.csv"
  $ config               :List of 9
   ..$ ncores            : num 1
   ..$ epsg              : num 4326
@@ -12,39 +12,41 @@ List of 12
   ..$ sepDec            : chr ","
  $ mapFields            :List of 5
   ..$ id  : chr "collar"
-  ..$ lat : chr "y"
-  ..$ lon : chr "x"
+  ..$ lat : chr "y_epsg31467"
+  ..$ lon : chr "x_epsg31467"
   ..$ date:List of 2
-  .. ..$ date      : chr "tag"
+  .. ..$ date      : chr "datum"
   .. ..$ dateFormat: chr "ymd"
   ..$ time:List of 2
   .. ..$ time      : chr "zeit"
   .. ..$ timeFormat: chr "hms"
  $ animal               :List of 2
-  ..$ ids    :List of 2
-  .. ..$ : num 2
+  ..$ ids    :List of 3
+  .. ..$ : chr "c5182"
+  .. ..$ : chr "c5181"
+  .. ..$ : chr "c511"
+  ..$ include:List of 3
   .. ..$ : num 1
-  ..$ include:List of 2
   .. ..$ : num 1
   .. ..$ : num 1
  $ spBbx                :List of 4
-  ..$ xmin: num 3549500
-  ..$ xmax: num 3562500
-  ..$ ymin: num 5990200
+  ..$ xmin: num 3553870
+  ..$ xmax: num 3562889
+  ..$ ymin: num 5991048
   ..$ ymax: num 6e+06
  $ spBbxRestricted      :List of 4
-  ..$ xmin: num 3549500
-  ..$ xmax: num 3562500
-  ..$ ymin: num 5990200
+  ..$ xmin: num 3553870
+  ..$ xmax: num 3562889
+  ..$ ymin: num 5991048
   ..$ ymax: num 6e+06
  $ temporalBbx          :List of 2
-  ..$ tmin: chr "2013-01-03 08:00:00"
-  ..$ tmax: chr "2013-01-03 08:00:00"
+  ..$ tmin: chr "2008-03-30 00:01:47"
+  ..$ tmax: chr "2010-10-09 13:01:12"
  $ temporalBbxRestricted:List of 2
-  ..$ tmin: chr "2013-01-03 08:00:00"
-  ..$ tmax: chr "2013-01-03 08:00:00"
+  ..$ tmin: chr "2008-03-30 00:01:47"
+  ..$ tmax: chr "2010-10-09 13:01:12"
  $ n                    :List of 2
-  ..$ initialN   : num 117
+  ..$ initialN   : num 5504
   ..$ restrictedN:List of 4
   .. ..$ id       : NULL
   .. ..$ lat      : NULL
@@ -70,36 +72,22 @@ List of 12
   .. ..$ res: num 100
   ..$ mcp  :List of 1
   .. ..$ level: num 95
-  ..$ kde  :List of 7
+  ..$ kde  :List of 5
   .. ..$ resolution    : num 100
   .. ..$ buffer        : num 1000
   .. ..$ level         : num 95
   .. ..$ bandwidth     : chr "href"
   .. ..$ bandwidthValue: num 100
-  .. ..$ xrange        :List of 2
-  .. .. ..$ 1:List of 2
-  .. .. .. ..$ : num 3551300
-  .. .. .. ..$ : num 3563500
-  .. .. ..$ 2:List of 2
-  .. .. .. ..$ : num 3548500
-  .. .. .. ..$ : num 3552200
-  .. ..$ yrange        :List of 2
-  .. .. ..$ 1:List of 2
-  .. .. .. ..$ : num 5989700
-  .. .. .. ..$ : num 6e+06
-  .. .. ..$ 2:List of 2
-  .. .. .. ..$ : num 6e+06
-  .. .. .. ..$ : num 6e+06
   ..$ locoh:List of 4
   .. ..$ type  : chr "k"
-  .. ..$ n     : logi TRUE
-  .. ..$ nValue: chr "10"
-  .. ..$ level : chr "95"
+  .. ..$ n     : logi FALSE
+  .. ..$ nValue: num 10
+  .. ..$ level : num 95
  $ todo                 :List of 7
   ..$ doSiteFidelity: logi FALSE
   ..$ doTTSI        : logi FALSE
   ..$ doAsymptote   : logi FALSE
-  ..$ doMCP         : logi FALSE
+  ..$ doMCP         : logi TRUE
   ..$ doKDE         : logi FALSE
-  ..$ doLocoh       : logi TRUE
+  ..$ doLocoh       : logi FALSE
   ..$ doCA          : logi FALSE

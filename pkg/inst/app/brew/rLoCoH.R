@@ -126,7 +126,7 @@ if (config$todo$doLocoh) {
         tt <- data.frame(resLocohs[[i]]$estimatorData)
         tt$area <- formatC(round(tt$area, 2), big.mark=",", format="f", drop0trailing = TRUE)
         names(tt) <- c("Level", "Area")
-        res$write(toHtml(data.frame(tt)))
+        res$write(toHTML(data.frame(tt)))
       } else {
         alertError(resLocohs[[i]])
       }

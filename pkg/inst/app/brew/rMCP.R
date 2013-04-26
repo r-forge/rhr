@@ -99,7 +99,7 @@ if (config$todo$doMCP) {
     tt <- data.frame(resMCPs[[i]]$estimatorData)
     tt$area <- formatC(round(tt$area, 2), big.mark=",", format="f", drop0trailing = TRUE)
     names(tt) <- c("Level", "Area")
-    res$write(toHtml(tt))
+    res$write(toHTML(tt))
     
   }
 
