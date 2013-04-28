@@ -1,7 +1,7 @@
 Package: rhr
 Type: Package
 Title: Package to calculate home range analysis and reproduce all steps
-Version: 0.01
+Version: 0.02
 Date: 2012-07-09
 Author: Johannes Signer
 Maintainer: <jmsigner@gmail.com>
