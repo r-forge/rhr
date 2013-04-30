@@ -1,13 +1,22 @@
 #' Local Convex Hull (LoCoH)
 #'
-#' @param xy a data frame with 2 columns. The first column contains x-coordiantes, the second one y-coordinates.
-#' @param type three types are availabe: i) k-nearest neighbours; ii) neighbours within radius r; iii) a within cum dist
+#' @param xy a data frame with at least two columns. The first column contains x-coordiantes and the second column y-coordinates.
+#' @param type one of k, r, a. See details. three types are availabe: i) k-nearest neighbours; ii) neighbours within radius r; iii) a within cum dist
 #' @param n if type is k, number of neaerst neibhers, if type is r radius and if type is a cum dist to be used up
 #' @param level at which levels should the home range be calculated. Numbers between 1 and 100.
 #' @param min.pts min.pts
+#' @details There are three different types available for determining the number of neighbors.
+#' \itemize{
+#'  \item{"k"}{uses the k nearest neighbours}
+#'  \item{"r"}{uses all neighbours within a radius r}
+#'  \item{"a"}{uses all neighbours that can be reached within a distance a. The distance to all points is calculated and then the cummulatively summed starting from the smallest until \code{a} is reached.}}
 #' @return object of class \code{SpatialPolygonsDataFrame}
 #' @export
-#' @author Johannes Signer 
+#' @examples
+#' data(datSH)
+#' nrow(datSH)
+#' locoh <- rhrLoCoH(datSH[, 2:3], type="k", n=100, level=c(50, 90))
+#' spplot(locoh, 'level')
 
 rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3) {
 
