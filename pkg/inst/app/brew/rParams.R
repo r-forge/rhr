@@ -21,130 +21,6 @@ pushViewport(viewport(x=unit(35, "mm"),
     # page frame        
     grid.rect(gp=gpar(lwd=0.2))
 
-# ---------------------------------------------------------------------------- #
-# Title Page
-    ## Title
-    pushViewport(viewport(y=unit(220, "mm"), width=unit(153.5, "mm"), height=unit(50, "mm"), just="bottom"))
-
-        grid.text("Reproducible Homerange Analysis", y=0.7, gp=gpar(fontface="bold", cex=2))
-        grid.text(paste0("(", date(), ")"),  y=unit(0.4, "npc"), gp=gpar(cex=0.9))
-        grid.text("based on the rhr package",  y=unit(0.4, "npc") - unit(2.2, "lines"), gp=gpar(cex=0.9))
-    popViewport()
-
-    ## Description
-    pushViewport(viewport(y=unit(200, "mm"), width=unit(153.5, "mm"), height=unit(20, "mm"), just="bottom"))
-        grid.lines(c(0.1,0.9), c(1,1), gp=gpar(lwd=0.1))
-        pushViewport(viewport(width=0.8))
-            grid.text("This is an automatically generated file with all parameters and settings, in order",
-                      x=0, just="left",
-                      y=0.7, gp=gpar(cex=0.9))
-            grid.text("to enable later replication of the same analysis given the same data set.",
-                      x=0, y=unit(0.7, "npc") - unit(1, "lines"),
-                      just="left", gp=gpar(cex=0.9))
-        popViewport()
-        grid.lines(c(0.1,0.9), c(0.1,0.1), gp=gpar(lwd=0.1))
-
-    popViewport()
-
-    ## Input data heading
-    pushViewport(viewport(y=unit(190, "mm"), width=unit(153.5, "mm"), height=unit(10, "mm"), just="bottom"))
-        grid.text("Input data", just="left", x=0, gp=gpar(fontface="bold", fontsize=18))
-    popViewport()
-
-    # Filename and format
-    pushViewport(viewport(y=unit(180, "mm"), width=unit(153.5, "mm"), height=unit(10, "mm"), just="bottom"))
-        grid.text("Relocations read from: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
-        grid.text(config$fileName, y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0.7, gp=gpar(fontfamily="mono"))
-    popViewport()
-
-    # Remap fields
-    # strShorten, make sure field names from user input are not to long
-    pushViewport(viewport(y=unit(140, "mm"), width=unit(153.5, "mm"), height=unit(30, "mm"), just="bottom"))
-        # title
-        grid.text("This filed contained the following column names, which were remaped to:",
-                  y=unit(1, "npc") - unit(1, "lines"),
-                  just=c("left", "bottom"), x=0)
-        # id
-        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$id, gp=gpar(fontfamily="mono"))
-        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
-        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.30, label="id")
-        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.40, label="this is the animal id")
-        # lon
-        grid.text(y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$lon, gp=gpar(fontfamily="mono"))
-        grid.text(y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
-        grid.text(y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0.30, label="lon")
-        grid.text(y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0.40, label="this is the lon")
-        # lat
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$lat, gp=gpar(fontfamily="mono"))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.30, label="lat")
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.40, label="this is the lat")
-
-        # date
-        grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$date['date'], gp=gpar(fontfamily="mono"))
-        grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
-        grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.30, label="date")
-        grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.40, label="this is the date")
-
-        # time
-        grid.text(y=unit(1, "npc") - unit(7, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$time['time'], gp=gpar(fontfamily="mono"))
-        grid.text(y=unit(1, "npc") - unit(7, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
-        grid.text(y=unit(1, "npc") - unit(7, "lines"), just=c("left", "bottom"), x=0.30, label="time")
-        grid.text(y=unit(1, "npc") - unit(7, "lines"), just=c("left", "bottom"), x=0.40, label="this is the time")
-    popViewport()
-
-
-    ## spatial bounding box
-    pushViewport(viewport(y=unit(110, "mm"), width=unit(153.5, "mm"), height=unit(20, "mm"), just="bottom"))
-        grid.text("The spatial bounding box was: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
-        # bbox total
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00, label=paste("xmin:", config$spBbx['xmin']))
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.25, label=paste("xmax:", config$spBbx['xmax']))
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.50, label=paste("ymin:", config$spBbx['ymin']))
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.75, label=paste("ymax:", config$spBbx['ymax']))
-
-        grid.text("The restricted spatial bounding box was: ", y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0)
-        # bbox restricted
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=paste("xmin:", config$spBbxRestricted['xmin']))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.25, label=paste("xmax:", config$spBbxRestricted['xmax']))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.50, label=paste("ymin:", config$spBbxRestricted['ymin']))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.75, label=paste("ymax:", config$spBbxRestricted['ymax']))
-
-    popViewport()
-
-    ## spatial bounding box
-    pushViewport(viewport(y=unit(85, "mm"), width=unit(153.5, "mm"), height=unit(20, "mm"), just="bottom"))
-        grid.text("The temporal bounding box was: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
-        # bbox total
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00, label=paste("tmin: ", config$temporalBbx$tmin))
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.50, label=paste("tmax: ", config$temporalBbx$tmax))
-
-        grid.text("The restricted temporal bounding box was: ", y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0)
-        # bbox restricted
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=paste("tmin: ", config$temporalBbxRestricted$tmin))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.50, label=paste("tmax: ", config$temporalBbxRestricted$tmax))
-
-    popViewport()
-
-    ## Number of relocations
-    pushViewport(viewport(y=unit(65, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
-        grid.text("Number of relcations: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
-
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00, label="Whole dataset")
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.70, label=config$n$initialN, gp=gpar(fontfamily="mono"))
-
-        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.00, label="Restricted dataset")
-        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.70, label=config$n$restrictedN, gp=gpar(fontfamily="mono"))
-    popViewport()
-
-    # footer
-    pushViewport(viewport(y=unit(0, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
-        grid.lines(c(0,1), c(1,1))
-        grid.text("Input data", x=0, just="left", gp=gpar(cex=0.7))
-        grid.text("Page 1 of 3", x=1, just="right", gp=gpar(cex=0.7))
-    popViewport()
-popViewport()
-grid.newpage()
 
 # ============================================================================ # 
 # 2nd to nth page
@@ -159,7 +35,7 @@ repH <- c()
 if (config$todo$doSiteFidelity) {
   # infoblock
   textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Site fidelity") -> rSF.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Input") -> rSF.input
+  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rSF.input
   textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Number of simulated trajectories") -> rSF.niter0
   textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=config$preAnalysis$siteFidelity$n) -> rSF.niter1
 
@@ -169,6 +45,7 @@ if (config$todo$doSiteFidelity) {
   
   # Results
   textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Results") -> rSF.res
+
   repItems[[length(repItems) + 1]] <- rSF.res 
   repH <- c(repH, 10)
 
@@ -176,17 +53,26 @@ if (config$todo$doSiteFidelity) {
   for (i in seq_along(sfs)) {
     # header
     repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label=names(datSub)[i], just=c("left", "bottom")),
-                                                linesGrob(y=c(0,0))))
+                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
+                                                         gp=gpar(fontface="bold")),
+                                                linesGrob(y=c(0.26,0.26))))
     repH <- c(repH, 10)
 
     # summary Linearity
+    repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                                textGrob(x=0.0, label="Summary of Linearity Index", just=c("left", "bottom"))))
+    repH <- c(repH, 8)
+
     repItems[[length(repItems) + 1]] <- summaryGrob(summary(sfs[[i]]$li.sim))
     repH <- c(repH, 12)
 
     # summary MSD
+    repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                                textGrob(x=0.0, label="Summary of Mean Squared Distance", just=c("left", "bottom"))))
+    repH <- c(repH, 8)
+
     repItems[[length(repItems) + 1]] <- summaryGrob(summary(sfs[[i]]$msd.sim))
-    repH <- c(repH, 12)
+    repH <- c(repH, 8)
 
     # plots
     p <- sfPlots[[i]]
@@ -194,15 +80,23 @@ if (config$todo$doSiteFidelity) {
     repH <- c(repH, 80)
 
     # ttest
+    repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                                textGrob(x=0.0, label="T-test for Linearity Index", just=c("left", "bottom"))))
+    repH <- c(repH, 8)
+
     repItems[[length(repItems) + 1]] <- ttestGrob(t.test(sfs[[i]]$li.sim, mu=sfs[[i]]$li.dat))
     repH <- c(repH, 12)
+
+    repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                                textGrob(x=0.0, label="T-test for Mean Squared Distance", just=c("left", "bottom"))))
+    repH <- c(repH, 8)
 
     repItems[[length(repItems) + 1]] <- ttestGrob(t.test(sfs[[i]]$msd.sim, mu=sfs[[i]]$msd.dat))
     repH <- c(repH, 12)
   }
   
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Site fidelity not requested") -> rSF.not
+  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Site fidelity was not requested") -> rSF.not
   repItems[[length(repItems) + 1]] <- rSF.not 
   repH <- c(repH, 15)
 }
@@ -212,14 +106,22 @@ if (config$todo$doSiteFidelity) {
 
 if (config$todo$doTTSI) {
   # infoblock
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Time To Statistical Independence") -> rTTSI.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Input") -> rTTSI.input
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Level") -> rTTSI.level0
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label="100") -> rTTSI.level1
+  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Time To Statistical Independence (TTSI)") -> rTTSI.header
+  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rTTSI.input
+  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="time interval [s]") -> rTTSI.level0
+  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$ttsi$interval) -> rTTSI.level1
+  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.0, just=c("left", "bottom"), label="tolerance [s]") -> rTTSI.level3
+  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$ttsi$tolerance) -> rTTSI.level4
+  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.0, just=c("left", "bottom"), label="type") -> rTTSI.level5
+  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$ttsi$type) -> rTTSI.level6
 
  # # add to pending
-  repItems[[length(repItems) + 1]] <- gTree(children=gList(rTTSI.header, rTTSI.input, rTTSI.level0, rTTSI.level1))
-  repH <- c(repH, 20)
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(rTTSI.header, rTTSI.input, rTTSI.level0, rTTSI.level1,
+                                              rTTSI.level3, rTTSI.level4, rTTSI.level5, rTTSI.level6))
+  repH <- c(repH, 30)
  # 
  # # Results
   textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Results") -> rTTSI.res
@@ -230,9 +132,10 @@ if (config$todo$doTTSI) {
   for (i in seq_along(ttsiPlots)) {
  #   # header
     repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label=names(datSub)[i], just=c("left", "bottom")),
-                                                linesGrob(y=c(0,0))))
-    repH <- c(repH, 5)
+                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
+                                                         gp=gpar(fontface="bold")),
+                                                linesGrob(y=c(0.26,0.26))))
+    repH <- c(repH, 10)
 
  #   # plots
     repItems[[length(repItems) + 1]] <- ttsiPlots[[i]]
@@ -240,7 +143,7 @@ if (config$todo$doTTSI) {
   }
   
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Time To Statistical Independence") -> rTTSI.not
+  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Time To Statistical Independence was not requested") -> rTTSI.not
   repItems[[length(repItems) + 1]] <- rTTSI.not 
   repH <- c(repH, 15)
 }
@@ -251,13 +154,41 @@ if (config$todo$doTTSI) {
 if (config$todo$doAsymptote) {
   # infoblock
   textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Asymptote") -> rAsym.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Input") -> rAsym.input
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Level") -> rAsym.level0	      
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label="100") -> rAsym.level1
+  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rAsym.input
+
+  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="minimum number of points") -> rAsym.level0	      
+  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$asymptote$minNPts) -> rAsym.level1
+  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.0, just=c("left", "bottom"), label="number of iterations") -> rAsym.level2	      
+  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$asymptote$nIter) -> rAsym.level3
+  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.0, just=c("left", "bottom"), label="increment per iteration") -> rAsym.level4	      
+  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$asymptote$increment) -> rAsym.level5
+  textGrob(y=unit(1, "npc") - unit(7, "lines"), x=0.0, just=c("left", "bottom"), label="estimator") -> rAsym.level6	      
+  textGrob(y=unit(1, "npc") - unit(7, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$asymptote$estimator) -> rAsym.level7
+  textGrob(y=unit(1, "npc") - unit(8, "lines"), x=0.0, just=c("left", "bottom"), label="number of replications") -> rAsym.level8	      
+  textGrob(y=unit(1, "npc") - unit(8, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$asymptote$nTimes) -> rAsym.level9
+  textGrob(y=unit(1, "npc") - unit(9, "lines"), x=0.0, just=c("left", "bottom"), label="level") -> rAsym.level10	      
+  textGrob(y=unit(1, "npc") - unit(9, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$asymptote$level) -> rAsym.level11
+  textGrob(y=unit(1, "npc") - unit(10, "lines"), x=0.0, just=c("left", "bottom"), label="tolerance to total area") -> rAsym.level12	      
+  textGrob(y=unit(1, "npc") - unit(10, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$preAnalysis$asymptote$tolTotArea) -> rAsym.level13
 
  ## add to pending
-  repItems[[length(repItems) + 1]] <- gTree(children=gList(rAsym.header, rAsym.input, rAsym.level0, rAsym.level1))
-  repH <- c(repH, 20)
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(rAsym.header, rAsym.input,
+                                              rAsym.level0, rAsym.level1,
+                                              rAsym.level2, rAsym.level3,
+                                              rAsym.level4, rAsym.level5,
+                                              rAsym.level6, rAsym.level7,
+                                              rAsym.level8, rAsym.level9,
+                                              rAsym.level10, rAsym.level11,
+                                              rAsym.level12, rAsym.level13
+                                              ))
+  repH <- c(repH, 50)
  # 
 
  ## Results
@@ -269,9 +200,11 @@ if (config$todo$doAsymptote) {
   for (i in seq_along(resAsym)) {
 
     # header
-      repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                  textGrob(x=0.0, label=names(datSub)[i], just=c("left", "bottom")),
-                                                  linesGrob(y=c(0,0))))
+    repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
+                                                         gp=gpar(fontface="bold")),
+                                                linesGrob(y=c(0.26,0.26))))
+    repH <- c(repH, 10)
       repH <- c(repH, 5)
 
     if (resAsym[[i]]$exit != 0) {
@@ -297,6 +230,7 @@ if (config$todo$doAsymptote) {
         repItems[[length(repItems) + 1]] <- textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), label="KDE") 
         repH <- c(repH, 5)
 
+        
         repItems[[length(repItems) + 1]] <- resAsym[[i]]$kdePlot
         repH <- c(repH, 80)
       }
@@ -307,7 +241,7 @@ if (config$todo$doAsymptote) {
 
   
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Asymptote not requested") -> rAsym.not
+  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Home range asymptote was not requested") -> rAsym.not
   repItems[[length(repItems) + 1]] <- rAsym.not 
   repH <- c(repH, 15)
 }
@@ -318,9 +252,10 @@ if (config$todo$doAsymptote) {
 if (config$todo$doCA) {
   # infoblock
   textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Core Area Estimation") -> rCA.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Input") -> rCA.input
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Level") -> rCA.level0
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label="100") -> rCA.level1
+  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rCA.input
+  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Resolution") -> rCA.level0
+  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+           label=config$estimator$ca$res) -> rCA.level1
 
   # add to pending
   repItems[[length(repItems) + 1]] <- gTree(children=gList(rCA.header, rCA.input, rCA.level0, rCA.level1))
@@ -335,9 +270,10 @@ if (config$todo$doCA) {
   for (i in seq_along(datSub)) {
     # header
     repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label=names(datSub)[i], just=c("left", "bottom")),
-                                                linesGrob(y=c(0,0))))
-    repH <- c(repH, 5)
+                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
+                                                         gp=gpar(fontface="bold")),
+                                                linesGrob(y=c(0.26,0.26))))
+    repH <- c(repH, 10)
 
     if (resCAs[[i]]$exit == 0) {
 
@@ -368,7 +304,7 @@ if (config$todo$doCA) {
 if (config$todo$doMCP) {
   # infoblock
   textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Minimum Convex Polygon") -> rMCP.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Input") -> rMCP.input
+  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rMCP.input
   textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Level") -> rMCP.level0
   textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(rhrCorrectLevels(config$estimator$mcp$level), collapse=",")) -> rMCP.level1
 
@@ -385,9 +321,10 @@ if (config$todo$doMCP) {
   for (i in seq_along(mcpPlots)) {
  #   # header
     repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label=names(datSub)[i], just=c("left", "bottom")),
-                                                linesGrob(y=c(0,0))))
-    repH <- c(repH, 5)
+                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
+                                                         gp=gpar(fontface="bold")),
+                                                linesGrob(y=c(0.26,0.26))))
+    repH <- c(repH, 10)
 
  #   # plots
     repItems[[length(repItems) + 1]] <- mcpPlots[[i]]
@@ -406,52 +343,37 @@ if (config$todo$doMCP) {
 if (config$todo$doKDE) {
   # infoblock
   textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Kernel Density Estimation") -> rKDE.header
-  # textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Input") -> rKDE.input
-  # textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Level") -> rKDE.level0
-  # textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label="100") -> rKDE.level1
+  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rKDE.input
 
- # # add to pending
-  repItems[[length(repItems) + 1]] <- gTree(children=gList(rKDE.header))
-  repH <- c(repH, 10)
+  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="level") -> rKDE.level0
+  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(config$estimator$kde$level, collapse=",")) -> rKDE.level1
+  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.0, just=c("left", "bottom"), label="resolution") -> rKDE.level2
+  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(config$estimator$kde$resolution, collapse=",")) -> rKDE.level3
+  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.0, just=c("left", "bottom"), label="buffer") -> rKDE.level4
+  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(config$estimator$kde$buffer, collapse=",")) -> rKDE.level5
+  textGrob(y=unit(1, "npc") - unit(7, "lines"), x=0.0, just=c("left", "bottom"), label="bandwidth type") -> rKDE.level6
+  textGrob(y=unit(1, "npc") - unit(7, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(config$estimator$kde$bandwidth, collapse=",")) -> rKDE.level7
 
- # # Results
- # textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Results") -> KDE.res
- # repItems[[length(repItems) + 1]] <- KDE.res 
- # repH <- c(repH, 10)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("KDE", "level",
-                                                 config$estimator$kde$level))
-  repH <- c(repH, 5)
 
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("KDE", "resolution",
-                                                 config$estimator$kde$resolution))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("KDE", "buffer",
-                                                 config$estimator$kde$buffer))
-  repH <- c(repH, 5)
+  # add to pending
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(rKDE.header, rKDE.input, 
+                                              rKDE.level0, rKDE.level1,
+                                              rKDE.level2, rKDE.level3,
+                                              rKDE.level4, rKDE.level5,
+                                              rKDE.level6, rKDE.level7
+                                              ))
+  repH <- c(repH, 30)
 
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("KDE", "bandwidth type",
-                                                 config$estimator$kde$bandwidth))
-  repH <- c(repH, 5)
+
 
   # add results
   for (i in seq_along(kdePlots)) {
     # header
     repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label=names(datSub)[i], just=c("left", "bottom")),
-                                                linesGrob(y=c(0,0))))
-    repH <- c(repH, 5)
+                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
+                                                         gp=gpar(fontface="bold")),
+                                                linesGrob(y=c(0.26,0.26))))
+    repH <- c(repH, 10)
 
     # plots
     repItems[[length(repItems) + 1]] <- kdePlots[[i]]
@@ -481,7 +403,7 @@ if (config$todo$doKDE) {
 
 if (config$todo$doLocoh) {
   # infoblock
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Local convex hull") -> rLocoh.header
+  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Local Convex Hull") -> rLocoh.header
   textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Input") -> rLocoh.input
   textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Level") -> rLocoh.level0
   textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label="100") -> rLocoh.level1
@@ -499,9 +421,10 @@ if (config$todo$doLocoh) {
   for (i in seq_along(locohPlots)) {
     # header
     repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label=names(datSub)[i], just=c("left", "bottom")),
-                                                linesGrob(y=c(0,0))))
-    repH <- c(repH, 5)
+                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
+                                                         gp=gpar(fontface="bold")),
+                                                linesGrob(y=c(0.26,0.26))))
+    repH <- c(repH, 10)
 
     # plots
     repItems[[length(repItems) + 1]] <- locohPlots[[i]]
@@ -537,13 +460,13 @@ if (config$todo$doTTSI) {
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
                                                just=c("left", "bottom"),
                                                gp=gpar(fontfamily="mono"),
-                                               label=c("TTSI", "time interval",
+                                               label=c("TTSI", "time interval [s]",
                                                  config$preAnalysis$ttsi$interval))
   repH <- c(repH, 5)
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
                                                just=c("left", "bottom"),
                                                gp=gpar(fontfamily="mono"),
-                                               label=c("TTSI", "tolerance",
+                                               label=c("TTSI", "tolerance [s]",
                                                  config$preAnalysis$ttsi$tolerance))
   repH <- c(repH, 5)
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
@@ -559,7 +482,7 @@ if (config$todo$doAsymptote) {
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
                                                just=c("left", "bottom"),
                                                gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "minum number of points",
+                                               label=c("Asymptote", "minimum number of points",
                                                  config$preAnalysis$asymptote$minNPts))
   repH <- c(repH, 5)
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
@@ -715,7 +638,7 @@ if (config$todo$doCA) {
                                                just=c("left", "bottom"),
                                                gp=gpar(fontfamily="mono"),
                                                label=c("Core Area", "resolution",
-                                                 config$estimator$ca$resolution))
+                                                 config$estimator$ca$res))
   repH <- c(repH, 5)
 }
 # ============================================================================ #
@@ -738,7 +661,135 @@ for (i in seq_along(repH)) {
 
 nPages <- max(onWhichPage)
 
-# Create report
+
+# ---------------------------------------------------------------------------- #
+# Title Page
+    ## Title
+    pushViewport(viewport(y=unit(220, "mm"), width=unit(153.5, "mm"), height=unit(50, "mm"), just="bottom"))
+
+        grid.text("Reproducible Homerange Analysis", y=0.7, gp=gpar(fontface="bold", cex=2))
+        grid.text(paste0("(", date(), ")"),  y=unit(0.4, "npc"), gp=gpar(cex=0.9))
+        grid.text("based on the rhr package",  y=unit(0.4, "npc") - unit(2.2, "lines"), gp=gpar(cex=0.9))
+    popViewport()
+
+    ## Description
+    pushViewport(viewport(y=unit(200, "mm"), width=unit(153.5, "mm"), height=unit(20, "mm"), just="bottom"))
+        grid.lines(c(0.1,0.9), c(1,1), gp=gpar(lwd=0.1))
+        pushViewport(viewport(width=0.8))
+            grid.text("This is an automatically generated file with all parameters and settings, in order",
+                      x=0, just="left",
+                      y=0.7, gp=gpar(cex=0.9))
+            grid.text("to enable later replication of the same analysis given the same data set.",
+                      x=0, y=unit(0.7, "npc") - unit(1, "lines"),
+                      just="left", gp=gpar(cex=0.9))
+        popViewport()
+        grid.lines(c(0.1,0.9), c(0.1,0.1), gp=gpar(lwd=0.1))
+
+    popViewport()
+
+    ## Input data heading
+    pushViewport(viewport(y=unit(190, "mm"), width=unit(153.5, "mm"), height=unit(10, "mm"), just="bottom"))
+        grid.text("Input data", just="left", x=0, gp=gpar(fontface="bold", fontsize=18))
+    popViewport()
+
+    # Filename and format
+    pushViewport(viewport(y=unit(180, "mm"), width=unit(153.5, "mm"), height=unit(10, "mm"), just="bottom"))
+        grid.text("Relocations read from: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
+        grid.text(config$fileName, y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0.7, gp=gpar(fontfamily="mono"))
+    popViewport()
+
+    # Remap fields
+    # strShorten, make sure field names from user input are not to long
+    pushViewport(viewport(y=unit(140, "mm"), width=unit(153.5, "mm"), height=unit(30, "mm"), just="bottom"))
+        # title
+        grid.text("This file contained the following column names, which were remaped to:",
+                  y=unit(1, "npc") - unit(1, "lines"),
+                  just=c("left", "bottom"), x=0)
+        # id
+        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$id, gp=gpar(fontfamily="mono"))
+        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
+        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.30, label="id")
+        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.40, label="this is the animal id")
+        # lon
+        grid.text(y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$lon, gp=gpar(fontfamily="mono"))
+        grid.text(y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
+        grid.text(y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0.30, label="lon")
+        grid.text(y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0.40, label="this is the lon")
+        # lat
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$lat, gp=gpar(fontfamily="mono"))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.30, label="lat")
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.40, label="this is the lat")
+
+        # date
+        grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$date['date'], gp=gpar(fontfamily="mono"))
+        grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
+        grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.30, label="date")
+        grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.40, label="this is the date")
+
+        # time
+        grid.text(y=unit(1, "npc") - unit(7, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$time['time'], gp=gpar(fontfamily="mono"))
+        grid.text(y=unit(1, "npc") - unit(7, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
+        grid.text(y=unit(1, "npc") - unit(7, "lines"), just=c("left", "bottom"), x=0.30, label="time")
+        grid.text(y=unit(1, "npc") - unit(7, "lines"), just=c("left", "bottom"), x=0.40, label="this is the time")
+    popViewport()
+
+
+    ## spatial bounding box
+    pushViewport(viewport(y=unit(110, "mm"), width=unit(153.5, "mm"), height=unit(20, "mm"), just="bottom"))
+        grid.text("The spatial bounding box was: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
+        # bbox total
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00, label=paste("xmin:", config$spBbx['xmin']))
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.25, label=paste("xmax:", config$spBbx['xmax']))
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.50, label=paste("ymin:", config$spBbx['ymin']))
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.75, label=paste("ymax:", config$spBbx['ymax']))
+
+        grid.text("The restricted spatial bounding box was: ", y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0)
+        # bbox restricted
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=paste("xmin:", config$spBbxRestricted['xmin']))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.25, label=paste("xmax:", config$spBbxRestricted['xmax']))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.50, label=paste("ymin:", config$spBbxRestricted['ymin']))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.75, label=paste("ymax:", config$spBbxRestricted['ymax']))
+
+    popViewport()
+
+    ## spatial bounding box
+    pushViewport(viewport(y=unit(85, "mm"), width=unit(153.5, "mm"), height=unit(20, "mm"), just="bottom"))
+        grid.text("The temporal bounding box was: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
+        # bbox total
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00, label=paste("tmin: ", config$temporalBbx$tmin))
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.50, label=paste("tmax: ", config$temporalBbx$tmax))
+
+        grid.text("The restricted temporal bounding box was: ", y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0)
+        # bbox restricted
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=paste("tmin: ", config$temporalBbxRestricted$tmin))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.50, label=paste("tmax: ", config$temporalBbxRestricted$tmax))
+
+    popViewport()
+
+    ## Number of relocations
+    pushViewport(viewport(y=unit(65, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
+        grid.text("Number of relcations: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
+
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00, label="Whole dataset")
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.70, label=config$n$initialN, gp=gpar(fontfamily="mono"))
+
+        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.00, label="Restricted dataset")
+        grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.70, label=config$n$restrictedN, gp=gpar(fontfamily="mono"))
+    popViewport()
+
+    # footer
+    pushViewport(viewport(y=unit(0, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
+        grid.lines(c(0,1), c(1,1))
+        grid.text("Input data", x=0, just="left", gp=gpar(cex=0.7))
+        grid.text(paste0("Page 1 of ", nPages + 2), x=1, just="right", gp=gpar(cex=0.7))
+    popViewport()
+popViewport()
+grid.newpage()
+
+# ============================================================================ #
+# Next pages
+
 for (page in 1:nPages) {
     pushViewport(viewport(x=unit(35, "mm"),
                           y=unit(12.5, "mm"),
@@ -778,7 +829,7 @@ for (page in 1:nPages) {
         pushViewport(viewport(y=unit(0, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
             grid.lines(c(0,1), c(1,1))
             grid.text("Input data", x=0, just="left", gp=gpar(cex=0.7))
-            grid.text(paste0("Page ", page + 1, " of ", nPages + 1), x=1, just="right", gp=gpar(cex=0.7))
+            grid.text(paste0("Page ", page + 1, " of ", nPages + 2), x=1, just="right", gp=gpar(cex=0.7))
         popViewport()
     popViewport()
     grid.newpage()
@@ -820,7 +871,7 @@ popViewport()
 pushViewport(viewport(width=0.98, height=unit(1.2, "lines"), y=0, x=0.5, just=c("center", "bottom")))
 grid.lines(c(0,1), c(1,1))
 grid.text("R-SessionInfo", x=0, just="left", gp=gpar(cex=0.7))
-grid.text("Page 3 of 3", x=1, just="right", gp=gpar(cex=0.7))
+grid.text(paste0("Page", nPages + 2, " of ", nPages + 2), x=1, just="right", gp=gpar(cex=0.7))
 popViewport()
 
 

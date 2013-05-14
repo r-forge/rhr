@@ -1,6 +1,6 @@
 \name{dfGrob}
 \alias{dfGrob}
-\title{dfGrop}
+\title{dfGrob}
 \usage{
   dfGrob(x, start = 0.03, stop = 0.97, digits = 2)
 }

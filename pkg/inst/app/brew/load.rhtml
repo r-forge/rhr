@@ -63,10 +63,7 @@
           <!-- Load Data
                ============================================================== -->
           <section id="sdata">
-            <div class="page-header">
               <h1>Load Data</h1>
-            </div>
-            <h2>Data file</h2>
             <p>Load data from a <code>*.csv</code> or <code>*.txt</code> file. You can specify the deliminator, number of lines to skip and decimal seperator below.</p>
 
             <form name="loadData" id="loadData" method="POST" enctype="multipart/form-data" class="form-horizontal">
@@ -206,7 +203,8 @@ if (!is.null(req$POST())) {
 
 		<!-- Mapping fields
 		============================================================== -->
-		<h2>Map fields</h2>
+		<hr>
+		<h1>Map fields</h1>
 		<p>In order to conduct a home range analysis the following information is required: longitude, latitude, date, time and id for each relocation<p>
 
 		<form name="formmapFields" method="POST">
@@ -272,27 +270,15 @@ if (!is.null(req$POST())) {
 		    </td>
 </tr>
 </table>
-<input type="button" id="btnMapFields" name="map" value="Map Fields" class="btn btn-primary">
+<input type="button" id="btnMapFields" name="map" value="Map Fields" class="btn btn-block btn-large btn-primary">
 </form>
 
-<!--- to be removed later
-    <input type="button" id="btnMapFields1" name="map" value="Map1">
-
-    <a href="#" id="show_hide1">show/hide</a>
-    <div id="headDat1"></div>
-    <div id="result3"></div>
-
-    <hr>
-    <input type="button" id="btnFoo" name="map" value="foo">
-    <input type="button" id="btnBar" name="map" value="bar">
-    <input type="button" id="btnBaz" name="map" value="baz">
-    <hr>
-    ---->
 </section>
 
 <!-- Apply restrictions
      ============================================================== -->
 <section id="stime">
+  <hr>
     <h1>Apply spatial and temproal restrictions</h1>
 
     <p>Apply a bounding box within which relocations are considered.</p>
@@ -310,12 +296,12 @@ if (!is.null(req$POST())) {
           <!-- Configure
                ============================================================== -->
           <section id="sconf">
-              <h1>Configure</h1>
+	    <hr>
+              <h1>Additional Settings</h1>
 	    <div id="hrConfig">
 	    <p>Set the number of cores of your computer to be used, the spatial reference system and other setting for the analysis here:
-	      <input type="button" class="btn" id="btnModalConfigOpen" value="Config">. 
+	      <input type="button" class="btn btn-large btn-primary btn-block" id="btnModalConfigOpen" value="Configure additional settings">
 	      <ul>
-		<li> The number of cores should not exceed the number of cores available on your machine. It might be a good idea to set the number of cores to 1-2 less than the total number of corse available to you, in order to avoid confilicts with other processes/users.</li>
 		<li> The spatial reference system needs to be set, if the output as kml and/or correctly projected shapfile is desired. </li>
 		</ul>
 	    </p>
@@ -326,9 +312,9 @@ if (!is.null(req$POST())) {
 <!-- Select analysis
      ============================================================== -->
 <section>
-    <h1>HR-Analysis</h1>
+  <hr>
+    <h1>Choose Analytical Steps</h1>
   <div id="hrAnalysis">
-    <h2>Preliminary analysis</h2>
     <table>
       <table class="table table-striped">
         <tr>
@@ -371,12 +357,6 @@ if (!is.null(req$POST())) {
           </td>
 
         </tr>
-      </table>
-
-      <!--- Estimators -->
-      <h2>Estimators</h2>
-      <table>
-        <table class="table table-striped">
           <tr>
             <th>Include</th>
             <th>Step</th>
@@ -437,7 +417,7 @@ if (!is.null(req$POST())) {
 
 
 <!-- Button to start everything -->
-<button id="hrAnalyze" class="btn btn-primary">Analyze</button>
+<button id="hrAnalyze" class="btn btn-block btn-large btn-primary">Analyze</button>
 
 
 </div>
@@ -465,7 +445,43 @@ if (!is.null(req$POST())) {
 
               <form id="modalConfigInputForm" class="form-horizontal">
 		<fieldset>
+
+		  <div class="control-group" id="modalConfigInUnitDiv">
+		    <label class="control-label" for="modalConfigInUnit">Input unit</label>
+		    <div class="controls">
+		      <select id="modalConfigInUnit">
+			<option value='m'>meter</option>
+			<option value='km'>km</option>
+			<option value='ft'>foot</option>
+			<option value='yd'>yard</option>
+			<option value='mi'>mile</option>
+			<option value='geo'>lon/lat</option>
+			<option value='ido'>I don't know</option>
+		      </select>  
+		    </div>
+		  </div>
+
+		  <div class="control-group" id="modalConfigOutUnitDiv">
+		    <label class="control-label" for="modalConfigOutUnit">Output unit</label>
+		    <div class="controls">
+                      <select id="modalConfigOutUnit">
+			<option value='sqm'>square meters</option>
+			<option value='ha'>ha</option>
+			<option value='sqkm'>square km</option>
+			<option value='sqft'>square feet</option>
+			<option value='sqyd'>square yrads</option>
+			<option value='acres'>acres</option>
+			<option value='sqmi'>square miles</option>
+			<option value='ipus'>input units squared</option>
+                      </select>  
+		    </div>
+		  </div>
 		  
+		  <div id="modalConfigUnitsNotKnown" class="alert alert-info">
+		    <b>If input units</b> are geographical (i.e., not projected) or unknown, the output units will be the input unit squared.
+		  </div>
+
+
 		  <!-- nCores 
 		  <div class="control-group">
 		    <label class="control-label" for="modalConfigNCores">Number of Cores</label>
@@ -482,16 +498,6 @@ if (!is.null(req$POST())) {
 		    </div>
 		  </div>
 
-		  <!-- out unit 		  <div class="control-group">
-		    <label class="control-label" for="modalConfigOutUnit">Output unit (not yet implemented)</label>
-		    <div class="controls">
-                      <select id="modalConfigOutUnit">
-			<option value='m2'>square meters</option>
-			<option value='km2'>square km</option>
-			<option value='ha'>hectars</option>
-                      </select>  
-		    </div>
-		    </div>-->
 
 
 		  <!-- Export KML -->

@@ -217,10 +217,24 @@ $(document).ready(function(){
   $('#btnModalConfigOpen').click( function () {
     $('#modalConfigNCores').val(config.config.ncores);
     $('#modalConfigEPSG').val(config.config.epsg);
+    $('#modalConfigInUnit').val(config.config.inUnit);
     $('#modalConfigOutUnit').val(config.config.outUnit);
     $('#modalConfigExpKml').val(config.config.expKML);
     $('#modalConfigUseGM').val(config.config.useGM);
+    $('#modalConfigUnitsNotKnown').hide();
     $('#modalConfig').modal('show');
+  });
+
+  // display warning if input units is unknown or geographical
+  $('#modalConfigInUnitDiv').change(function() {
+    if ($('#modalConfigInUnit').val() == "geo" || $('#modalConfigInUnit').val() == "ido") {
+      $('#modalConfigUnitsNotKnown').show();
+      $('#modalConfigOutUnitDiv').hide();
+      config.config.outUnit = "ipus";
+    } else {
+      $('#modalConfigUnitsNotKnown').hide();
+      $('#modalConfigOutUnitDiv').show();
+    }
   });
 
   // use of button[id^=btnModalConfigCancel] to match multiple buttons
@@ -235,6 +249,7 @@ $(document).ready(function(){
       $('#modalConfig').modal('hide');
       config.config.ncores = $('#modalConfigNCores').val();
       config.config.epsg = $('#modalConfigEPSG').val();
+      config.config.inUnit = $('#modalConfigInUnit').val();
       config.config.outUnit = $('#modalConfigOutUnit').val();
       config.config.expKML = $('#modalConfigExpKML').prop('checked');
       config.config.useGM = $('#modalConfigUseGM').prop('checked');
@@ -566,7 +581,7 @@ $(document).ready(function(){
     }
   });
 
-  // show checkbox
+  // show checkboxjquery dropdown change
   $('#modalLocohSelectType').change(function() {
     if ($(this).val() == "r") {
       $('#modalLocohCheckboxNDiv').hide();

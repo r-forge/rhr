@@ -5,7 +5,8 @@
             config=list(
             ncores=1,
 	    epsg=4326,
-	    outUnit="m2",
+	    inUnit="ido",
+	    outUnit="ipus",
             internetConnection=ifelse(class(try(getURL("www.google.com"))) == "try-error", FALSE, TRUE),
 	    expKML=0,
 	    useGM=0,

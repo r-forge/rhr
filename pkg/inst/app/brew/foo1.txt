@@ -3,7 +3,8 @@
 "config": {
  "ncores":      1,
 "epsg":   4326,
-"outUnit": "m2",
+"inUnit": "ido",
+"outUnit": "ipus",
 "internetConnection": true,
 "expKML":      0,
 "useGM":      0,

@@ -97,8 +97,8 @@ if (config$todo$doMCP) {
     res$write(h3(paste0("MCP for ", ids[i])))
     res$write(img(paste0(imageurl, mcpFilenamePlots[i]), cap=""))
     tt <- data.frame(resMCPs[[i]]$estimatorData)
-    tt$area <- formatC(round(tt$area, 2), big.mark=",", format="f", drop0trailing = TRUE)
-    names(tt) <- c("Level", "Area")
+    tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
+    names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
     res$write(toHTML(tt))
     
   }

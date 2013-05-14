@@ -1,12 +1,12 @@
 List of 12
  $ fileName             : chr "test.csv"
  $ config               :List of 9
-  ..$ ncores            : num 1
-  ..$ epsg              : num 4326
-  ..$ outUnit           : chr "m2"
+  ..$ epsg              : chr "4326"
+  ..$ inUnit            : chr "m"
+  ..$ outUnit           : chr "acres"
   ..$ internetConnection: logi TRUE
-  ..$ expKML            : num 0
-  ..$ useGM             : num 0
+  ..$ expKML            : logi FALSE
+  ..$ useGM             : logi FALSE
   ..$ skip              : num 0
   ..$ sep               : chr "coma"
   ..$ sepDec            : chr ","
@@ -71,7 +71,7 @@ List of 12
   ..$ ca   :List of 1
   .. ..$ res: num 100
   ..$ mcp  :List of 1
-  .. ..$ level: num 95
+  .. ..$ level: chr "95,12,31,33,42"
   ..$ kde  :List of 5
   .. ..$ resolution    : num 100
   .. ..$ buffer        : num 1000
