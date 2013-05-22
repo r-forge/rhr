@@ -83,6 +83,7 @@
 			<option value='coma'>Coma (,)</option>
 			<option value='semi'>Semin colon (;)</option>
 			<option value='tab'>Tabulator (\t)</option>
+			<option value='space'>Spache ( )</option>
                       </select>  
 		    </div>
 		  </div>
@@ -134,7 +135,7 @@ if (!is.null(req$POST())) {
     str <- readLines(name$tempfile, n=60 + skip)
 
 	# asign sep
-   sep <- switch(sep, coma=",", tab="\t", semi=";")
+   sep <- switch(sep, coma=",", tab="\t", semi=";", space=" ")
 
                                         # asign sepDec
    sepDec <- switch(sepDec, coma=",", point=".")
