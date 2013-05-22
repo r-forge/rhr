@@ -19,7 +19,6 @@ if (config$todo$doLocoh) {
       try(rhrEstimator(x[, c('lon', 'lat')], estimator="locoh", level=locohLevels,
                    type=locoh$type, n=locoh$nValue))
     })
-    save(resLocohs, file="abc.RData")
 
     ids <- names(datSub)
 
