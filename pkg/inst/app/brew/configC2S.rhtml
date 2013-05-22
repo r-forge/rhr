@@ -5,8 +5,9 @@
         config <- fromJSON(req$POST()[['config']], simplify=FALSE)
   }
 
-  save(config, file="config.Rdata")
-  sink("foo2.txt")
-  str(config)  
- sink()
+  # debugging
+  # save(config, file="config.Rdata")
+  # sink("foo2.txt")
+  # str(config)  
+  # sink()
 %>
