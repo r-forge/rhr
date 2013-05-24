@@ -113,7 +113,7 @@ h4 <- function(x) {
 #' @export
 
 img <- function(address, cap="") {
-  cat(paste0("<table border='0' align='left', width='100%''><tr><td><img src='", address, "'></td><td></td><tr><td>", cap, "</td><td></td></tr></table><br>"))
+  cat(paste0("<img src='", address, "'>"))
 }
 
 # imgs <- function(address, cap="", cat=TRUE) {
@@ -279,6 +279,21 @@ alertWarning <- function(x, cat=TRUE) {
   }
 }
 
+#' alertSuccess
+#'
+#' wraps string as bootstrap alert-success
+#' @param x a string
+#' @param cat whether it should be printed to sto or not
+#' @export
+alertWarning <- function(x, cat=TRUE) {
+  out <- paste0("<div class='alert alert-success'>", x, "</div>")
+  if (cat) {
+    return(cat(out))
+  } else {
+    return(out)
+  }
+}
+
 #' alertError
 #'
 #' wraps string as bootstrap alert-error
@@ -339,7 +354,7 @@ plotTTSI <- function(res, path=NULL, toFirst2=FALSE) {
   pushViewport(dataViewport(c(1, length(m)), range(c(m, n, na.rm=TRUE), na.rm=TRUE))) 
   grid.yaxis(gp=gpar(cex=0.8))
   grid.xaxis(gp=gpar(cex=0.8))
-  grid.text("Time interval",y=unit(-3,"lines"))
+  grid.text("Time interval [seconds]",y=unit(-3,"lines"))
   grid.text("m",x=unit(-3,"lines"),rot=90)
   for (i in seq(m)) grid.lines(rep(i, 2), c(0, m[i]), default.units="native")
   # grid.lines(c(1,length(m)), c(n,n), default.units="native", gp=gpar(col="red", lty=2))
@@ -463,8 +478,10 @@ dfGrob <- function(x, start=0.03, stop=0.97, digits=2) {
   l[[length(l) + 1]] <- textGrob(names(x), x=xs, y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), gp=gpar(fontface="bold"))
   l[[length(l) + 1]] <- linesGrob(x=c(start, stop), y=unit(1, "npc") - unit(1.25, "lines"))
 
+  for (i in 1:ncol(x)) if (is.numeric(x[1,i])) x[,i] <- round(x[,i], digits)
+
   for (i in 1:nrow(x))
-    l[[length(l) + 1]] <- textGrob(round(x[i,], digits), x=xs, y=unit(1, "npc") - unit(i + 1.5, "lines"), just=c("left", "bottom"))
+    l[[length(l) + 1]] <- textGrob(x[i,], x=xs, y=unit(1, "npc") - unit(i + 1.5, "lines"), just=c("left", "bottom"))
   return(gTree(children=do.call("gList", l)))
 }
 
