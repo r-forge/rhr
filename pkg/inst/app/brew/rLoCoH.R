@@ -113,8 +113,7 @@ if (config$todo$doLocoh) {
 
       if (!is(resLocohs[[i]], "try-error")) {
         # NEEDS some more work
-         res$write(p(paste0("Local Convex Hull type of <code>", resLocohs[[i]]$estimator$type, "</code> was calculated with value of <code>",  formatC(round(resLocohs[[i]]$estimator$n, 2), big.mark=",", format="f", drop0trailing = TRUE), "</code>.")))
-         res$write(cat(str(resLocohs[[i]]$estimator)))
+         res$write(p(paste0("Local Convex Hull type of <code>", resLocohs[[i]]$estimator$type, "</code> was calculated with value of <code>",  formatC(round(resLocohs[[i]]$estimator$n, 2), big.mark=",", format="f", drop0trailing = TRUE), "</code> ", config$config$inUnit, ".")))
 
         # res$write(cat(str(resLocohs[[i]]$estimator)))
 
@@ -123,8 +122,8 @@ if (config$todo$doLocoh) {
 
         
         tt <- data.frame(resLocohs[[i]]$estimatorData)
-        tt$area <- formatC(round(tt$area, 2), big.mark=",", format="f", drop0trailing = TRUE)
-        names(tt) <- c("Level", "Area")
+        tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
+         names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
         res$write(toHTML(data.frame(tt)))
       } else {
         alertError(resLocohs[[i]])
