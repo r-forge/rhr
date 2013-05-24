@@ -23,8 +23,7 @@ pushViewport(viewport(x=unit(35, "mm"),
 
 
 # ============================================================================ # 
-# 2nd to nth page
-# Prepare everything
+# Prepare 2nd to nth page
 
 repItems <- list()
 repH <- c()
@@ -58,41 +57,33 @@ if (config$todo$doSiteFidelity) {
                                                 linesGrob(y=c(0.26,0.26))))
     repH <- c(repH, 10)
 
-    # summary Linearity
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label="Summary of Linearity Index", just=c("left", "bottom"))))
-    repH <- c(repH, 8)
+    # CI for simulated data
+    tmp <- sfs[[i]]$fidelity.results
+    names(tmp)[3:4] <- c("CI lower", "CI upper")
 
-    repItems[[length(repItems) + 1]] <- summaryGrob(summary(sfs[[i]]$li.sim))
-    repH <- c(repH, 12)
+    repItems[[length(repItems) + 1]] <- dfGrob(tmp, digits=4)
+    repH <- c(repH, 15)
 
-    # summary MSD
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label="Summary of Mean Squared Distance", just=c("left", "bottom"))))
-    repH <- c(repH, 8)
-
-    repItems[[length(repItems) + 1]] <- summaryGrob(summary(sfs[[i]]$msd.sim))
-    repH <- c(repH, 8)
 
     # plots
     p <- sfPlots[[i]]
     repItems[[length(repItems) + 1]] <- p
-    repH <- c(repH, 80)
+    repH <- c(repH, 100)
 
-    # ttest
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label="T-test for Linearity Index", just=c("left", "bottom"))))
-    repH <- c(repH, 8)
+    # Recom
+    sfR <- strsplit(sfs[[i]]$msg, " ")[[1]]
+    sfR.lines <- cumsum(nchar(sfR)) %/% 65
+    sfR.nlines <- max(sfR.lines)
+    sfR.str <- paste(tapply(sfR, sfR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
 
-    repItems[[length(repItems) + 1]] <- ttestGrob(t.test(sfs[[i]]$li.sim, mu=sfs[[i]]$li.dat))
-    repH <- c(repH, 12)
+    sfR.grob <- textGrob(label=sfR.str) 
 
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, label="T-test for Mean Squared Distance", just=c("left", "bottom"))))
-    repH <- c(repH, 8)
-
-    repItems[[length(repItems) + 1]] <- ttestGrob(t.test(sfs[[i]]$msd.sim, mu=sfs[[i]]$msd.dat))
-    repH <- c(repH, 12)
+    # Draw a Green Box to highlight key findings
+    sfR.rect.grob <- rectGrob(width=0.95, height=unit(5 * sfR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
+                                                                                   alpha=0.34))
+    
+    repItems[[length(repItems) + 1]] <- gTree(children=gList(sfR.rect.grob, sfR.grob))
+    repH <- c(repH, 5 * sfR.nlines + 6)
   }
   
 } else {
@@ -104,7 +95,7 @@ if (config$todo$doSiteFidelity) {
 # ---------------------------------------------------------------------------- # 
 ## TTSI
 
-if (config$todo$doTTSI) {
+if (config$todo$doTTSI & config$config$dateTime) {
   # infoblock
   textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Time To Statistical Independence (TTSI)") -> rTTSI.header
   textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rTTSI.input
@@ -128,20 +119,39 @@ if (config$todo$doTTSI) {
   repItems[[length(repItems) + 1]] <- rTTSI.res 
   repH <- c(repH, 10)
 
- # # add results
+  # add results
   for (i in seq_along(ttsiPlots)) {
- #   # header
+    # header
     repItems[[length(repItems) + 1]] <- gTree(children=gList(
                                                 textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
                                                          gp=gpar(fontface="bold")),
                                                 linesGrob(y=c(0.26,0.26))))
     repH <- c(repH, 10)
 
- #   # plots
+    # plots
     repItems[[length(repItems) + 1]] <- ttsiPlots[[i]]
     repH <- c(repH, 80)
+
+    # Recom
+    ttsiR <- strsplit(resTTSI[[i]]$msg, " ")[[1]]
+    ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
+    ttsiR.nlines <- max(ttsiR.lines)
+    ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
+
+    ttsiR.grob <- textGrob(label=ttsiR.str) 
+
+    # Draw a Green Box to highlight key findings
+    ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
+                                                                                   alpha=0.34))
+    
+    repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
+    repH <- c(repH, 5 * ttsiR.nlines + 6)
   }
   
+} else if (config$todo$doTTSI & !config$config$dateTime) {
+  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Time To Statistical Independence: date and time not provided") -> rTTSI.not
+  repItems[[length(repItems) + 1]] <- rTTSI.not 
+  repH <- c(repH, 15)
 } else {
   textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Time To Statistical Independence was not requested") -> rTTSI.not
   repItems[[length(repItems) + 1]] <- rTTSI.not 
@@ -753,7 +763,8 @@ nPages <- max(onWhichPage)
 
     popViewport()
 
-    ## spatial bounding box
+    ## Temporal bounding box
+    if (config$config$dateTime) {
     pushViewport(viewport(y=unit(85, "mm"), width=unit(153.5, "mm"), height=unit(20, "mm"), just="bottom"))
         grid.text("The temporal bounding box was: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
         # bbox total
@@ -766,6 +777,7 @@ nPages <- max(onWhichPage)
         grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.50, label=paste("tmax: ", config$temporalBbxRestricted$tmax))
 
     popViewport()
+  }
 
     ## Number of relocations
     pushViewport(viewport(y=unit(65, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
@@ -864,7 +876,7 @@ loadedPkg.lines <- cumsum(nchar(loadedPkg)) %/% 55
 loadedPkg.str <- paste(tapply(loadedPkg, loadedPkg.lines, function(x) paste(x, collapse="; ")), collapse="\n")
 
 
-grid.text(paste0(a$R.version$version.string, "\n", "Plattform: ", a$R.version$platform, "(", strsplit(a$R.version$arch, "_")[[1]][1], "-bit)\n\nlocale:\n", loc.str, "\n\nattached base packages:\n", basePkg.str, "\n\nother attached packages:\n", otherPkg.str, "\n\nloaded viar a namespace (and not attached):\n", loadedPkg.str  ), x=0, y=unit(ystart, "npc") - unit(3, "lines"), just=c("left", "top"), gp=gpar(fontfamily="mono"))
+grid.text(paste0(a$R.version$version.string, "\n", "Plattform: ", a$R.version$platform, "(", strsplit(a$R.version$arch, "_")[[1]][1], "-bit)\n\nlocale:\n", loc.str, "\n\nattached base packages:\n", basePkg.str, "\n\nother attached packages:\n", otherPkg.str, "\n\nloaded via a namespace (and not attached):\n", loadedPkg.str  ), x=0, y=unit(ystart, "npc") - unit(3, "lines"), just=c("left", "top"), gp=gpar(fontfamily="mono"))
 
 popViewport()
 
