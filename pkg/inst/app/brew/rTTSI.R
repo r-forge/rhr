@@ -1,7 +1,7 @@
 <%
 
 res <- Response$new()
-if (config$todo$doTTSI) {
+if (config$todo$doTTSI & config$config$dateTime) {
 
   ttsi <- config$preAnalysis$ttsi
 
@@ -47,19 +47,33 @@ if (config$todo$doTTSI) {
   # --------------------------------------------------------------------------- #
   # Add to report
 
-  ## res$write(h2("Time to statistical independence"))
-  res$write(p(paste0("Description of TTSI")))
+  res$write(p(paste0("Time to statistical independence calculates at which time intervall Schoeners V reaches the expected value of 2. The x-axis on the plots shows the time intervall in seconds and on the y axis m indicates the number of pairs (i.e., the number segments of the trajectory) and Schoeners V is calcualted as..")))
 
   for (i in seq_along(resTTSI)) {
     res$write(h3(paste0("TTSI for ", ids[i])))
-    # res$write(p(paste0("The critical value of 2 was reached for the first time with a time interval of ", resTTSI[which(resTTSI[, 'V'] >= 2)[1],'interval'], " seconds.")))
-    res$write(img(paste0(imageurl, ttsiFilenamePlots0[i]), cap="TTSI"))
+
+    
+    # was ttsi reached?
+    if (any(resTTSI[[i]]$dat[, 'V'] >= 2)) {
+      where <- which(resTTSI[[i]]$dat[, 'V'] >= 2)
+      resTTSI[[i]]$msg <- paste0("Time to statistical independence was reached at ",
+                             resTTSI[[i]]$interval[where],
+                            " seconds, with ", resTTSI[[i]]$dat[where, 'm'], " pairs")
+
+    } else {
+      resTTSI[[i]]$msg <- paste0("Time to statistical independence was not reached")
+    }
+
+    res$write(img(paste0(imageurl, ttsiFilenamePlots0[i]), cap=""))
+    res$write(alert(resTTSI[[i]]$msg))
   }
 
 
+} else if (!config$config$dateTime) {
+   res$write(alert("Time to statistical independence was requested, but information about date and time of relocations was not provided"))
 } else {
    res$write(alert("Time to statistical independence was not requested"))
-}
+ }
 res$finish()
 
 %>
