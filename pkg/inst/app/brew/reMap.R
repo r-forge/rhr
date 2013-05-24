@@ -16,11 +16,23 @@
   config$mapFields$time$time <- time <- req$POST()[['time']]
   config$mapFields$time$timeFormat <- timeformat <- req$POST()[['timeformat']]
 
+if (id == "NA") {
+  dat[, 'newId'] <- "Animal_1"
+  id <- 'newId'
+}
+
+if (date == "NA" || time == "NA") {
+  datrm <- data.frame(id=dat[, id], lat=dat[, lat], lon=dat[, lon], stringsAsFactors=FALSE)
+  config$config$dateTime <- FALSE
+} else {
   date.parsed <- eval(parse(text=paste0(dateformat, "(dat[, date])")))
   time.parsed <- eval(parse(text=paste0(timeformat, "(dat[, time])")))  
   timestamp <- date.parsed + time.parsed
 
   datrm <- data.frame(id=dat[, id], lat=dat[, lat], lon=dat[, lon], timestamp=timestamp, stringsAsFactors=FALSE)
+  config$config$dateTime <- TRUE
+
+}
  
   #--- datsubSplit <- datsub <- datrm
   
@@ -43,11 +55,13 @@
   config$spBbxRestricted$ymax <- max(datrm$lat)
   config$n$restrictedN <- nrow(datrm)
 
+if (config$config$dateTime) {
   config$temporalBbxRestricted$tmin <- as.character(min(datrm$timestamp))
   config$temporalBbxRestricted$tmax <- as.character(max(datrm$timestamp))
 
   config$temporalBbx$tmin <- as.character(min(datrm$timestamp))
   config$temporalBbx$tmax <- as.character(max(datrm$timestamp))
+}
 
 
 %>
