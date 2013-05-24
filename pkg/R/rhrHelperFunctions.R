@@ -494,7 +494,7 @@ dfGrob <- function(x, start=0.03, stop=0.97, digits=2) {
 #' @export
 
 rhrConvertUnit <- function(x, inUnit="m", outUnit="ha") {
-  if (inUnit == "sqinput") {
+  if (inUnit == "ido") {
     return(x)
   } else if (inUnit == "m") {
     if (outUnit == "sqm") {
