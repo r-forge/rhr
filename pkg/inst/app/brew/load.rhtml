@@ -17,7 +17,6 @@
     </style>
 
     <link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <!-- <script src="http://code.jquery.com/jquery-latest.js"></script> -->
     <script src="../js/jquery18.min.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <script type="text/javascript" src="../js/jquery.validate.min.js"></script>
@@ -35,14 +34,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">Reproduciple home range</a>
+          <a class="brand" href="#">Reproduciple Home Range Analysis</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
-              Uni G&oumlttingen </p>
+              Forest Zoology and Forest Conservation - University of G&oumlttingen </p>
             <ul class="nav">
               <li class="active"><a href="#">Setup</a></li>
-              <li><a href="analyze.rhtml">Results</a></li>
-              <li><a href="about.rhtml">About</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -83,7 +80,6 @@
 			<option value='coma'>Coma (,)</option>
 			<option value='semi'>Semin colon (;)</option>
 			<option value='tab'>Tabulator (\t)</option>
-			<option value='space'>Spache ( )</option>
                       </select>  
 		    </div>
 		  </div>
@@ -135,9 +131,9 @@ if (!is.null(req$POST())) {
     str <- readLines(name$tempfile, n=60 + skip)
 
 	# asign sep
-   sep <- switch(sep, coma=",", tab="\t", semi=";", space=" ")
+   sep <- switch(sep, coma=",", tab="\t", semi=";")
 
-                                        # asign sepDec
+                                        # asign decimal seperator
    sepDec <- switch(sepDec, coma=",", point=".")
 
     # test if a seperator works for the Body
@@ -164,7 +160,7 @@ if (!is.null(req$POST())) {
       f <- "no data loaded"
 
 	     })
-      f <- c(names(dat), NA)
+      f <- c(NA, names(dat))
 
       alert(paste0('<b>Data</b> (', name[1], ') successfully loaded'))
 
@@ -188,7 +184,7 @@ if (!is.null(req$POST())) {
   }
 } else if (!is.null(datFromR)) {
   dat <- datFromR
-  f <- c(names(datFromR), NA)
+  f <- c(NA, names(datFromR))
   cat(paste0('<div class="alert alert-success"><b>Data</b> read from R</div>'))
 } else {
   f <- "no data loaded"
@@ -347,22 +343,6 @@ if (!is.null(req$POST())) {
           </td>
         </tr>
 
-        <!-- Asymptote -->
-        <tr>
-          <td>
-            <input type="checkbox" id="doAsymptote">
-          </td>
-          <td>Asymptote</td>
-          <td>
-	    <input type="button" class="btn" id="btnModalAsymptoteOpen" value="Change">
-          </td>
-
-        </tr>
-          <tr>
-            <th>Include</th>
-            <th>Step</th>
-            <th>Change properties</th>
-          </tr>
 
           <!-- MCP -->
           <tr>
@@ -400,6 +380,18 @@ if (!is.null(req$POST())) {
 <td>
   <input type="button" class="btn" id="btnModalLocohOpen" value="Change">
 </td>
+
+<!-- Asymptote -->
+<tr>
+  <td>
+    <input type="checkbox" id="doAsymptote">
+  </td>
+  <td>Asymptote</td>
+  <td>
+    <input type="button" class="btn" id="btnModalAsymptoteOpen" value="Change">
+  </td>
+
+</tr>
 
 <!-- Core Area -->
 </tr>
@@ -623,7 +615,7 @@ if (!is.null(req$POST())) {
 		  </div>
 
 		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteInputIncrement">Numper of points per increment</label>
+		    <label class="control-label" for="modalAsymptoteInputIncrement">Number of points per increment</label>
 		    <div class="controls">
                       <input type="text" id="modalAsymptoteInputIncrement" name="modalAsymptoteInputIncrement" value="1" class="left"><br>
 		    </div>

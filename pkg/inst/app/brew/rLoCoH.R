@@ -71,7 +71,7 @@ if (config$todo$doLocoh) {
 
           p <- ggmap(get_googlemap(center=c(mean(lon), mean(lat)), zoom=l, maptype="hybrid")) + 
             geom_path(size=3, alpha=0.4, data=tempol.df, aes(x=long, y=lat, group=group, color=factor(level))) +
-              labs(colour="MCP Level", x="lon", y="lat") +
+              labs(colour="Level", x="lon", y="lat") +
                 geom_path(size=0.2, colour="black", data=tempol.df, aes(x=long, y=lat, group=group)) +
                   scale_color_manual(values=terrain.colors(10)) +
                     theme_bw()
@@ -81,9 +81,9 @@ if (config$todo$doLocoh) {
           p <- ggplot(tempol.df, aes(x=long, y=lat, group=group, color=factor(level))) + 
             geom_point(data=datSub[[i]], aes(x=lon, y=lat, group=NULL, color=NULL), alpha=0.1) + 
               geom_path(size=3, alpha=0.4) +
-                labs(colour="Level Level", x="lon", y="lat") +
+                labs(colour="Level", x="lon", y="lat") +
                   geom_path(size=0.2, colour="black") +
-                    scale_color_manual(values=terrain.colors(10)) + theme_bw()
+                    scale_color_manual(values=terrain.colors(10)) + theme_bw() + coord_equal()
         }
 
         print(p)

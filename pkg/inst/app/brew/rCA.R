@@ -43,6 +43,8 @@ if (config$todo$doCA) {
     names(r1)[1:3] <- c("x", "y", "z")
     r1$z <- as.numeric(r1$z >= obs[which.max(dd)])
     r1$z <- ifelse(is.na(r1$z), 0, r1$z)
+    r1$z <- factor(r1$z)
+    levels(r1$z) <- c("other", "core area")
 
     if (all(r1$z[1] == r1$z)) {
       return(list(exit=1, msg="All values are the same"))
@@ -54,7 +56,8 @@ if (config$todo$doCA) {
       theme_bw() + labs(x="pctrange", y="pctprob")
 
 
-    p2 <- ggplot(data=r1) + geom_tile(aes(x=x, y=y, fill=factor(z))) + coord_equal() + scale_x_continuous(expand=c(0,0)) + scale_y_continuous(expand=c(0,0)) + labs(x=NULL, y=NULL) + theme_bw()
+    p2 <- ggplot(data=r1) + geom_tile(aes(x=x, y=y, fill=z)) +
+      coord_equal() + scale_x_continuous(expand=c(0,0)) + scale_y_continuous(expand=c(0,0)) + labs(colour="", x=NULL, y=NULL) + theme_bw()
 
 
     return(list(exit=0, plot1=p1, plot2=p2, rast=rast))

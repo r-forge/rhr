@@ -8,12 +8,19 @@ res <- Response$new()
 # Do subset
 # subset time & space
 
+if (config$config$dateTime) {
 datSub <- datrm[datrm$timestamp >= ymd_hms(config$temporalBbxRestricted$tmin) &
                 datrm$timestamp <= ymd_hms(config$temporalBbxRestricted$tmax) &
                 datrm$lat >= config$spBbxRestricted$ymin &
                 datrm$lat <= config$spBbxRestricted$ymax &
                 datrm$lon >= config$spBbxRestricted$xmin &
                 datrm$lon <= config$spBbxRestricted$xmax, ]
+} else {
+datSub <- datrm[datrm$lat >= config$spBbxRestricted$ymin &
+                datrm$lat <= config$spBbxRestricted$ymax &
+                datrm$lon >= config$spBbxRestricted$xmin &
+                datrm$lon <= config$spBbxRestricted$xmax, ]
+}
 
 # Add the number of relocations to the config list
 config$n$restrictedN <- nrow(datSub)

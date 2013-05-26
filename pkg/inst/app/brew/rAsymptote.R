@@ -29,13 +29,21 @@ if (config$todo$doAsymptote) {
     # MCP
 
     if ("mcp" %in% asym$estimator) {
-      resAsym[[i]]$mcp <- do.call("rbind", lapply(ns, function(n) data.frame(rhrEstimator(x[sample(1:nrow(x), n), c('lon', 'lat')], estimator="mcp", levels=asym$level)$estimatorData)))
+      resAsym[[i]]$mcp <- data.frame(do.call("rbind", lapply(ns, function(n) data.frame(rhrEstimator(x[sample(1:nrow(x), n), c('lon', 'lat')], estimator="mcp", levels=asym$level)$estimatorData))))
 
+      # res$write(cat(str(resAsym[[i]]$mcp)))
+      resAsym[[i]]$mcp[,2] <- rhrConvertUnit(resAsym[[i]]$mcp[,2], config$config$inUnit, config$config$outUnit)
+      
+
+      
       # Calculate where the asymptote was reached
       # Area with all points:
       totalA <- data.frame(rhrEstimator(x[, c("lon", "lat")], "mcp", level=asym$level)$estimatorData)
+      totalA$area <- rhrConvertUnit(totalA$area, config$config$inUnit, config$config$outUnit)
 
-      df <- data.frame(ns=rep(ns, each=length(asym$level)), level=resAsym[[i]]$mcp[,1], area=resAsym[[i]]$mcp[,2])
+      df <- data.frame(ns=rep(ns, each=length(asym$level)),
+                       level=resAsym[[i]]$mcp[,1],
+                       area=resAsym[[i]]$mcp[,2])
 
       # calculate confidence intervals
       confints <- ddply(df, c("level", "ns"), function(x) t.test(x$area)$conf.int) 
@@ -58,7 +66,7 @@ if (config$todo$doAsymptote) {
         }
       })
 
-      resAsym[[i]]$asymReachedAt <- asymReached <- data.frame(level=asym$level, ns=asymReached, area=totalA$area) 
+      resAsym[[i]]$MCPasymReached <- asymReached <- data.frame(level=asym$level, ns=asymReached, area=totalA$area) 
       
 
      # # plot
@@ -84,7 +92,7 @@ if (config$todo$doAsymptote) {
         p <- p + facet_wrap(~level, ncol=2, scale="free_y") +
         theme_bw() +
         theme(legend.position="none") +
-        labs(x="Number of points", y="Area")
+        labs(x="Number of points", y=paste("Area [", config$config$outUnit, "]"))
 
       resAsym[[i]]$mcpPlot <- grid.grabExpr(print(p))
 
@@ -107,6 +115,7 @@ if (config$todo$doAsymptote) {
         h <- kde['bandwidth']
       }
 
+
       config$estimator$kde$xrange <- lapply(datSub, function(x) range(x[, "lon"]) + rep(as.numeric(kde['buffer']), 2) * c(-1, 1))
       config$estimator$kde$yrange <- lapply(datSub, function(x) range(x[, "lat"]) + rep(as.numeric(kde['buffer']), 2) * c(-1, 1))
 
@@ -118,7 +127,9 @@ if (config$todo$doAsymptote) {
                      yrange=config$estimator$kde$yrange[[i]],
                      resolution=as.numeric(kde['resolution'])), "area", asym$level)$A))
 
-      df <- data.frame(ns=rep(ns, each=length(asym$level)), level=resAsym[[i]]$kde[,1], area=resAsym[[i]]$kde[,2])
+      df <- data.frame(ns=rep(ns, each=length(asym$level)),
+                       level=resAsym[[i]]$kde[,1],
+                       area=rhrConvertUnit(resAsym[[i]]$kde[,2], config$config$inUnit, config$config$outUnit))
 
 
       # Calculate where the asymptote was reached
@@ -130,6 +141,7 @@ if (config$todo$doAsymptote) {
                      yrange=config$estimator$kde$yrange[[i]],
                      resolution=as.numeric(kde['resolution'])), "area", asym$level)$A
       totalA <- data.frame(totalA)
+      totalA$area <- rhrConvertUnit(totalA$area, config$config$inUnit, config$config$outUnit)
 
       # calculate confidence intervals
       confints <- ddply(df, c("level", "ns"), function(x) t.test(x$area)$conf.int) 
@@ -152,7 +164,7 @@ if (config$todo$doAsymptote) {
         }
       })
 
-      resAsym[[i]]$asymReachedAt <- asymReached <- data.frame(level=asym$level, ns=asymReached, area=totalA$area) 
+      resAsym[[i]]$KDEasymReached <- asymReached <- data.frame(level=asym$level, ns=asymReached, area=totalA$area) 
       
 
      # # plot
@@ -177,7 +189,7 @@ if (config$todo$doAsymptote) {
         p <- p + facet_wrap(~level, ncol=2, scale="free_y") +
         theme_bw() +
         theme(legend.position="none") +
-        labs(x="Number of points", y="Area")
+        labs(x="Number of points", y=paste0("Area [", config$config$outUnit, "]"))
 
       resAsym[[i]]$kdePlot <- grid.grabExpr(print(p))
 
@@ -228,6 +240,24 @@ if (config$todo$doAsymptote) {
   # Rewrite results
   res$write(p(paste0("Description of Asymptote")))
 
+  aysm.msg <- function(x){
+
+    if (any(!is.na(x$ns))) { # Assym reached by some levels
+      msg.reached <- paste0("The asymptote at the level(s) (", paste0(x$level[!is.na(x$ns)], collapse=", "), ") was reached with ", paste0(x$ns[!is.na(x$ns)], collapse=", "), " points respectively")
+    } else {
+      msg.reached <- ""
+    }
+
+    if (any(is.na(x$ns))) { # Assym reached by some levels
+      msg.notreached <- paste0("No asymptote was reached for level(s): ", paste0(x$level[is.na(x$ns)], collapse=", "))
+    } else {
+      msg.notreached <- ""
+    }
+
+    paste(msg.reached, msg.notreached)
+
+  }
+
   for (i in 1:length(resAsym)) {
     res$write(h3(paste0("Asymptote for ", ids[i])))
 
@@ -239,11 +269,19 @@ if (config$todo$doAsymptote) {
     if (!is.null(resAsym[[i]]$mcp)) {
       res$write(p("For MCP the asymptote was reached after ..."))
       res$write(img(paste0(imageurl, paste0("rhr_AsymptotePlot_id_", ids[i], "_mcp.png")), cap="Asym for MCP"))
+
+      
+
+      
+      res$write(alert(resAsym[[i]]$MCPmsg <- aysm.msg(resAsym[[i]]$MCPasymReached)))
+
     }
 
     if (!is.null(resAsym[[i]]$kde)) {
       res$write(p("For KDE the asymptote was reached after ..."))
       res$write(img(paste0(imageurl, paste0("rhr_AsymptotePlot_id_", ids[i], "_kde.png")), cap="KDE"))
+
+      res$write(alert(resAsym[[i]]$KDEmsg <- aysm.msg(resAsym[[i]]$KDEasymReached)))
     }
 
   }
@@ -251,7 +289,7 @@ if (config$todo$doAsymptote) {
 
 
 } else {
-  res$write(alert("Asymptote not requested"))
+  res$write(alert("The home range asymptote was not requested"))
 }
 res$finish()
 
