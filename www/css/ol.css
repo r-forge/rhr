@@ -1,0 +1,67 @@
+
+/**
+ * Layer switcher
+ */
+.olSwitcher {
+    position: absolute;
+    top: 25px;
+    right: 0px;
+    width: 20em;
+    font-family: sans-serif;
+    font-weight: bold;
+    margin-top: 3px;
+    margin-left: 3px;
+    margin-bottom: 3px;
+    font-size: smaller;
+    color: white;
+    background-color: transparent;
+}
+
+.abc {
+    top: 25px;
+    right: 0px;
+    width: 20em;
+    font-family: sans-serif;
+    font-weight: bold;
+    margin-top: 3px;
+    margin-left: 3px;
+    margin-bottom: 3px;
+    font-size: smaller;
+    color: green;
+    background-color: transparent;
+    height:500px;
+    overflow:auto;
+}
+
+.abc label {
+ display:inline;
+ margin-left: 10px;
+}
+
+.olSwitcher .layersDiv {
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-bottom: 5px;
+    padding-right: 75px;
+    background-color: darkblue;
+    width: 100%;
+    height: 100%;
+}
+
+.olSwitcher .layersDiv .baseLbl,
+.olSwitcher .layersDiv .dataLbl {
+    margin-top: 3px;
+    margin-left: 3px;
+    margin-bottom: 3px;
+}
+
+.olSwitcher .layersDiv .baseLayersDiv,
+.olSwitcher .layersDiv .dataLayersDiv {
+    padding-left: 10px;
+}
+
+.olSwitcher .maximizeDiv,
+.olSwitcher .minimizeDiv {
+    top: 5px;
+    right: 0px;
+}
