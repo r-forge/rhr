@@ -4,19 +4,18 @@
 #' @param levels a vector with the percentage of closest points to the centroid that are used to calculated MCP
 #' @return object of class \code{SpatialPolygonsDataFrame}
 #' @export
-#' @author Johannes Signer modified code from \code{adehabitatHR::mcp}
+#' @author Johannes Signer modified and adapted code from \code{adehabitatHR::mcp}
 #' @examples
-#' cat("hello world")
+#' data(datSH)
+#' mcp1 <- rhrMCP(datSH[, 2:3], levels=95)
+#' mcp2 <- rhrMCP(datSH[, 2:3], levels=c(50, 90, 95))
+
 
 
 rhrMCP <- function(xy, levels=95) {
 
-  # Original function adehabitatHR:::mcp this is a for speed improved and stripped down version
-
   ## Computes the centroid of the relocations for each animal    
-
   centroid <- colMeans(xy)
-
 
   ## Distances from the relocations to the centroid: we keep
   ## the "percent" closest
