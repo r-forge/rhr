@@ -18,10 +18,12 @@
   Minimum Convex Polygon (MCP)
 }
 \examples{
-cat("hello world")
+data(datSH)
+mcp1 <- rhrMCP(datSH[, 2:3], levels=95)
+mcp2 <- rhrMCP(datSH[, 2:3], levels=c(50, 90, 95))
 }
 \author{
-  Johannes Signer modified code from
+  Johannes Signer modified and adapted code from
   \code{adehabitatHR::mcp}
 }
 
