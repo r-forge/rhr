@@ -21,6 +21,22 @@ pushViewport(viewport(x=unit(35, "mm"),
     # page frame        
     grid.rect(gp=gpar(lwd=0.2))
 
+# ============================================================================ # 
+# Global settings
+
+global <- list()
+global$h1 <- list()
+global$h1$gpar <- gpar(fontface="bold", fontsize=18)
+global$h1$size <- 12
+global$h2$gpar <- gpar(fontsize=16)
+global$h2$size <- 8
+global$h3$grob <- function(x) {
+  gTree(children=gList(
+          textGrob(x=0.0, y=0.3, label=x, just=c("left", "bottom"), gp=gpar(fontsize=14)),
+                   linesGrob(y=c(0.2,0.2))))
+      }
+global$h3$size <- 10
+
 
 # ============================================================================ # 
 # Prepare 2nd to nth page
@@ -33,33 +49,31 @@ repH <- c()
 
 if (config$todo$doSiteFidelity) {
   # infoblock
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Site fidelity") -> rSF.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rSF.input
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Number of simulated trajectories") -> rSF.niter0
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=config$preAnalysis$siteFidelity$n) -> rSF.niter1
+  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h1$gpar, label="Site fidelity") 
+  repH <- c(repH, global$h1$size)
+  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h2$gpar, label="Settings") 
+  repH <- c(repH, global$h2$size)
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="Number of simulated trajectories"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$siteFidelity$n)))
+  repH <- c(repH, 10)
 
-  # add to pending
-  repItems[[length(repItems) + 1]] <- gTree(children=gList(rSF.header, rSF.input, rSF.niter0, rSF.niter1))
-  repH <- c(repH, 20)
   
   # Results
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Results") -> rSF.res
-
-  repItems[[length(repItems) + 1]] <- rSF.res 
-  repH <- c(repH, 10)
+  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h2$gpar, label="Results") 
+  repH <- c(repH, global$h2$size)
 
   # add results
   for (i in seq_along(sfs)) {
     # header
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
-                                                         gp=gpar(fontface="bold")),
-                                                linesGrob(y=c(0.26,0.26))))
-    repH <- c(repH, 10)
+    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
+    repH <- c(repH, global$h3$size)
 
     # CI for simulated data
     tmp <- sfs[[i]]$fidelity.results
-    names(tmp)[3:4] <- c("CI lower", "CI upper")
+    names(tmp)[3:4] <- c("CI lower (sim)", "CI upper (sim)")
+    tmp[, 1] <- c("Linearity Index", "MSD")
 
     repItems[[length(repItems) + 1]] <- dfGrob(tmp, digits=4)
     repH <- c(repH, 15)

@@ -15,13 +15,13 @@ if (config$todo$doSiteFidelity) {
     png(file=filename)
 
     ## msd
-    p1 <- ggplot(data.frame(msd=sfs[[i]]$msd.sim), aes(factor("msd"), msd)) + geom_jitter(alpha=0.4) + geom_boxplot(alpha=0.3) + theme_bw() + scale_x_discrete(name="") + scale_y_continuous(name="MSD from Center of Activity")
+    p1 <- ggplot(data.frame(msd=sfs[[i]]$msd.sim), aes(factor("msd"), msd)) + geom_jitter(alpha=0.4) + geom_boxplot(alpha=0.3) + theme_bw() + scale_x_discrete(name="MSD", breaks=NULL) + scale_y_continuous(name="MSD from Center of Activity (MSD)") + xlab("MSD")
     hlineData <- data.frame(yin=sfs[[i]]$msd.dat)
     p1 <- p1 + geom_hline(aes(yintercept = yin, colour="red"), hlineData)
 
     ### Li
-    p2 <- ggplot(data.frame(li=sfs[[i]]$li.sim), aes(factor("li"), li)) + geom_jitter(alpha=0.4) + geom_boxplot(alpha=0.3) + theme_bw() + scale_x_discrete(name="") + scale_y_continuous(name="Linearity Index")
-    hlineData <- data.frame(yin=sfs[[i]]$li.dat)
+    p2 <- ggplot(data.frame(li=sfs[[i]]$li.sim), aes(factor("li"), li)) + geom_jitter(alpha=0.4) + geom_boxplot(alpha=0.3) + theme_bw() + scale_x_discrete(name="LI", breaks=NULL) + scale_y_continuous(name="Linearity Index (LI)") 
+    hlineData <- data.frame(yin=sfs[[i]]$li.dat) 
     p2 <- p2 + geom_hline(aes(yintercept = yin, colour="red"), hlineData)
 #
     grid.arrange(p1,p2, ncol=2, main="Site Fidelity")
@@ -52,9 +52,6 @@ if (config$todo$doSiteFidelity) {
 
 
     
-    #res$write(p("Below t-test to support the the boxplots"))
-    #res$write(toHTML(t.test(sfs[[i]]$li.sim, mu=sfs[[i]]$li.dat), cap=""))
-    #res$write(toHTML(t.test(sfs[[i]]$msd.sim, mu=sfs[[i]]$msd.dat), cap=""))
     res$write(toHTML(fidelity.results))
 
     if (sfs[[i]]$li.dat < li.ci[1] && sfs[[i]]$msd.dat < msd.ci[1]) {
