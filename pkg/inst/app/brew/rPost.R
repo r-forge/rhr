@@ -2,9 +2,6 @@
 
 res <- Response$new()
 
-# ============================================================================ # 
-# Remove data
-rm(datSub)
 
 # ============================================================================ #
 # copy files
@@ -36,36 +33,28 @@ fnShp <- fn[!fn %in% c(fnRda, fnKml, fnTif)]
 fnShp <- fnShp[!grepl("*.png", fnShp)]
 fnShp <- fnShp[!grepl("*.pdf", fnShp)]
 
-res$write(h3("Rdata"))
-res$write(cat("<ul>"))
-res$write(cat(paste0("<li><a href='", dataurl, fnRda, "'>", fnRda, " </a></li>")))
-res$write(cat("</ul>"))
 
-if (config$config$expKML) {
-  res$write(h3("Kml"))
+for (i in seq_along(names(datSub))) {
+
+  fnRda.this <- fnRda[grepl(names(datSub)[i], fnRda)]
+  fnKml.this <- fnKml[grepl(names(datSub)[i], fnKml)]
+  fnTif.this <- fnTif[grepl(names(datSub)[i], fnTif)]
+  fnShp.this <- fnShp[grepl(names(datSub)[i], fnShp)]
+
+  res$write(h3(names(datSub[i])))
   res$write(cat("<ul>"))
-  res$write(cat(paste0("<li><a href='", dataurl, fnKml, "'>", fnKml, " </a></li>")))
+  if (length(fnRda.this) > 0) res$write(cat(paste0("<li><a href='", dataurl, fnRda.this, "'>", fnRda.this, " </a></li>")))
+  if (length(fnKml.this) > 0) res$write(cat(paste0("<li><a href='", dataurl, fnKml.this, "'>", fnKml.this, " </a></li>")))
+  if (length(fnTif.this) > 0) res$write(cat(paste0("<li><a href='", dataurl, fnTif.this, "'>", fnTif.this, " </a></li>")))
+  if (length(fnShp.this) > 0) res$write(cat(paste0("<li><a href='", dataurl, fnShp.this, "'>", fnShp.this, " </a></li>")))
   res$write(cat("</ul>"))
 }
 
-if (config$todo$doKDE | config$todo$doCA) {
-  res$write(h3("Tif"))
-  res$write(cat("<ul>"))
-  res$write(cat(paste0("<li><a href='", dataurl, fnTif, "'>", fnTif, " </a></li>")))
-  res$write(cat("</ul>"))
-  res$write(h3("Shape file"))
-  res$write(cat("<ul>"))
-  res$write(cat(paste0("<li><a href='", dataurl, fnShp, "'>", fnShp, " </a></li>")))
-  res$write(cat("</ul>"))
-}
-
-if (config$todo$doLocoh | config$todo$doMCP) {
-  res$write(h3("Shape file"))
-  res$write(cat("<ul>"))
-  res$write(cat(paste0("<li><a href='", dataurl, fnShp, "'>", fnShp, " </a></li>")))
-  res$write(cat("</ul>"))
-}
 
 res$finish()
+
+# ============================================================================ # 
+# Remove data
+rm(datSub)
 
 %>
