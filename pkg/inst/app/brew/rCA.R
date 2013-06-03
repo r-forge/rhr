@@ -53,7 +53,7 @@ if (config$todo$doCA) {
     p1 <- ggplot(data.frame(x=pctrange, y=pctprob), aes(x=x, y=y)) + geom_line() + xlim(c(0,1)) + ylim(c(0,1)) +
       geom_abline(intercept=1, slope=-1) + 
       geom_point(aes(x=x,y=y), colour="red", data=data.frame(x=pctrange[which.max(dd)], y=pctprob[which.max(dd)])) + 
-      theme_bw() + labs(x="pctrange", y="pctprob")
+      theme_bw() + labs(x="Percent of Home Range", y="Percent of max Relative Frequency")
 
 
     p2 <- ggplot(data=r1) + geom_tile(aes(x=x, y=y, fill=z)) +
