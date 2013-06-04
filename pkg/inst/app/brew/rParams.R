@@ -27,15 +27,24 @@ pushViewport(viewport(x=unit(35, "mm"),
 global <- list()
 global$h1 <- list()
 global$h1$gpar <- gpar(fontface="bold", fontsize=18)
-global$h1$size <- 12
+global$h1$grob <- function(x) {
+  textGrob(x=0.0, y=0.2, just=c("left", "bottom"), gp=global$h1$gpar, label=x) 
+}
+global$h1$size <- 18
+
 global$h2$gpar <- gpar(fontsize=16)
-global$h2$size <- 8
+global$h2$size <- 12
+global$h2$grob <- function(x) {
+  textGrob(x=0.0, y=0.2, just=c("left", "bottom"), gp=global$h2$gpar, label=x) 
+}
+
 global$h3$grob <- function(x) {
   gTree(children=gList(
           textGrob(x=0.0, y=0.3, label=x, just=c("left", "bottom"), gp=gpar(fontsize=14)),
                    linesGrob(y=c(0.2,0.2))))
       }
-global$h3$size <- 10
+global$h3$size <- 12
+global$line$size <- 5.5
 
 
 # ============================================================================ # 
@@ -49,19 +58,19 @@ repH <- c()
 
 if (config$todo$doSiteFidelity) {
   # infoblock
-  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h1$gpar, label="Site fidelity") 
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Site fidelity") 
   repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h2$gpar, label="Settings") 
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
   repH <- c(repH, global$h2$size)
   repItems[[length(repItems) + 1]] <- gTree(children=gList(
                                               textGrob(x=0.0, just=c("left", "bottom"), label="Number of simulated trajectories"),
                                               textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
                                                label=config$preAnalysis$siteFidelity$n)))
-  repH <- c(repH, 10)
+  repH <- c(repH, global$line$size)
 
   
   # Results
-  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h2$gpar, label="Results") 
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
   repH <- c(repH, global$h2$size)
 
   # add results
@@ -111,36 +120,38 @@ if (config$todo$doSiteFidelity) {
 
 if (config$todo$doTTSI & config$config$dateTime) {
   # infoblock
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Time To Statistical Independence (TTSI)") -> rTTSI.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rTTSI.input
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="time interval [s]") -> rTTSI.level0
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$ttsi$interval) -> rTTSI.level1
-  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.0, just=c("left", "bottom"), label="tolerance [s]") -> rTTSI.level3
-  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$ttsi$tolerance) -> rTTSI.level4
-  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.0, just=c("left", "bottom"), label="type") -> rTTSI.level5
-  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$ttsi$type) -> rTTSI.level6
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Time To Statistical Independence") 
+  repH <- c(repH, global$h1$size)
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
+  repH <- c(repH, global$h2$size)
 
- # # add to pending
-  repItems[[length(repItems) + 1]] <- gTree(children=gList(rTTSI.header, rTTSI.input, rTTSI.level0, rTTSI.level1,
-                                              rTTSI.level3, rTTSI.level4, rTTSI.level5, rTTSI.level6))
-  repH <- c(repH, 30)
- # 
- # # Results
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Results") -> rTTSI.res
-  repItems[[length(repItems) + 1]] <- rTTSI.res 
-  repH <- c(repH, 10)
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="time interval [s]"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$ttsi$interval)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="tolerance [s]"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$ttsi$tolerance)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="type"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$ttsi$type)))
+  repH <- c(repH, global$line$size)
+
+  
+  # Results
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
+  repH <- c(repH, global$h2$size)
 
   # add results
   for (i in seq_along(ttsiPlots)) {
-    # header
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
-                                                         gp=gpar(fontface="bold")),
-                                                linesGrob(y=c(0.26,0.26))))
-    repH <- c(repH, 10)
+    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
+    repH <- c(repH, global$h3$size)
 
     # plots
     repItems[[length(repItems) + 1]] <- ttsiPlots[[i]]
@@ -177,58 +188,62 @@ if (config$todo$doTTSI & config$config$dateTime) {
 
 if (config$todo$doAsymptote) {
  # infoblock
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Asymptote") -> rAsym.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rAsym.input
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Asymptote") 
+  repH <- c(repH, global$h1$size)
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
+  repH <- c(repH, global$h2$size)
 
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="minimum number of points") -> rAsym.level0	      
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$asymptote$minNPts) -> rAsym.level1
-  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.0, just=c("left", "bottom"), label="number of iterations") -> rAsym.level2	      
-  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$asymptote$nIter) -> rAsym.level3
-  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.0, just=c("left", "bottom"), label="increment per iteration") -> rAsym.level4	      
-  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$asymptote$increment) -> rAsym.level5
-  textGrob(y=unit(1, "npc") - unit(7, "lines"), x=0.0, just=c("left", "bottom"), label="estimator") -> rAsym.level6	      
-  textGrob(y=unit(1, "npc") - unit(7, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$asymptote$estimator) -> rAsym.level7
-  textGrob(y=unit(1, "npc") - unit(8, "lines"), x=0.0, just=c("left", "bottom"), label="number of replications") -> rAsym.level8	      
-  textGrob(y=unit(1, "npc") - unit(8, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$asymptote$nTimes) -> rAsym.level9
-  textGrob(y=unit(1, "npc") - unit(9, "lines"), x=0.0, just=c("left", "bottom"), label="level") -> rAsym.level10	      
-  textGrob(y=unit(1, "npc") - unit(9, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$asymptote$level) -> rAsym.level11
-  textGrob(y=unit(1, "npc") - unit(10, "lines"), x=0.0, just=c("left", "bottom"), label="tolerance to total area") -> rAsym.level12	      
-  textGrob(y=unit(1, "npc") - unit(10, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-           label=config$preAnalysis$asymptote$tolTotArea) -> rAsym.level13
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="minimum number of points"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$asymptote$minNPts)))
+  repH <- c(repH, global$line$size)
 
- ## add to pending
-  repItems[[length(repItems) + 1]] <- gTree(children=gList(rAsym.header, rAsym.input,
-                                              rAsym.level0, rAsym.level1,
-                                              rAsym.level2, rAsym.level3,
-                                              rAsym.level4, rAsym.level5,
-                                              rAsym.level6, rAsym.level7,
-                                              rAsym.level8, rAsym.level9,
-                                              rAsym.level10, rAsym.level11,
-                                              rAsym.level12, rAsym.level13
-                                              ))
-  repH <- c(repH, 50)
- # 
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="number of iterations"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$asymptote$nIter)))
+  repH <- c(repH, global$line$size)
 
- ## Results
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Results") -> Asym.res
-  repItems[[length(repItems) + 1]] <- Asym.res 
-  repH <- c(repH, 10)
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="increment per iteration"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$asymptote$increment)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="estimator"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$asymptote$estimator)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="number of replications"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$asymptote$nTimes)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="level"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$asymptote$level)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="tolerance to total area"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$asymptote$tolTotArea)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
+  repH <- c(repH, global$h2$size)
 
  ### Add plots
  for (i in seq_along(resAsym)) {
 
  #   # header
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
-                                                         gp=gpar(fontface="bold")),
-                                                linesGrob(y=c(0.26,0.26))))
-    repH <- c(repH, 10)
+    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
+    repH <- c(repH, global$h3$size)
 
     if (resAsym[[i]]$exit != 0) {
 
@@ -323,9 +338,9 @@ if (config$todo$doAsymptote) {
 
 if (config$todo$doCA) {
   # infoblock
-  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h1$gpar, label="Core Area Estimation") 
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Core Area Estimation") 
   repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h2$gpar, label="Settings") 
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
   repH <- c(repH, global$h2$size)
   repItems[[length(repItems) + 1]] <- gTree(children=gList(
                                               textGrob(x=0.0, just=c("left", "bottom"), label="Resolution"),
@@ -334,7 +349,7 @@ if (config$todo$doCA) {
   repH <- c(repH, 10)
 
   # Results
-  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h2$gpar, label="Results") 
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
   repH <- c(repH, global$h2$size)
 
   # add results
@@ -371,15 +386,18 @@ if (config$todo$doCA) {
 
 if (config$todo$doMCP) {
   # infoblock
-  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h1$gpar, label="Minimum Convex Polygon") 
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Minimum Convex Polygon") 
   repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- textGrob(x=0.0, just=c("left", "bottom"), gp=global$h2$gpar, label="Settings") 
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
   repH <- c(repH, global$h2$size)
   repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                              textGrob(x=0.0, just=c("left", "bottom"), label="Level"),
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="level"),
                                               textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
                                                label=config$estimator$mcp$level)))
-  repH <- c(repH, 10)
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
+  repH <- c(repH, global$h2$size)
 
  # add results
   for (i in seq_along(mcpPlots)) {
@@ -412,38 +430,44 @@ if (config$todo$doMCP) {
 
 if (config$todo$doKDE) {
   # infoblock
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Kernel Density Estimation") -> rKDE.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Settings") -> rKDE.input
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Kernel Density Estimation") 
+  repH <- c(repH, global$h1$size)
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
+  repH <- c(repH, global$h2$size)
 
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="level") -> rKDE.level0
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(config$estimator$kde$level, collapse=",")) -> rKDE.level1
-  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.0, just=c("left", "bottom"), label="resolution") -> rKDE.level2
-  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(config$estimator$kde$resolution, collapse=",")) -> rKDE.level3
-  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.0, just=c("left", "bottom"), label="buffer") -> rKDE.level4
-  textGrob(y=unit(1, "npc") - unit(6, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(config$estimator$kde$buffer, collapse=",")) -> rKDE.level5
-  textGrob(y=unit(1, "npc") - unit(7, "lines"), x=0.0, just=c("left", "bottom"), label="bandwidth type") -> rKDE.level6
-  textGrob(y=unit(1, "npc") - unit(7, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=paste0(config$estimator$kde$bandwidth, collapse=",")) -> rKDE.level7
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="level"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$estimator$kde$level)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="resolution"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$estimator$kde$resolution)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="buffer"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$estimator$kde$buffer)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="bandwidth type"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$estimator$kde$bandwith)))
+  repH <- c(repH, global$line$size)
 
 
-  # add to pending
-  repItems[[length(repItems) + 1]] <- gTree(children=gList(rKDE.header, rKDE.input, 
-                                              rKDE.level0, rKDE.level1,
-                                              rKDE.level2, rKDE.level3,
-                                              rKDE.level4, rKDE.level5,
-                                              rKDE.level6, rKDE.level7
-                                              ))
-  repH <- c(repH, 30)
-
-
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
+  repH <- c(repH, global$h2$size)
 
   # add results
   for (i in seq_along(kdePlots)) {
     # header
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
-                                                         gp=gpar(fontface="bold")),
-                                                linesGrob(y=c(0.26,0.26))))
-    repH <- c(repH, 10)
+    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
+    repH <- c(repH, global$h3$size)
 
     # plots
     repItems[[length(repItems) + 1]] <- kdePlots[[i]]
@@ -478,30 +502,32 @@ if (config$todo$doKDE) {
 
 if (config$todo$doLocoh) {
   # infoblock
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontsize=18), label="Local Convex Hull") -> rLocoh.header
-  textGrob(y=unit(1, "npc") - unit(3, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Input") -> rLocoh.input
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.0, just=c("left", "bottom"), label="Level") -> rLocoh.level0
-  textGrob(y=unit(1, "npc") - unit(4, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=config$estimator$locoh$level) -> rLocoh.level1
-  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.0, just=c("left", "bottom"), label="Type") -> rLocoh.level2
-  textGrob(y=unit(1, "npc") - unit(5, "lines"), x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"), label=config$estimator$locoh$type) -> rLocoh.level3
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Local Convex Hull") 
+  repH <- c(repH, global$h1$size)
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
+  repH <- c(repH, global$h2$size)
 
- # add to pending
-  repItems[[length(repItems) + 1]] <- gTree(children=gList(rLocoh.header, rLocoh.input, rLocoh.level0, rLocoh.level1))
-  repH <- c(repH, 25)
- # 
- # # Results
-  textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), gp=gpar(fontface="bold"), label="Results") -> Locoh.res
-  repItems[[length(repItems) + 1]] <- Locoh.res 
-  repH <- c(repH, 10)
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="level"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$estimator$locoh$level)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="type"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$estimator$locoh$type)))
+  repH <- c(repH, global$line$size)
+
+
+  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
+  repH <- c(repH, global$h2$size)
 
   # add results
   for (i in seq_along(locohPlots)) {
     # header
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(
-                                                textGrob(x=0.0, y=0.3, label=names(datSub)[i], just=c("left", "bottom"),
-                                                         gp=gpar(fontface="bold")),
-                                                linesGrob(y=c(0.26,0.26))))
-    repH <- c(repH, 10)
+    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
+    repH <- c(repH, global$h3$size)
 
     # plots
     repItems[[length(repItems) + 1]] <- locohPlots[[i]]
@@ -531,7 +557,7 @@ if (config$todo$doLocoh) {
 # ============================================================================ #
 # Summary of parameters
 
-repItems[[length(repItems) + 1]] <- textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="bold"), label="Summary of parameters used")
+repItems[[length(repItems) + 1]] <- global$h1$grob("Summary of parameters used")
 repH <- c(repH, 20)
 
 if (config$todo$doSiteFidelity) {
