@@ -10,4 +10,7 @@
 \description{
   Wraps a string as a h4 heading
 }
+\examples{
+h4("Title 4")
+}
 

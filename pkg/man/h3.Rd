@@ -10,4 +10,7 @@
 \description{
   Wraps a string as a h3 heading
 }
+\examples{
+h3("Title 3")
+}
 

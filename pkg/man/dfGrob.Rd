@@ -17,4 +17,13 @@
   Create a grid representation for an object of class
   data.frame
 }
+\examples{
+grid.newpage()
+pushViewport(viewport())
+grid.draw(dfGrob(data.frame(id=1:10, class=letters[1:10], stringsAsFactors=FALSE)))
+popViewport()
+}
+\author{
+  Johannes Signer
+}
 

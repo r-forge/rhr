@@ -5,9 +5,12 @@
   h2(x)
 }
 \arguments{
-  \item{x}{a txt string}
+  \item{x}{a string}
 }
 \description{
   Wraps a string as a h2 heading
+}
+\examples{
+h2("Title 2")
 }
 

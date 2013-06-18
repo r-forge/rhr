@@ -41,7 +41,6 @@
 #' plot(k1)
 #' plot(k2)}
 
-
 rhrKDE <- function(xy, h="href", xrange=NA, yrange=NA, resolution=100, lscv.n=100, tol=1, return.raster=FALSE) {
   # load libraries
   require(KernSmooth)

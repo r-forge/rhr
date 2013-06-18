@@ -12,4 +12,7 @@
 \description{
   Wraps a string as inline code
 }
+\examples{
+code("cat('foo')")
+}
 

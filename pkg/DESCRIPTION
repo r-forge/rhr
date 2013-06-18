@@ -35,7 +35,6 @@ Collate:
     'rhrEstimator.R'
     'rhrEstMCP.R'
     'rhrEstimatorCharacteristic.R'
-    'pBrhrEstimator.R'
     'rhrEstKDE.R'
     'rhrEstLoCoH.R'
     'rhrCoreArea.R'

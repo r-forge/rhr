@@ -70,7 +70,10 @@ cat('</table>')
 #' 
 #' Wraps a string as a h1 heading
 #' @param x a txt string
+#' @author Johannes Signer
 #' @export
+#' @examples
+#' h1("Title 1")
 
 h1 <- function(x) {
   cat(paste0("<h1>", x, "</h1>"))
@@ -79,8 +82,11 @@ h1 <- function(x) {
 #' h2
 #' 
 #' Wraps a string as a h2 heading
-#' @param x a txt string
+#' @param x a string
 #' @export
+#' @examples
+#' h2("Title 2")
+
 h2 <- function(x) {
   cat(paste0("<h2>", x, "</h2>"))
 }
@@ -90,6 +96,8 @@ h2 <- function(x) {
 #' Wraps a string as a h3 heading
 #' @param x a txt string
 #' @export
+#' @examples
+#' h3("Title 3")
 
 h3 <- function(x) {
   cat(paste0("<h3>", x, "</h3>"))
@@ -100,6 +108,8 @@ h3 <- function(x) {
 #' Wraps a string as a h4 heading
 #' @param x a txt string
 #' @export
+#' @examples
+#' h4("Title 4")
 
 h4 <- function(x) {
   paste0("<h4>", x, "</h4>")
@@ -145,6 +155,8 @@ p <- function(x, ...) {
 #' @param x a string
 #' @param ... additional arguments, none implemented
 #' @export
+#' @examples
+#' code("cat('foo')")
 
 code <- function(x) {
   paste0("<pre>", x, "</pre>")
@@ -218,43 +230,16 @@ toHTML.htest <- function(x, cap=NULL, ...) {
 }
 
 
-# chtml <- function(header="From R", bd="Test", template=NULL, outfile="") {
-#   if (is.null(template) | !file.exists(template)) {
-#     stop("no template found")
-#   }
-# 
-#   bdtmp <- readChar(template, file.info(template)$size)
-#   bdtmp <- gsub("<!--header-->", x=bdtmp, replacement=header)
-#   bdtmp <- sub("<!--body-->", x=bdtmp, replacement=bd)
-#   cat(bdtmp, file=outfile)
-# }
-
-# accordion <- function(el, id="accor01") {
-#   # el - is a list - each intery is an other list which is 1 accordion
-#   #  each entry need to have a heading and a body
-#   out <- paste0('<div class="accordion" id="', id, '">')
-# 
-#   tmp <- lapply(el, function(x) paste0('<div class="accordion-group">
-#   <div class="accordion-heading">
-#   <a class="accordion-toggle" data-toggle="collapse" data-parent="#', id, '" href="#', gsub(" ", "", x[[1]]), '">', x[[1]], 
-#   '</a> </div>
-#   <div id="', gsub(" ", "", x[[1]]), '" class="accordion-body collapse">
-#   <div class="accordion-inner">', x[[2]], ' </div> </div> </div>'))
-# 
-#   tmp <- do.call("c", tmp)
-#   out <- paste0(out, tmp, collapse="\n")
-# 
-#   out <- paste0(out, "</div>", collapse="\n")
-#   cat(out)
-# }
-
-# issue alert
 #' alert
 #'
-#' wraps string as bootstrap alert
+#' wraps string as twitter bootstrap alert
 #' @param x a string
 #' @param cat whether it should be printed to sto or not
 #' @export
+#' @author Johannes Signer
+#' @examples
+#' alert("Calculation completed") 
+
 alert <- function(x, cat=TRUE) {
   out <- paste0("<div class='alert alert-info'>", x, "</div>")
   if (cat) {
@@ -270,6 +255,10 @@ alert <- function(x, cat=TRUE) {
 #' @param x a string
 #' @param cat whether it should be printed to sto or not
 #' @export
+#' @author Johannes Signer
+#' @examples
+#' alertWarning("Something went wrong") 
+
 alertWarning <- function(x, cat=TRUE) {
   out <- paste0("<div class='alert alert-warning'>", x, "</div>")
   if (cat) {
@@ -285,7 +274,11 @@ alertWarning <- function(x, cat=TRUE) {
 #' @param x a string
 #' @param cat whether it should be printed to sto or not
 #' @export
-alertWarning <- function(x, cat=TRUE) {
+#' @author Johannes Signer
+#' @examples
+#' alertSuccess("Everything went good") 
+
+alertSuccess <- function(x, cat=TRUE) {
   out <- paste0("<div class='alert alert-success'>", x, "</div>")
   if (cat) {
     return(cat(out))
@@ -454,6 +447,12 @@ summaryGrob <- function(x) {
 #' Create a grid representation for an object of class htest
 #' @param x a htest
 #' @export
+#' @author Johannes Signer
+#' @examples
+#' grid.newpage()
+#' pushViewport(viewport())
+#' grid.draw(ttestGrob(t.test(1:10, mu=5)))
+#' popViewport()
 
 ttestGrob <- function(x) {
   h <- textGrob(c("test statistic", "df", "p-value", "Alternative"), x=c(0.03, .28, .53, .78), y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), gp=gpar(fontface="bold"))
@@ -470,6 +469,12 @@ ttestGrob <- function(x) {
 #' @param stop where to stop, default is 0.97
 #' @param digits to how many digists numbers are rounded
 #' @export
+#' @author Johannes Signer
+#' @examples
+#' grid.newpage()
+#' pushViewport(viewport())
+#' grid.draw(dfGrob(data.frame(id=1:10, class=letters[1:10], stringsAsFactors=FALSE)))
+#' popViewport()
 
 dfGrob <- function(x, start=0.03, stop=0.97, digits=2) {
   xs <- seq(start, stop, length.out=(ncol(x)+1))
@@ -481,7 +486,8 @@ dfGrob <- function(x, start=0.03, stop=0.97, digits=2) {
   for (i in 1:ncol(x)) if (is.numeric(x[1,i])) x[,i] <- round(x[,i], digits)
 
   for (i in 1:nrow(x))
-    l[[length(l) + 1]] <- textGrob(x[i,], x=xs, y=unit(1, "npc") - unit(i + 1.5, "lines"), just=c("left", "bottom"))
+    l[[length(l) + 1]] <- textGrob(label=as.character(x[i,]), x=xs, y=unit(1, "npc") - unit(i + 1.5, "lines"), just=c("left", "bottom"))
+
   return(gTree(children=do.call("gList", l)))
 }
 

@@ -10,4 +10,10 @@
 \description{
   Wraps a string as a h1 heading
 }
+\examples{
+h1("Title 1")
+}
+\author{
+  Johannes Signer
+}
 

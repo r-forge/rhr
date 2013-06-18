@@ -1,7 +1,6 @@
 \name{alert}
 \alias{alert}
-\title{#   <a class="accordion-toggle" data-toggle="collapse" data-parent=", id, '" href="#', gsub(" ", "", x[[1]]), '">', x[[1]],
-alert}
+\title{alert}
 \usage{
   alert(x, cat = TRUE)
 }
@@ -11,6 +10,12 @@ alert}
   \item{cat}{whether it should be printed to sto or not}
 }
 \description{
-  wraps string as bootstrap alert
+  wraps string as twitter bootstrap alert
+}
+\examples{
+alert("Calculation completed")
+}
+\author{
+  Johannes Signer
 }
 

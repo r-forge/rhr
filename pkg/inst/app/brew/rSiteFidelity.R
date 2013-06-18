@@ -46,7 +46,7 @@ if (config$todo$doSiteFidelity) {
     fidelity.results <- data.frame(Measure=c("LI", "MSD"),
                                    Observed=c(sfs[[i]]$li.dat, sfs[[i]]$msd.dat),
                                    LCI=c(li.ci[1], msd.ci[1]),
-                                   UCI=c(li.ci[2], msd.ci[2]))
+                                   UCI=c(li.ci[2], msd.ci[2]), stringsAsFactors=FALSE)
     names(fidelity.results)[3:4] <- c("lower 95 % confidence interval", "upper 95 % confidence interval")
     sfs[[i]]$fidelity.results <- fidelity.results
 
