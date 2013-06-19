@@ -33,7 +33,6 @@ rhrFidelity <- function(dat, n=100) {
 #' @param n the number of coordinates
 #' @return a list
 #' @useDynLib rhr
-#' @export
 #' @author Johannes Signer
 
 
