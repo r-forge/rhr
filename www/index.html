@@ -15,9 +15,6 @@
       .tab-pane {min-height: 400px;}
     </style>
 
-    <!-- Modernizr for browser feature-checking 
-	 + HTML5shiv (included in modernizr) see modernizr.com -->
-    <script src="js/modernizr-2.5.3.min.js"></script>
 
     <!-- Fav and touch icons -->
     <!-- alternatively, remove these lines and place icons
@@ -28,7 +25,6 @@
     <link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
     <link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
     
-    <script src="js/map.js"></script>
     <style type="text/css"> img { max-width:none; } </style> 
   </head>
 
@@ -54,15 +50,36 @@
     </div><!-- /navbar -->
     
     <div class="container">
-
-      <div class="page-header">
-	<h1>Package</h1>
-      </div>
-      
       <div class="row">
 
 	<div class="span12">				
-	  <h2>Funcitonality</h2>
+
+      <div class="page-header hero-unit">
+	<h1>Reproducibple Homeranges with R</h1>
+      </div>
+
+	</div> <!-- span12 -->
+
+
+	<div class="span7">				
+      <p>
+      <b>rhr</b> is an R package to explore data from animal telemetry studies and to conduct home range analysis. The implemented methods are based on a rigorous review of home range analysis conducted by Laver and Kelly (2008).</p>
+
+      <p>The first <b>r</b> in the packages names stands for reproducible. By this we mean, that the package produces automatically a report showing the main findings of the analysis and parameter values used during analytical steps. Additionally the <b>rhr</b> package provides a GUI (Graphical User Interface) thourgh which all analytical steps can be called. The GUI is built in html and runs R in the background. This feature is intended to ease the use of home range analyses for users with less commandline experience.
+      </p>
+	</div> <!-- span12 -->
+
+
+	<div class="span5">				
+
+      <img src="img/img1.png" class="img-polaroid">
+	</div> <!-- span12 -->
+      </div> 
+
+      <div class="row">
+	<div class="span12">				
+      
+	  <h1>Funcitonality</h1>
 	  <ul>
 	    <li>Graphical User Interaface</li>
 	    <li>Generation of pdf report</li>
@@ -84,7 +101,7 @@
       <hr>
 
       <footer>
-        <p><a href="http://www.spamwell.com/">Spamwell</a> - </p>
+        <p><a href="http://www.spamwell.net/">Spamwell</a></p>
       </footer>
 
 
@@ -100,23 +117,6 @@
       <!-- Bootstrap JS: compiled and minified -->
       <script src="js/bootstrap.min.js"></script>
 
-      <script src="OpenLayers.js"></script>
-
-      <!-- Example plugin: Prettify -->
-      <script src="js/prettify/prettify.js"></script>
-      
-      <!-- Initialize Scripts -->
-      <script>
-	// Activate Google Prettify in this page
-	addEventListener('load', prettyPrint, false);
-	
-	$(document).ready(function(){
-
-	// Add prettyprint class to pre elements
-	$('pre').addClass('prettyprint');
-	
-	}); // end document.ready
-      </script>
 
   </body>
 </html>
