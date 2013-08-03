@@ -112,7 +112,7 @@ h3 <- function(x) {
 #' h4("Title 4")
 
 h4 <- function(x) {
-  paste0("<h4>", x, "</h4>")
+  cat(paste0("<h4>", x, "</h4>"))
 }
 
 #' img
@@ -583,4 +583,355 @@ rhrConvertUnit <- function(x, inUnit="m", outUnit="ha") {
       return(x /1)
     }
   }
+}
+
+
+#' rasterFromXYVect
+#' 
+#' Creates empty raster
+#' @param xy a data.frame or matrix. The first column are x coordinates and the second column are y coordinates
+#' @param xrange range of x
+#' @param yrange range of y
+#' @param res resolution
+
+rasterFromXYVect <- function(xy, xrange=NA, yrange=NA, res=100) {
+
+  if (any(is.na(xrange)) | length(xrange) != 2) {
+    xrange <- c(min(xy[,1]), max(xy[,1]))
+    warning("retrieved x-range from data")
+  } 
+  if (any(is.na(yrange)) | length(yrange) != 2) {
+    yrange <- c(min(xy[,2]), max(xy[,2]))
+    warning("retrieved y-range from data")
+  }
+
+  ## determine gridsize
+  ncolumns <- ceiling(diff(xrange) / res)
+  nrows <- ceiling(diff(yrange) / res)
+
+  return(raster(xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2],
+                nrows=nrows, ncols=ncolumns))
+}
+
+#' rhrHREstimator
+#' 
+#' Constructor for RhrHREstimator
+#' @param dat used data
+#' @param call how the fun was called
+#' @param params parameters that where passed
+#' @param ud whether or not an UD is desired
+#' @param cud whether or not a CUD is desired
+
+rhrHREstimator <- function(dat, call, params, ud, cud) {
+
+  dat <- dat[, 1:2]
+  names(dat)[1:2] <- c("lon", "lat")
+
+  l <- list(call=call, dat=dat, parameters=params, results=list(ud=ifelse(ud, 0, NA), cud=ifelse(cud, 0, NA)))
+  class(l) <- "RhrHREstimator"
+  return(l)
+}
+
+
+#' print for RhrHREstimator
+#' 
+#' generic print for RhrHREstimator
+#' @usage print(x, ...)
+#' @aliases print print.RhrHREstimator
+#' @param x RhrHREstimator object
+#' @param how how the output should be formated, can be either screen, html or grob
+#' @param ... ignored
+#' @method print RhrHREstimator
+#' @export
+
+print.RhrHREstimator <- function(x, ...) {
+
+  if (length(how) > 1) {
+    warning("only first element of what is used")
+  }
+
+  if (!how %in% c("screen", "html", "grob")) {
+    stop("how can only be screen, html or grob")
+  }
+
+  if (how == "screen") {
+    cat(paste0("class       : ", class(x)),
+        paste0("estimator   : ", x$parameters$name),
+        paste0("call        : ", deparse(x$call)),
+        paste0("n points    : ", nrow(x$dat)),
+        paste0("ud          : ", x$parameters$ud),
+        paste0("cud         : ", x$parameters$cud),
+        sep="\n")
+  }
+
+  if (how == "html") {
+    
+  }
+}
+
+
+#' Generic Function to set UD
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param ud the ud, object of class raster
+#' @param ... further arguments, none implemented
+#' @export
+#' @return an object of class rhrHREstimator with ud
+
+rhrSetUD <- function(x, ud, ...) {
+  UseMethod("rhrSetUD", x)
+}
+
+#' Set the UD
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param ud the ud, object of class raster
+#' @param ... further arguments, none implemented
+#' @export
+#' @method rhrSetUD RhrHREstimator
+
+rhrSetUD.RhrHREstimator <- function(x, ud, ...) {
+
+  if (!is(ud, "RasterLayer")) {
+    stop("ud is no raster")
+  }
+
+  x$results$ud <- ud
+  return(x)
+
+}
+
+#' Generic Function to set CUD
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param cud the ud, object of class raster
+#' @param ... further arguments, none implemented
+#' @export
+#' @return an object of class rhrHREstimator with a cud
+
+rhrSetCUD <- function(x, cud, ...) {
+  UseMethod("rhrSetCUD", x)
+}
+
+
+#' Set the CUD
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param cud the cud, object of class raster
+#' @param ... further arguments, none implemented
+#' @export
+#' @method rhrSetUD RhrHREstimator
+
+rhrSetCUD.RhrHREstimator <- function(x, cud, ...) {
+  if (!is(cud, "RasterLayer")) {
+    stop("cud is no raster")
+  }
+  x$results$cud <- cud
+  return(x)
+}
+
+
+rhrSetIso <- function(x, iso, ...) {
+  UseMethod("rhrSetIso", x)
+}
+
+
+rhrSetIso.RhrHREstimator <- function(x, iso, ...) {
+  if (!inherits(iso, "SpatialPolygons")) {
+    stop("iso is no object of class SpatialPolygons")
+  }
+  x$results$isopleths <- iso
+  return(x)
+}
+
+
+#### has* methods
+
+#' Checks if an rhrEstimator posses an ud
+#' 
+#' @param x an object of class rhrHREstimator
+#' @export
+#' @return TRUE/FALSE
+
+hasUD <- function(x) {
+  UseMethod("hasUD", x)
+}
+
+
+#' Checks if an rhrEstimator posses a ud
+#' 
+#' @param x an object of class rhrHREstimator
+#' @export
+#' @method hasUD RhrHREstimator
+
+hasUD.RhrHREstimator <- function(x) {
+  if (is(x$results$ud, "RasterLayer")) {
+    return(TRUE)
+  }
+  return(FALSE)
+}
+
+
+#' Checks if an rhrEstimator posses a cud
+#' 
+#' @param x an object of class rhrHREstimator
+#' @export
+#' @return TRUE/FALSE
+
+hasCUD <- function(x) {
+  UseMethod("hasUD", x)
+}
+
+
+#' Checks if an rhrEstimator posses a cud
+#' 
+#' @param x an object of class rhrHREstimator
+#' @export
+#' @method hasCUD RhrHREstimator
+
+hasCUD.RhrHREstimator <- function(x) {
+
+  if (is(x$results$cud, "RasterLayer")) {
+    return(TRUE)
+  }
+  return(FALSE)
+
+}
+
+
+#' Checks if an rhrEstimator posses isopleths
+#' 
+#' @param x an object of class rhrHREstimator
+#' @export
+#' @return TRUE/FALSE
+
+hasIsopleths <- function(x) {
+  UseMethod("hasIsopleths", x)
+}
+
+
+#' Check if isopleths are available
+#' 
+#' @param x an object of class rhrHREstimator
+#' @export
+#' @method hasIsopleths RhrHREstimator
+
+hasIsopleths.RhrHREstimator <- function(x) {
+  if (inherits(x$results$isopleths, "SpatialPolygons")) {
+    return(TRUE)
+  }
+  return(FALSE)
+
+}
+
+
+### Get methods
+
+#' Retrives the UD of an rhrHREstimator object
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param ... further arguments, none implemented
+#' @export
+#' @return the UD raster
+
+ud <- function(x, ...) {
+  UseMethod("ud", x)
+}
+
+
+#' Set the UD
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param ... further arguments, none implemented
+#' @export
+#' @method ud RhrHREstimator
+
+ud.RhrHREstimator <- function(x, ...) {
+
+  if (hasUD(x)) {
+    return(x$results$ud)
+  }
+  return(NA)
+}
+
+
+#' Retrives the CUD of an rhrHREstimator object
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param ... further arguments, none implemented
+#' @export
+#' @return the UD raster
+
+cud <- function(x, ...) {
+  UseMethod("cud", x)
+}
+
+
+#' Retrives the CUD of an rhrHREstimator object
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param ... further arguments, none implemented
+#' @export
+#' @method ud RhrHREstimator
+
+cud.RhrHREstimator <- function(x, ...) {
+
+  if (hasCUD(x)) {
+    return(x$results$cud)
+  }
+  return(NA)
+}
+
+
+## Shamelessly copied from:
+## http://stackoverflow.com/questions/3478923/displaying-the-actual-parameter-list-of-the-function-during-execution
+## It is also available in the amer package, which has however been removed from CRAN
+expand.call <- function(definition=NULL,
+         call=sys.call(sys.parent(1)),
+         expand.dots = TRUE,
+         doEval=TRUE)
+{
+
+    safeDeparse <- function(expr){
+        #rm line breaks, whitespace             
+        ret <- paste(deparse(expr), collapse="")
+        return(gsub("[[:space:]][[:space:]]+", " ", ret))
+    }
+
+    call <- .Internal(match.call(definition, call, expand.dots))
+
+    #supplied args:
+    ans <- as.list(call)
+    if(doEval) ans[-1] <- lapply(ans[-1], eval)
+
+    #possible args:
+    frmls <- formals(safeDeparse(ans[[1]]))
+    #remove formal args with no presets:
+    frmls <- frmls[!sapply(frmls, is.symbol)]
+
+    add <- which(!(names(frmls) %in% names(ans)))
+    return(as.call(c(ans, frmls[add])))
+}
+
+#' Retrives the isopleths of an rhrHREstimator object
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param ... further arguments, none implemented
+#' @export
+#' @return SpatialPolygonsDataFrame
+
+isopleths <- function(x, ...) {
+  UseMethod("isopleths", x)
+}
+
+
+#' get the isopleths from rhrHREstimator
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param ... further arguments, none implemented
+#' @export
+#' @method isopleths RhrHREstimator
+
+isopleths.RhrHREstimator <- function(x, ...) {
+    return(x$results$isopleths)
 }

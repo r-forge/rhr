@@ -1,9 +1,14 @@
 #' Local Convex Hull (LoCoH)
 #'
-#' @param xy a data frame with at least two columns. The first column contains x-coordiantes and the second column y-coordinates.
+#' @param xy data.frame with two columns. The first column contains x coordinaes and the second column contains y coordinates
+#' @param levels a vector with the percentage of closest points to the centroid that are used to calculated MCP
+#' @param ud a logical value, whether or not a utilitisation distribution should be calculated
+#' @param cud a logical value, whether or not a cumulative utilitisation distribution should be calculated
+#' @param xrange vector of length 2, with xmin and xmax for the UD
+#' @param yrange vector of length 2, with ymin and ymax for the UD
+#' @param res the resolution for the ud. 
 #' @param type one of k, r, a. See details. three types are availabe: i) k-nearest neighbours; ii) neighbours within radius r; iii) a within cum dist
 #' @param n if type is k, number of neaerst neibhers, if type is r radius and if type is a cum dist to be used up
-#' @param level at which levels should the home range be calculated. Numbers between 1 and 100.
 #' @param min.pts min.pts
 #' @details There are three different types available for determining the number of neighbors.
 #' \itemize{
@@ -18,11 +23,11 @@
 #' locoh <- rhrLoCoH(datSH[, 2:3], type="k", n=100, level=c(50, 90))
 #' spplot(locoh, 'level')
 
-rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3) {
+rhrLoCoH <- function(xy, type="k", n=10, levels=95, min.pts=3, ud=FALSE, cud=FALSE, xrange=NA, yrange=NA, res=100) {
 
   # input checking
   # type:
-  if (!type %in% c("a", "k", "r", "t", "tf")) {
+  if (!type %in% c("a", "k", "r")) {
     stop("rhrLocoh: incorrect type")
   }
 
@@ -33,29 +38,49 @@ rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3) {
 
   
   # Are levels between 1 and 100, remove duplicated, order and add 0
-  level <- level[order(level)]
+  levels <- levels[order(levels)]
 
-  if (max(level) > 99 | min(level) < 1 | length(level) != length(unique(level))) {
-    level <- level[level < 100 & level > 0]
-    level <- unique(level)
-    warning(paste0("adjusted level(s) to: ", level))
+  if (max(levels) > 99 | min(levels) < 1 | length(levels) != length(unique(levels))) {
+    levels <- levels[levels < 100 & levels > 0]
+    levels <- unique(levels)
+    warning(paste0("adjusted level(s) to: ", levels))
   }
-  level.o <- level
-  level <- c(0, level, 100)
+
+  
+  levels.o <- levels
+  levels <- c(0, levels, 100)
+
+  if (ud) {
+    levels <- seq(0, 100, 1)
+  }
+
+  
+  ## local variables
+  projString <- CRS(NA)  # contains the projection information
+  
+  ## Input checks
+  ## Coordinates
+  if(!is(xy, "data.frame")) {
+    if(inherits(xy, "SpatialPoints")) {
+      projString <- proj4string(xy)
+      xy <- data.frame(coordinates(xy))
+    } else {
+      stop(paste0("xy should be of class data.frame or SpatialPoints. The provided xy is of class ", class(xy)))
+    }
+  }
+
+  ## UD
+  if (!is(ud, "logical")) {
+    stop(paste0("ud should be logical. the provided object is ", class(ud)))
+  }
 
   ind <- 1:nrow(xy)
   if (type == "k") {
     # 1. calc dist
     # 2. order by dist
     # 3. take n nearest
-    n <- n - 1 # to be consistent with adehabitatHR
+    n <- n - 1 # to be consistent with adehabitatHR -> check Getz paper
     abc1 <- lapply(ind, function(i) ind[order(sqrt((xy[,1] - xy[i,1])^2 + (xy[,2] - xy[i,2])^2))][1:n])
-  } else if (type == "t") {
-    # 1. time dist
-    # 2. order by dist
-    # 3. take n nearest
-    n <- n - 1 # to be consistent with adehabitatHR
-    abc1 <- lapply(ind, function(i) ind[order(sqrt((as.numeric(ts) - as.numeric(ts[i]))^2))][1:n])
   } else if (type == "r") {
     # 1. calc dist
     # 2. take all pts with dist <= n
@@ -71,6 +96,12 @@ rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3) {
 
             })
   }
+
+  ## call constructor for output
+  out <- rhrHREstimator(xy, call=match.call(), params=list(name="LoCoH", levels=levels.o, ud=ud, cud=cud, type=type, n=n,
+                                                 proj4string=projString), ud=ud, cud=cud)
+
+
 
   # remove the ones with less than min.pts pts
   abc1 <- abc1[sapply(abc1, length) >= min.pts]
@@ -112,15 +143,12 @@ rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3) {
   a <- data.frame(id=d$id[fac.id == 1], per=p/length(p) * 100)
 
   ## Get groups of isopleths
-  a$isopleth <- cut(a$per, breaks=level)
+  a$isopleth <- cut(a$per, breaks=levels)
   a$isopleth.v <- as.numeric(a$isopleth) 
 
   ### 1. Make a spatial polygon for each isopleth
   ## I have a vector with the ids of polygons for each isopleth, 
   ## For each isopleth merge all polys that fall within this isopleth and the ones already passe (i.e. the ones that are larger)
-  #   bb <- lapply(split(a[, c("id", "isopleth.v")], a$isopleth.v), function(x) Polygons(lapply(pol[x$id], Polygon), unique(x$isopleth.v)))
-  #   bb <- lapply(bb, function(x) SpatialPolygons(list(x)))
-  #   bb <- lapply(bb, function(x) gUnaryUnion(x, row.names(x)))
 
   bb <- lapply(split(a[, c("id", "isopleth.v")], a$isopleth.v), function(x) Polygons(lapply(pol[x$id], Polygon), unique(x$isopleth.v)))
   bb <- lapply(bb, function(x) SpatialPolygons(list(x)))
@@ -131,10 +159,32 @@ rhrLoCoH <- function(xy, type="k", n=10, level=95, min.pts=3) {
   }
 
   b <- do.call("rbind", bb)
-  attribute.data <- data.frame(level=level[as.numeric(row.names(b))+1], area=sapply(slot(b, "polygons"), function(x) slot(x, "area")))
+  attribute.data <- data.frame(level=levels[as.numeric(row.names(b))+1], area=sapply(slot(b, "polygons"), function(x) slot(x, "area")))
   row.names(attribute.data) <- row.names(b)
   
-   b <- SpatialPolygonsDataFrame(b, data=attribute.data)
-   return(b[b$level %in% level.o,])
+  b <- SpatialPolygonsDataFrame(b, data=attribute.data)
+ # slot(b, "polygons") <- lapply(slot(b, "polygons"), checkPolygonsHoles)
+ # b <- unionSpatialPolygons(b, as.character(b$level))
+
+  proj4string(b) <- projString
+
+  if (!ud & !cud) {
+    out <- rhrSetIso(out, b[b$level %in% levels.o,])
+    return(out)
+  }
+
+  r1 <- rasterFromXYVect(xy, xrange=xrange, yrange=yrange, res=res)
+  cud <- rasterize(b, r1, field="level", fun=min) / 100
+### NOT WORKING YET
+  ud <- (1 - cud) / sum(1 - cud[], na.rm=T)
+
+  # locoh at levls
+  locoh <- b[b$level %in% levels.o,]
+
+  out <- rhrSetIso(out, locoh)
+  out <- rhrSetCUD(out, cud)
+  out <- rhrSetUD(out, ud)
+
+  return(out)
 }
 

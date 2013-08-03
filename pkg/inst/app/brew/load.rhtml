@@ -34,7 +34,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </a>
-          <a class="brand" href="#">Reproduciple Home Range Analysis</a>
+          <a class="brand" href="#">Reproducible Home Range Analysis</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
               Forest Zoology and Forest Conservation - University of G&oumlttingen </p>
@@ -61,7 +61,7 @@
                ============================================================== -->
           <section id="sdata">
               <h1>Load Data</h1>
-            <p>Load data from a <code>*.csv</code> or <code>*.txt</code> file. You can specify the deliminator, number of lines to skip and decimal seperator below.</p>
+            <p>Load data from a <code>*.csv</code> or <code>*.txt</code> file. You can specify the deliminator, number of lines to skip and decimal separator below.</p>
 
             <form name="loadData" id="loadData" method="POST" enctype="multipart/form-data" class="form-horizontal">
 	      <fieldset>
@@ -74,11 +74,11 @@
 		  </div>
 
 		  <div class="control-group">
-		    <label class="control-label" for="uploadSep">Field Seperator</label>
+		    <label class="control-label" for="uploadSep">Field Separator</label>
 		    <div class="controls">
                       <select id="uploadSep" name="uploadSep">
-			<option value='coma'>Coma (,)</option>
-			<option value='semi'>Semin colon (;)</option>
+			<option value='comma'>Comma (,)</option>
+			<option value='semi'>Semi colon (;)</option>
 			<option value='tab'>Tabulator (\t)</option>
                       </select>  
 		    </div>
@@ -92,10 +92,10 @@
 		  </div>
 
 		  <div class="control-group">
-		    <label class="control-label" for="uploadSepDec">Decimal Seperator</label>
+		    <label class="control-label" for="uploadSepDec">Decimal Separator</label>
 		    <div class="controls">
                       <select id="uploadSepDec" name="uploadSepDec">
-			<option value='coma'>Coma (,)</option>
+			<option value='comma'>Comma (,)</option>
 			<option value='point'>Point(.)</option>
                       </select>  
 		    </div>
@@ -131,12 +131,12 @@ if (!is.null(req$POST())) {
     str <- readLines(name$tempfile, n=60 + skip)
 
 	# asign sep
-   sep <- switch(sep, coma=",", tab="\t", semi=";")
+   sep <- switch(sep, comma=",", tab="\t", semi=";")
 
-                                        # asign decimal seperator
-   sepDec <- switch(sepDec, coma=",", point=".")
+                                        # asign decimal separator
+   sepDec <- switch(sepDec, comma=",", point=".")
 
-    # test if a seperator works for the Body
+    # test if a separator works for the Body
     # each lines requires more than one field and same length
     testBody <- function(str, sep) {
       str <- strsplit(str, sep)
@@ -165,14 +165,14 @@ if (!is.null(req$POST())) {
       alert(paste0('<b>Data</b> (', name[1], ') successfully loaded'))
 
       # the frist lines of 
-      p("Current header of your is (fields are seperated by <code>|</code>)")
+      p("Current header of your is (fields are separated by <code>|</code>)")
       cat(paste0("<pre>", paste(names(dat), collapse="|"), "</pre>"))
 
-      p("The first 10 lines of your data are (fields are seperated by <code>|</code>):")
+      p("The first 10 lines of your data are (fields are separated by <code>|</code>):")
       cat(paste0("<pre>", paste(apply(head(dat, 10), 1, paste0, collapse="|"), collapse="\n"), "</pre>"))
     } else {
 
-	   cat('<div class="alert alert-error"><b>Something went wrong:</b> wrong field seperator</div>')
+	   cat('<div class="alert alert-error"><b>Something went wrong:</b> wrong field separator</div>')
       cat(paste0("<pre>", paste0(head(str), collapse="\n"), "</pre>"))
     }
       
@@ -358,7 +358,7 @@ if (!is.null(req$POST())) {
 
 </tr>
 
-<!-- MCP -->
+<!-- KDE -->
 <tr>
   <td>
     <input type="checkbox" id="doKDE">
@@ -370,12 +370,12 @@ if (!is.null(req$POST())) {
 </td>
 </tr>
 
-<!-- Kernel -->
+<!-- Locoh -->
 <tr>
   <td>
     <input type="checkbox" id="doLocoh">
   </td>
-  <td>Locoal Convex Hull</td>
+  <td>Local Convex Hull</td>
 </td>
 <td>
   <input type="button" class="btn" id="btnModalLocohOpen" value="Change">
@@ -703,7 +703,7 @@ if (!is.null(req$POST())) {
           <div id="modalKDE" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
             <div class="modal-header">
               <button type="button" class="close" id="btnModalKDECancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Kerndel Density Estimation</h3>
+              <h3 id="myModalLabel">Kernel Density Estimation</h3>
             </div>
             <div class="modal-body">
 
@@ -809,7 +809,7 @@ if (!is.null(req$POST())) {
   <label class="control-label" for="modalLocohInputLevel">Levels(s)</label>
   <div class="controls">
                 <input type="text" id="modalLocohInputLevel" name="modalLocohInputLevel" value="1" class="left"><br>
-  <p class="help-block">Seperate multiple levels with a coma<p>
+  <p class="help-block">Separate multiple levels with a comma<p>
   </div>
   </div>
 

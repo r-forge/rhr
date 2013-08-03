@@ -187,7 +187,7 @@ if (config$todo$doTTSI & config$config$dateTime) {
 ## Asymptote
 
 if (config$todo$doAsymptote) {
- # infoblock
+  ## infoblock
   repItems[[length(repItems) + 1]] <- global$h1$grob("Asymptote") 
   repH <- c(repH, global$h1$size)
   repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
@@ -214,7 +214,7 @@ if (config$todo$doAsymptote) {
   repItems[[length(repItems) + 1]] <- gTree(children=gList(
                                               textGrob(x=0.0, just=c("left", "bottom"), label="estimator"),
                                               textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
-                                               label=config$preAnalysis$asymptote$estimator)))
+                                               label=paste(unlist(config$preAnalysis$asymptote$estimator), collapse=","))))
   repH <- c(repH, global$line$size)
 
   repItems[[length(repItems) + 1]] <- gTree(children=gList(
@@ -241,97 +241,91 @@ if (config$todo$doAsymptote) {
  ### Add plots
  for (i in seq_along(resAsym)) {
 
- #   # header
+ ## header
     repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
     repH <- c(repH, global$h3$size)
 
-    if (resAsym[[i]]$exit != 0) {
+    #if (resAsym[[i]]$exit != 0) {
 
-    # Needs to go to a proper function
-    ttsiR <- strsplit(resAsym[[i]]$message, " ")[[1]]
-    ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
-    ttsiR.nlines <- max(ttsiR.lines)
-    ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
+    #  ## Needs to go to a proper function
+    #  ttsiR <- strsplit(resAsym[[i]]$message, " ")[[1]]
+    #  ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
+    #  ttsiR.nlines <- max(ttsiR.lines)
+    #  ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
 
-    ttsiR.grob <- textGrob(label=ttsiR.str) 
+    #  ttsiR.grob <- textGrob(label=ttsiR.str) 
 
-    # Draw a Green Box to highlight key findings
-    ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
-                                                                                   alpha=0.34))
-    
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
-    repH <- c(repH, 5 * ttsiR.nlines + 6)
+    #  ## Draw a Green Box to highlight key findings
+    #  ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
+    #                                                                                     alpha=0.34))
+    #  
+    #  repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
+    #  repH <- c(repH, 5 * ttsiR.nlines + 6)
 
-      next
-    }
+    #  next
+    #}
 
-    
     if ("mcp" %in% config$preAnalysis$asymptote$estimator) {
-      ## header
-
-     ## plots MCP
-     repItems[[length(repItems) + 1]] <- textGrob(y=unit(1, "npc") - unit(1, "lines"),
+      ## plots MCP
+      repItems[[length(repItems) + 1]] <- textGrob(y=unit(1, "npc") - unit(1, "lines"),
                                                    x=0.0, just=c("left", "bottom"),
                                                    label="Minimum Convex Polygon") 
       repH <- c(repH, 5)
+      ## header
+      if (!is.null(resAsym[[i]]$mcpAsym)) {
+        repItems[[length(repItems) + 1]] <- resAsym[[i]]$mcpPlot
+        repH <- c(repH, 80)
+      } 
 
-      repItems[[length(repItems) + 1]] <- resAsym[[i]]$mcpPlot
-      repH <- c(repH, 80)
+      ## Needs to go to a proper function
+      ttsiR <- strsplit(resAsym[[i]]$mcpMsg, " ")[[1]]
+      ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
+      ttsiR.nlines <- max(ttsiR.lines)
+      ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
+      ttsiR.grob <- textGrob(label=ttsiR.str) 
 
-    # Needs to go to a proper function
-    ttsiR <- strsplit(resAsym[[i]]$MCPmsg, " ")[[1]]
-    ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
-    ttsiR.nlines <- max(ttsiR.lines)
-    ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
-
-    ttsiR.grob <- textGrob(label=ttsiR.str) 
-
-    # Draw a Green Box to highlight key findings
-    ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
-                                                                                   alpha=0.34))
-    
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
-    repH <- c(repH, 5 * ttsiR.nlines + 6)
-
-     
-    }
-    if ("kde" %in% config$preAnalysis$asymptote$estimator) {
-
-     ## plots KDE
-     repItems[[length(repItems) + 1]] <- textGrob(y=unit(1, "npc") - unit(1, "lines"), x=0.0, just=c("left", "bottom"), label="KDE") 
-     repH <- c(repH, 5)
-
+      ## Draw a Green Box to highlight key findings
+      ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
+                                                                                         alpha=0.34))
       
-     repItems[[length(repItems) + 1]] <- resAsym[[i]]$kdePlot
-     repH <- c(repH, 80)
+      repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
+      repH <- c(repH, 5 * ttsiR.nlines + 6)
 
-    # Needs to go to a proper function
-    ttsiR <- strsplit(resAsym[[i]]$KDEmsg, " ")[[1]]
-    ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
-    ttsiR.nlines <- max(ttsiR.lines)
-    ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
-
-    ttsiR.grob <- textGrob(label=ttsiR.str) 
-    # Draw a Green Box to highlight key findings
-    ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
-                                                                                   alpha=0.34))
-    
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
-    repH <- c(repH, 5 * ttsiR.nlines + 6)
     }
+    
+    if ("kde" %in% config$preAnalysis$asymptote$estimator) {
+      ## plots KDE
+      repItems[[length(repItems) + 1]] <- textGrob(y=unit(1, "npc") - unit(1, "lines"),
+                                                   x=0.0, just=c("left", "bottom"),
+                                                   label="Kernel Density Estimation") 
+      repH <- c(repH, 5)
 
- }
+      ## header
+      if (!is.null(resAsym[[i]]$kdeAsym)) {
+        repItems[[length(repItems) + 1]] <- resAsym[[i]]$kdePlot
+        repH <- c(repH, 80)
+      }
+      ## Needs to go to a proper function
+      ttsiR <- strsplit(resAsym[[i]]$kdeMsg, " ")[[1]]
+      ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
+      ttsiR.nlines <- max(ttsiR.lines)
+      ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
+      ttsiR.grob <- textGrob(label=ttsiR.str) 
 
-
-
-  
+      ## Draw a Green Box to highlight key findings
+      ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
+                                                                                         alpha=0.34))
+      repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
+      repH <- c(repH, 5 * ttsiR.nlines + 6)
+    }
+  }
 } else {
   textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Home range asymptote was not requested") -> rAsym.not
   repItems[[length(repItems) + 1]] <- rAsym.not 
   repH <- c(repH, 15)
 }
 
-# ---------------------------------------------------------------------------- # 
+## ---------------------------------------------------------------------------- # 
 ## Core Area
 
 
@@ -354,24 +348,16 @@ if (config$todo$doCA) {
 
   # add results
   for (i in seq_along(datSub)) {
-    # header
+    ## header
     repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
     repH <- c(repH, global$h3$size)
 
-    if (resCAs[[i]]$exit == 0) {
-
-      # plots
-      repItems[[length(repItems) + 1]] <- caPlots1[[i]]
+      ## plots
+      repItems[[length(repItems) + 1]] <- resCa[[i]]$kdePlot1
       repH <- c(repH, 80)
 
-      repItems[[length(repItems) + 1]] <- caPlots2[[i]]
+      repItems[[length(repItems) + 1]] <- resCa[[i]]$kdePlot2
       repH <- c(repH, 80)
-
-    } else {
-      textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label=resCAs[[i]]$msg) -> rCA
-      repItems[[length(repItems) + 1]] <- rCA 
-      repH <- c(repH, 10)
-    }
   }
     
   
@@ -409,7 +395,7 @@ if (config$todo$doMCP) {
     repH <- c(repH, 80)
 
     # Areas
-    tt <- data.frame(resMCPs[[i]]$estimatorData)
+    tt <- data.frame(isopleths(resMCPs[[i]]))
     tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
     names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
     mcp.area <- dfGrob(tt)
@@ -474,12 +460,12 @@ if (config$todo$doKDE) {
     repH <- c(repH, 80)
 
     # areas
-    tt <- data.frame(data.frame(resKDEsAreas[[i]]))
+    tt <- data.frame(data.frame(resKDEsContours[[i]]))
     tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
     names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
     
     repItems[[length(repItems) + 1]] <- dfGrob(tt)
-    repH <- c(repH, ((nrow(resKDEsAreas[[i]]) * 5) + 10))
+    repH <- c(repH, ((nrow(tt) * 5) + 10))
 
     
 
@@ -487,7 +473,7 @@ if (config$todo$doKDE) {
                                                  just=c("left", "bottom"),
                                                  gp=gpar(fontfamily="mono"),
                                                  label=c("KDE", "bandwidth value",
-                                                   round(resKDEs[[i]]$h$h), 2))
+                                                   round(resKDEs[[i]]$parameters$h, 2)))
     repH <- c(repH, 5)
   }
   
@@ -533,18 +519,18 @@ if (config$todo$doLocoh) {
     repItems[[length(repItems) + 1]] <- locohPlots[[i]]
     repH <- c(repH, 80)
     # areas
-    tt <- data.frame(data.frame(resLocohs[[i]]$estimatorData))
+    tt <- data.frame(data.frame(isopleths(resLocohs[[i]])))
     tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
     names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
     
     repItems[[length(repItems) + 1]] <- dfGrob(tt)
-    repH <- c(repH, ((nrow(resLocohs[[i]]$estimatorData) * 5) + 10))
+    repH <- c(repH, ((nrow(isopleths(resLocohs[[i]])) * 5) + 10))
 
     repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
                                                  just=c("left", "bottom"),
                                                  gp=gpar(fontfamily="mono"),
                                                  label=c("Locoh", "Value of n",
-                                                   formatC(round(resLocohs[[i]]$estimator$n, 2), big.mark=",", format="f", drop0trailing = TRUE)))
+                                                   formatC(round(resLocohs[[i]]$parameters$n, 2), big.mark=",", format="f", drop0trailing = TRUE)))
     repH <- c(repH, 5)
   }
   

@@ -2,33 +2,41 @@
 \alias{rhrKDE}
 \title{Kernel Density Estimation (KDE)}
 \usage{
-  rhrKDE(xy, h = "href", xrange = NA, yrange = NA,
-    resolution = 100, lscv.n = 100, tol = 1,
-    return.raster = FALSE)
+  rhrKDE(xy, xrange = NA, yrange = NA, res = 100,
+    ud = TRUE, cud = TRUE, levels = 95, h = "href",
+    lscv.n = 100, tol = 1)
 }
 \arguments{
   \item{xy}{data.frame with two columns. The first column
   contains x coordinaes and the second column contains y
   coordinates}
 
+  \item{levels}{a vector with the percentage of closest
+  points to the centroid that are used to calculated MCP}
+
+  \item{ud}{a logical value, whether or not a utilitisation
+  distribution should be calculated}
+
+  \item{cud}{a logical value, whether or not a cumulative
+  utilitisation distribution should be calculated}
+
+  \item{xrange}{vector of length 2, with xmin and xmax for
+  the UD}
+
+  \item{yrange}{vector of length 2, with ymin and ymax for
+  the UD}
+
+  \item{res}{the resolution for the ud.}
+
   \item{h}{bandwidth, either a string ("href", "lscv") or
   an actual value}
-
-  \item{xrange}{the xrange for the out grid}
-
-  \item{yrange}{the yrange for the out grid}
-
-  \item{resolution}{the resolution for the out grid}
 
   \item{lscv.n}{number of iterations for lscv}
 
   \item{tol}{the tolerace for lscv}
-
-  \item{return.raster}{returns the hat matrix with kernel
-  densities as an object of class raster}
 }
 \value{
-  object of class \code{RhrEstimatorKDE}
+  object of class \code{RhrHREstimator}
 }
 \description{
   Kernel Density Estimation (KDE)

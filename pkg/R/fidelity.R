@@ -7,8 +7,14 @@
 #' @author Johannes Signer
 #' @return object of class \code{RhrFidelity}, which is a list of length 4. \code{msd.dat} and \code{li.dat} is the mean square distance and linearity for the real date. \code{msd.sim} and \code{li.sim} are the mean square distances and linearities for the simulated trajectories. 
 #' @examples
+#' # simulated data
+#' set.seed(123)
 #' dat <- data.frame(x=runif(1000, 0, 100), y=runif(1000, 0, 100))
 #' rhrFidelity(dat, n=500)
+#'
+#' # Example Data
+#' data(datSH)
+#' res <- rhrFidelity(datSH[, 2:3])
 
 rhrFidelity <- function(dat, n=100) {
 

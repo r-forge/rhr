@@ -9,93 +9,80 @@ rhrCoreArea <- function(x, ...) {
   UseMethod("rhrCoreArea", x)
 }
 
-#' Core Area for Minimum Convex Polygon
+
+#' Core area for home range estimator
 #' 
-#' @param x a RhrEstimatorMCP object
+#' @param x object of class RhrHREstimator
 #' @param ... further parameters passed to the area function
+#' @method rhrCoreArea RhrHREstimator
 #' @export
-#' @method rhrCoreArea RhrEstimatorMCP
-#' @return The area
+#' @return object of class RhrHRCoreArea
 
-rhrCoreArea.RhrEstimatorMCP <- function(x, ...) {
-  
- stop("Does not makes sense")
+rhrCoreArea.RhrHREstimator <- function(x, ...) {
 
-}
-
-#' Core Area for Kernel Density Estimation
-#' 
-#' @param x Kernel density estimation
-#' @param ... further parameters passed to the area function
-#' @method rhrCoreArea RhrEstimatorKDE
-#' @export
-#' @return The area
-
-rhrCoreArea.RhrEstimatorKDE <- function(x, ...) {
-  est <- x
-
-  nr <- ceiling(diff(range(est$xrange)) / est$resolution)
-  nc <- ceiling(diff(range(est$yrange)) / est$resolution)
-  r <- raster(nrow=nr, ncol=nc, xmn=est$xrange[1], xmx=est$xrange[2], ymn=est$yrange[1], ymx=est$yrange[2])
-  r[] <- est$data$fhat[nr:1,]
-
-
-  res <- rhrCoreAreaBase(r)
-
-}
-
-rhrCoreAreaBase <- function(r) {
-
-  obs <- getValues(r)
-  obs <- obs[!is.na(obs)]
-  ranks <- order(obs)
-  obs <- obs[order(obs)]
-  prob <- obs / sum(obs)
-
-  pctprob <- prob / max(prob)
-
-  # pctrange <- sapply(prob, function(x) sum(prob >= x) /length(prob))
-
- # to move to src
-  pd <- function(prob) {
-    .Call("pdcpp", prob, PACKAGE="rhr")
+  if (!hasUD(x)) {
+    stop("UD is required to calculate core area")
   }
 
-#cppFunction('
-#  NumericVector pd(NumericVector prob) {
-#    int n = prob.size();
-#    NumericVector out(n);
-#
-#    for(int i = 0; i < n; ++i) {
-#      int sum = 0;
-#      for (int j = 0; j < n; ++j) {
-#        if ( prob[j] >= prob[i]) {
-#          sum += 1;
-#        }
-#      }
-#      out[i] = (double)sum/n;
-#    }
-#    return out;
-#  }
-#')
+  ## retrieves the ud
+  r <- ud(x)
 
+  ## Standardize the ud to 1, not necessary anymore
+  uds <- r[] / sum(r[], na.rm=TRUE)
 
+  ## fraction of max uds
+  fuds <- uds / max(uds, na.rm=TRUE)
 
-pctrange <- pd(prob)
+  ## Create a rastre with fraction of maximum ud
+  pctp.r <- setValues(r, fuds)
 
-  dd <- sapply(1:length(prob), function(i) distancePointLine(pctrange[i], pctprob[i], 0, 1, 1, 0))
+  ## oder fraction of maximum ud 
+  fuds.o <- order(fuds, decreasing=T)
 
+  uds.fudso <- uds[fuds.o]
 
+  pctp <- fuds[fuds.o]
 
-  data.frame(obs=obs, ranks=ranks, prob=prob, pctprob=pctprob, pctrange=pctrange, mindist=dd)
+  pctr <- rep(NA, length(uds))
+
+  for (i in seq_along(uds)) {
+    pctr[i] <- sum(uds.fudso >= uds.fudso[i], na.rm=TRUE) / length(uds.fudso)
+  }
+  dd <- sapply(1:length(pctr), function(i) distancePointLine(pctr[i], pctp[i], 0, 1, 1, 0))
+  out <- list(pctprob=pctp, pctrange=pctr, rast=pctp.r >= pctp[which.max(dd)], dist=dd, method="powell")
+  class(out) <- "RhrHRCoreArea"
+  return(out)
 }
 
 
 distancePointLine <- function(x, y, x1, y1, x2, y2) {
-
  # code from: http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
  normalLength = ((x2 - x1)^2 + (y2 - y1)^2)
  abs((x - x1) * (y2 - y1) - (y - y1) * (x2 - x1)) / normalLength
+}
 
+
+#' plot for RhrHRCoreArea
+#' 
+#' generic plot for RhrHREstimator
+#' @usage plot(x, ...)
+#' @aliases plot plot.RhrHREstimator
+#' @param x RhrHRCoreArea object
+#' @param ... none implemented
+#' @method plot RhrHRCoreArea
+#' @export
+
+plot.RhrHRCoreArea <- function(x, ...) {
+  ## Plot curve
+  p <- ggplot(data.frame(x=x$pctrange, y=x$pctprob), aes(x=x, y=y)) +
+    geom_point(alpha=0.04, position=position_jitter(height=0.01, width=0.01)) +
+      xlim(c(0,1)) + ylim(c(0,1)) +
+        geom_abline(intercept=1, slope=-1) + 
+          geom_point(aes(x=x,y=y), colour="red", size=4,
+                     data=data.frame(x=x$pctrange[which.max(x$dist)], y=x$pctprob[which.max(x$dist)])) +
+                       geom_hline(aes(yintercept=y), colour="red", 
+                                  data=data.frame(y=x$pctprob[which.max(x$dist)])) +
+                                    theme_bw() + labs(title="Corea Area Estimation", x="Fraction of Home Range", y="Fraction of maximum Relative Frequency")
+  return(p)
 }
 

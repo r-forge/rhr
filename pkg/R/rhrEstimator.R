@@ -5,7 +5,6 @@
 #' @param ... parameters passed to the home range estimator
 #' @export
 #' @return object of class RhrEstimator
-#' @examples a <- rhrEstimator(cbind(rnorm(1000), rnorm(1000)), "MCP")
 
 
 rhrEstimator <- function(xy, estimator, ...) {

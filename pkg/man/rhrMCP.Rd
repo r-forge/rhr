@@ -2,14 +2,30 @@
 \alias{rhrMCP}
 \title{Minimum Convex Polygon (MCP)}
 \usage{
-  rhrMCP(xy, levels = 95)
+  rhrMCP(xy, levels = 95, ud = FALSE, cud = FALSE,
+    xrange = NA, yrange = NA, res = 100)
 }
 \arguments{
-  \item{xy}{SpatialPointsDataFrame, holding fixes for the
-  animal and time frame that the MCP should be calculated}
+  \item{xy}{data.frame with two columns. The first column
+  contains x coordinaes and the second column contains y
+  coordinates}
 
   \item{levels}{a vector with the percentage of closest
   points to the centroid that are used to calculated MCP}
+
+  \item{ud}{a logical value, whether or not a utilitisation
+  distribution should be calculated}
+
+  \item{cud}{a logical value, whether or not a cumulative
+  utilitisation distribution should be calculated}
+
+  \item{xrange}{vector of length 2, with xmin and xmax for
+  the UD}
+
+  \item{yrange}{vector of length 2, with ymin and ymax for
+  the UD}
+
+  \item{res}{the resolution for the ud.}
 }
 \value{
   object of class \code{SpatialPolygonsDataFrame}

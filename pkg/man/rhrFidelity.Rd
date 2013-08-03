@@ -22,8 +22,14 @@
   Site fidelity
 }
 \examples{
+# simulated data
+set.seed(123)
 dat <- data.frame(x=runif(1000, 0, 100), y=runif(1000, 0, 100))
 rhrFidelity(dat, n=500)
+
+# Example Data
+data(datSH)
+res <- rhrFidelity(datSH[, 2:3])
 }
 \author{
   Johannes Signer

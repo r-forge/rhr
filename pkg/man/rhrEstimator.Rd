@@ -18,7 +18,4 @@
 \description{
   Function to calculate a home range estimator
 }
-\examples{
-a <- rhrEstimator(cbind(rnorm(1000), rnorm(1000)), "MCP")
-}
 
