@@ -569,19 +569,18 @@ if (!is.null(req$POST())) {
 		  </div>
 
 		  <div class="control-group">
-		    <label class="control-label" for="modalTTSIInputTolerance">Tolerance [seconds]</label>
+		    <label class="control-label" for="modalTTSIInputNTimes">Number of times above critical value</label>
 		    <div class="controls">
-                      <input type="text" id="modalTTSIInputTolerance" name="modalTTSIInputTolerance" value="1" class="left"><br>
+                      <input type="text" id="modalTTSIInputNTimes" name="modalTTSIInputNTimes" value="3" class="left"><br>
 		    </div>
 		  </div>
 
 		  <div class="control-group">
-		    <label class="control-label" for="modalTTSIInputType">Type</label>
+		    <label class="control-label" for="modalTTSIConsec">Consecutive observations</label>
 		    <div class="controls">
-                      <select id="modalTTSIInputType">
-			<option value='strict'>strict</option>
-			<option value='all'>all</option>
-			<option value='con'>consecutive</option>
+                      <select id="modalTTSIInputConsec">
+			<option value='TRUE'>TRUE</option>
+			<option value='FALSE'>FALSE</option>
                       </select>  
 		    </div>
 		  </div>
