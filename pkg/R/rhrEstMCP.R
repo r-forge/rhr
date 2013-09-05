@@ -21,7 +21,7 @@ rhrMCP <- function(xy, levels=95, ud=FALSE, cud=FALSE, xrange=NA, yrange=NA, res
 
   ## local variables
   argsIn <- as.list(environment())[-1]
-  projString <- CRS(NA)  # contains the projection information
+  projString <- CRS(as.character(NA))  # stores the projection information
   
   ## Input checks
   ## Coordinates
@@ -88,9 +88,8 @@ rhrMCP <- function(xy, levels=95, ud=FALSE, cud=FALSE, xrange=NA, yrange=NA, res
   bb <- SpatialPolygons(lapply(seq(length(levels.ud)), function(x) Polygons(list(Polygon(xy.bord[[x]])), x)))
   bb <- SpatialPolygonsDataFrame(bb, data=data.frame(level=levels.ud, area=gArea(bb, byid=TRUE)), match.ID=FALSE)
 
-  if (!is.na(projString)) {
-    proj4string(bb) <- projString
-  }
+  ## Project
+  proj4string(bb) <- projString
 
   out <- rhrSetIso(out, bb)
 

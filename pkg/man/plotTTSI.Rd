@@ -2,15 +2,16 @@
 \alias{plotTTSI}
 \title{plot ttsi}
 \usage{
-  plotTTSI(res, path = NULL, toFirst2 = FALSE)
+  plotTTSI(res, cvReached, cvReachedAt)
 }
 \arguments{
   \item{res}{from ttsi}
 
-  \item{path}{where the plot should be safed}
+  \item{cvReached}{whether or not the critical value was
+  passed}
 
-  \item{toFirst2}{only plot until critical value of 2 is
-  first reached}
+  \item{cvReachedAt}{time interval at which the critical
+  value was reached}
 }
 \description{
   plots results of rhrSchoener

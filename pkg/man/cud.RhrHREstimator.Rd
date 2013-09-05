@@ -2,7 +2,7 @@
 \alias{cud.RhrHREstimator}
 \title{Retrives the CUD of an rhrHREstimator object}
 \usage{
-  \method{ud}{RhrHREstimator} (x, ...)
+  \method{cud}{RhrHREstimator} (x, ...)
 }
 \arguments{
   \item{x}{an object of class rhrHREstimator}

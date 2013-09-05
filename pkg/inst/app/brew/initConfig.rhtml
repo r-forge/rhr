@@ -27,7 +27,7 @@
                  temporalBbxRestricted=list(tmin=NA, tmax=NA), 
                  n=list(initialN=NA, restrictedN=NA), 
                  preAnalysis=list(siteFidelity=list(n=100), 
-                   ttsi=list(interval=5 * 60 * 60, tolerance=10 * 60, type="con" ), 
+                   ttsi=list(interval=5 * 60 * 60, consec=TRUE, alpha=0.25, ntimes=3), 
                    asymptote=list(nIter=10, minNPts=50, increment=50, estimator=c("mcp"), level=95,
                      nTimes=5, tolTotArea=95)), 
                  estimator=list(ca=list(res=100),

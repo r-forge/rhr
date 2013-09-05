@@ -333,8 +333,8 @@ $(document).ready(function(){
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalTTSIOpen').click( function () {
 	$('#modalTTSIInputInterval').val(config.preAnalysis.ttsi.interval);
-	$('#modalTTSIInputTolerance').val(config.preAnalysis.ttsi.tolerance);
-	$('#modalTTSIInputType').val(config.preAnalysis.ttsi.type);
+	$('#modalTTSIInputNTimes').val(config.preAnalysis.ttsi.ntimes);
+	$('#modalTTSIInputConsec').val(config.preAnalysis.ttsi.consec);
 	$('#modalTTSI').modal('show');
     });
 
@@ -349,8 +349,8 @@ $(document).ready(function(){
 	if ($("#modalTTSIInputForm").valid()) {
 	    $('#modalTTSI').modal('hide');
 	    config.preAnalysis.ttsi.interval = $('#modalTTSIInputInterval').val();
-	    config.preAnalysis.ttsi.tolerance = $('#modalTTSIInputTolerance').val();
-	    config.preAnalysis.ttsi.type = $('#modalTTSIInputType').val();
+	    config.preAnalysis.ttsi.ntimes = $('#modalTTSIInputNTimes').val();
+	    config.preAnalysis.ttsi.consec = $('#modalTTSIInputConsec').val();
 
 	} else {
 	    alert("Invalid value");
@@ -363,7 +363,7 @@ $(document).ready(function(){
 	    modalTTSIInputInterval: { 
 		required: true, 
 		digits: true },
-	    modalTTSIInputTolerance : {
+	    modalTTSIInputNtimes : {
 		required : true,
 		digits : true
 		

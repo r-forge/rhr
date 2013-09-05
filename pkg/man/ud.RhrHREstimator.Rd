@@ -1,6 +1,6 @@
 \name{ud.RhrHREstimator}
 \alias{ud.RhrHREstimator}
-\title{Set the UD}
+\title{Get the UD}
 \usage{
   \method{ud}{RhrHREstimator} (x, ...)
 }
@@ -10,6 +10,6 @@
   \item{...}{further arguments, none implemented}
 }
 \description{
-  Set the UD
+  Get the UD
 }
 

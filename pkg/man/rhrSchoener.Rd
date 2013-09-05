@@ -2,7 +2,8 @@
 \alias{rhrSchoener}
 \title{Schoener's ratio}
 \usage{
-  rhrSchoener(dat, interval, tolerance = 0, type = "con")
+  rhrSchoener(dat, interval, alpha = 0.25, minM = 10,
+    consec = TRUE)
 }
 \arguments{
   \item{dat}{a data.frame with 3 columns. The first column
@@ -12,12 +13,14 @@
 
   \item{interval}{The interval in seconds}
 
-  \item{tolerance}{The tolerance of the interval, i.e.
-  interval +- tolerance}
+  \item{alpha}{The alpha value used to calculate the
+  critical value}
 
-  \item{type}{either all (for all reachable points within
-  time interval), strict (for stricly consecutive points)
-  or cons (for relaxed consecutive points).}
+  \item{minM}{The minimum number of pairs required, if m is
+  smaller than this argument it will return NA.}
+
+  \item{consec}{indicates whether or not the observations
+  are consecutive}
 }
 \value{
   \code{vector} vector of length three. V is Schoeners v, n
@@ -27,13 +30,19 @@
 \description{
   Schoener's ratio
 }
+\note{
+  This implementation uses the normal distribution as a
+  sampling distribution.
+}
 \examples{
 set.seed(123)
-rhrSchoener(cbind(rnorm(1000), rnorm(1000), 1:1000), 10, 2, "all")
-rhrSchoener(cbind(rnorm(1000), rnorm(1000), 1:1000), 10, 2, "strict")
-rhrSchoener(cbind(rnorm(1000), rnorm(1000), 1:1000), 10, type="con")
 }
 \author{
   Johannes Signer
+}
+\references{
+  Swihart, R. and Slade N. 1985, Testing for indpendence of
+  observations in animal movement, Ecology, 66(4), 1176 -
+  1184
 }
 

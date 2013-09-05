@@ -1,9 +1,8 @@
 \name{plot.RhrHRAsymptote}
-\alias{plot}
 \alias{plot.RhrHRAsymptote}
 \title{plot for RhrHRAsymptote}
 \usage{
-  plot(x, ...)
+  \method{plot}{RhrHRAsymptote} (x, draw = TRUE, ...)
 }
 \arguments{
   \item{x}{RhrHRAsymptote}
@@ -14,6 +13,6 @@
   \item{...}{none implemented}
 }
 \description{
-  generic plot for RhrHREstimator
+  generic plot for RhrHRAsymptote
 }
 

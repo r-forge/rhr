@@ -7,7 +7,7 @@ if (config$todo$doLocoh) {
 
 
     resLocohs <- lapply(datSub, function(x) {
-      # determine k for each animal 
+    ## determine k for each animal 
     if (locoh$n) {
         if (locoh$type == "k") {
           locoh$nValue <- sqrt(nrow(x))
@@ -32,70 +32,22 @@ if (config$todo$doLocoh) {
 
       if (!is(resLocohs[[i]], "try-error")) {
 
-       p <- plot(resLocohs[[i]], useGE=config$config$useGM, what="iso", draw=FALSE)
+        p <- plot(resLocohs[[i]], useGE=config$config$useGM, what="iso", draw=FALSE)
 
-       # tempol <- isopleths(resLocohs[[i]])
+        png(file=file.path(imagepath, locohFilenamePlots[i]))
 
-       # # Set SRS correct if ggmap to be used
-       # if (config$config$useGM) {
-       #   proj4string(tempol) <- CRS(paste0("+init=epsg:", config$config$epsg))
-       #   tempol <- spTransform(tempol, CRS("+proj=longlat +ellps=sphere +no_defs"))
-       # }
-
-       # tempol@data$id = rownames(tempol@data)
-       # tempol.points = fortify(tempol) #, region="id")
-       # tempol.df = join(tempol.points, tempol@data, by="id")
-
-       png(file=file.path(imagepath, locohFilenamePlots[i]))
-
-       # 
-       # if (config$config$useGM) {
-
-       #   bb <- bbox(tempol)
-       #   lon <- bb[1,]
-       #   lat <- bb[2,]
-
-       #   lon2x <- function(lon) lon * pi/180 * 6378137
-       #   lat2y <- function(lat) log(tan(lat * (pi/180)/2 + pi/4)) * 6378137 
-
-       #   x <- lon2x(extendrange(lon, f=0.03))
-       #   y <- lat2y(extendrange(lat, f=0.03))
-
-
-       #   d <- sqrt(diff(x)^2 + diff(y)^2)
-       #   levels <- 1:21
-
-       #   # http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Resolution_and_Scale
-       #   zooms <- 40075000/256 * cos(0) / 2^levels * 256 
-       #   l <- which(abs(zooms - d) == min(abs(zooms - d))) + 1
-
-       #   p <- ggmap(get_googlemap(center=c(mean(lon), mean(lat)), zoom=l, maptype="hybrid")) + 
-       #     geom_path(size=3, alpha=0.4, data=tempol.df, aes(x=long, y=lat, group=group, color=factor(level))) +
-       #       labs(colour="Level", x="lon", y="lat") +
-       #         geom_path(size=0.2, colour="black", data=tempol.df, aes(x=long, y=lat, group=group)) +
-       #           scale_color_manual(values=terrain.colors(10)) +
-       #             theme_bw()
-       #   
-       # } else {
-
-       #   p <- ggplot(tempol.df, aes(x=long, y=lat, group=group, color=factor(level))) + 
-       #     geom_point(data=datSub[[i]], aes(x=lon, y=lat, group=NULL, color=NULL), alpha=0.1) + 
-       #       geom_path(size=3, alpha=0.4) +
-       #         labs(colour="Level", x="lon", y="lat") +
-       #           geom_path(size=0.2, colour="black") +
-       #             scale_color_manual(values=terrain.colors(10)) + theme_bw() + coord_equal()
-       # }
 
         print(p)
         dev.off()
         locohPlots[[i]] <- grid.grabExpr(print(p))
 
-        # Save RDS
+        ## Save RDS
         saveRDS(isopleths(resLocohs[[i]]), file=file.path(datapath, locohFilenameRda[i]))
-        # Save Shp
+
+        ## Save Shp
         writePolyShape(isopleths(resLocohs[[i]]), fn=file.path(datapath, locohFilenameSHP[i]))
 
-        # KML
+        ## KML
         if (config$config$expKML) {
           tlocoh <- isopleths(resLocohs[[i]])
           proj4string(tlocoh) <- CRS(paste0("+init=epsg:", config$config$epsg))
@@ -114,18 +66,15 @@ if (config$todo$doLocoh) {
       if (!is(resLocohs[[i]], "try-error")) {
          res$write(p(paste0("Local Convex Hull type of <code>", resLocohs[[i]]$parameters$type, "</code> was calculated with value of <code>",  formatC(round(resLocohs[[i]]$parameters$n, 2), big.mark=",", format="f", drop0trailing = TRUE), "</code> ", config$config$inUnit, ".")))
 
-        # res$write(cat(str(resLocohs[[i]]$estimator)))
-
 
         res$write(img(paste0(imageurl, locohFilenamePlots[i]), cap=""))
 
-        
         tt <- data.frame(isopleths(resLocohs[[i]]))
         tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
          names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
         res$write(toHTML(data.frame(tt)))
       } else {
-        alertError(resLocohs[[i]])
+        alertError("Something went wrong, did you provide enough points?")
       }
     }
 

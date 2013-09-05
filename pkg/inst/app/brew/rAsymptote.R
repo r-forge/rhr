@@ -3,9 +3,7 @@
 res <- Response$new()
 if (config$todo$doAsymptote) {
 
-  res$write(cat(str(config$preAnalysis$asymptote$estimator)))
   asym <- config$preAnalysis$asymptote
-
   asym$level <- rhrCorrectLevels(asym$level)
   resAsym <- list()
 

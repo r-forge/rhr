@@ -10,30 +10,49 @@ if (config$todo$doTTSI & config$config$dateTime) {
   ttsiFilenamePlots0 <- paste0("rhr_timeToStatisticalIndependencePlot_id_", ids, ".png")
   ttsiPlots <- list()
 
+
   resTTSI <- lapply(datSub, function(x) {
     totalDiff <- diff(range(as.numeric(x$timestamp)))  # get difference between first and last relocation
     ints <- seq(ttsi$interval, totalDiff, ttsi$interval)  # create seq of from 0 total Diff
     resDiff <- list()
 
-      for (i in seq_along(ints)) {
-        resDiff[[i]] <- rhrSchoener(x[, c('lon', 'lat', 'timestamp')], interval=ints[i], tolerance=ttsi$tolerance, type=ttsi$type)
 
-    #    if (FALSE) {
-          if (resDiff[[i]]['V'] >= 2) {
-            break
-          }
-    #    }
+    nTimesAboveCriticalValue <- 0
+    cvReached <- FALSE
+    enoughM <- TRUE
+
+      for (i in seq_along(ints)) {
+        resDiff[[i]] <- rhrSchoener(x[, c('lon', 'lat', 'timestamp')], interval=ints[i], consec=ttsi$consec)
+
+
+        if (is.na(resDiff[[i]]['V'])) {
+          break
+        }
+
+        ## Check if V is above critical value
+        if (resDiff[[i]]['V'] >= resDiff[[i]]['cv']) {
+          nTimesAboveCriticalValue <- nTimesAboveCriticalValue + 1
+        } else {
+          nTimesAboveCriticalValue <- 0
+        }
+
+        if (nTimesAboveCriticalValue >= ttsi$ntimes | is.na(resDiff[[i]]['V'])) {
+          cvReached <- TRUE
+          break
+        }
+
      }
 
  
     a <- data.frame(do.call("rbind", resDiff))
-    return(list(dat=a, interval=ints))
+    a <- a[complete.cases(a), ]
+    return(list(dat=a, interval=ints, cvReached=cvReached, cvReachedAt=ints[i]))
  })
 
 
   for (i in seq_along(resTTSI)) {
    # Create plots
-   plot0 <- grid.grabExpr(plotTTSI(resTTSI[[i]]$dat))
+   plot0 <- grid.grabExpr(plotTTSI(resTTSI[[i]]$dat, cvReached=resTTSI[[i]]$cvReached, cvReachedAt=resTTSI[[i]]$cvReachedAt))
 
    png(file=file.path(imagepath, ttsiFilenamePlots0[i]))
    grid.draw(plot0)
@@ -54,11 +73,11 @@ if (config$todo$doTTSI & config$config$dateTime) {
 
     
     # was ttsi reached?
-    if (any(resTTSI[[i]]$dat[, 'V'] >= 2)) {
-      where <- which(resTTSI[[i]]$dat[, 'V'] >= 2)
+    if (resTTSI[[i]]$cvReached) {
+      where <- resTTSI[[i]]$cvReachedAt
       resTTSI[[i]]$msg <- paste0("Time to statistical independence was reached at ",
-                             resTTSI[[i]]$interval[where],
-                            " seconds, with ", resTTSI[[i]]$dat[where, 'm'], " pairs")
+                             where,
+                            " seconds, with ", resTTSI[[i]]$dat[which(resTTSI[[i]]$dat$interval == where), 'm'], " pairs")
 
     } else {
       resTTSI[[i]]$msg <- paste0("Time to statistical independence was not reached")
