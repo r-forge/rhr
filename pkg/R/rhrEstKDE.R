@@ -124,6 +124,7 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
     h <- href(xy)
     h <- c(h, h)
     hres$method <- "href"
+
   } else if (tolower(h) == "hpi") {
     ## Do for each coordiante seperately
     hx <- dpik(xy[,1], gridsize=ncolumns)
@@ -225,7 +226,7 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
         for (i in 1:nrow(pos)) {
           if (gContainsProperly(bb[pos[i,1]], bb[pos[i,2]])) {
 
-            ## seconds poly is contained by the first
+            ## second poly is contained by the first
             holes[pos[i,2]] <- TRUE
           }
         }

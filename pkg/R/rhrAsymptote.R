@@ -122,41 +122,24 @@ rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=
 
 #' print object of rhrHRAsymptote
 #' 
-#' @usage print(x, ...)
-#' @aliases print print.RhrHRAsymptote
 #' @param x RhrHRAsymptote
-#' @param how should it be printed, this can be either sceen, html or grob
+#' @param ... none implemented
 #' @method print RhrHRAsymptote
 #' @export
 
-print.RhrHRAsymptote <- function(x, how="screen") {
+print.RhrHRAsymptote <- function(x, ...) {
 
-  if (length(how) > 1) {
-    warning("only first element of what is used")
-  }
+  cat(paste0("class                    : ", class(x)),
+      paste0("asymptote calculated for : ", paste0(x$asymtotes$level, collapse=",")),
+      paste0("asypotote reached at     : ", paste0(x$asymtotes$ns, collapse=",")),
+      sep="\n")
 
-  if (!how %in% c("screen", "html", "grob")) {
-    stop("how can only be screen, html or grob")
-  }
-
-  if (how == "screen") {
-    cat(paste0("class                    : ", class(x)),
-        paste0("asymptote calculated for : ", paste0(x$asymtotes$level, collapse=",")),
-        paste0("asypotote reached at     : ", paste0(x$asymtotes$ns, collapse=",")),
-        sep="\n")
-  }
-
-  if (how == "html") {
-
-  }
 }
 
 
 #' plot for RhrHRAsymptote
 #' 
-#' generic plot for RhrHREstimator
-#' @usage plot(x, ...)
-#' @aliases plot plot.RhrHRAsymptote
+#' generic plot for RhrHRAsymptote
 #' @param x RhrHRAsymptote
 #' @param draw indicates whether the plot should be drawn or not. If this is  \code{FALSE} a grob is returned.
 #' @param ... none implemented

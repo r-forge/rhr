@@ -20,8 +20,7 @@
 #' @examples
 #' data(datSH)
 #' nrow(datSH)
-#' locoh <- rhrLoCoH(datSH[, 2:3], type="k", n=100, level=c(50, 90))
-#' spplot(locoh, 'level')
+#' locoh <- rhrLoCoH(datSH[1:100, 2:3], type="k", n=10, level=c(50, 90))
 
 rhrLoCoH <- function(xy, type="k", n=10, levels=95, min.pts=3, ud=FALSE, cud=FALSE, xrange=NA, yrange=NA, res=100) {
 
@@ -35,9 +34,8 @@ rhrLoCoH <- function(xy, type="k", n=10, levels=95, min.pts=3, ud=FALSE, cud=FAL
   if (is.na(n)) {
     stop(paste("rhrLocoh: n should be numeric, not ", n))
   }
-
   
-  # Are levels between 1 and 100, remove duplicated, order and add 0
+  ## Are levels between 1 and 100, remove duplicated, order and add 0
   levels <- levels[order(levels)]
 
   if (max(levels) > 99 | min(levels) < 1 | length(levels) != length(unique(levels))) {
@@ -76,10 +74,17 @@ rhrLoCoH <- function(xy, type="k", n=10, levels=95, min.pts=3, ud=FALSE, cud=FAL
 
   ind <- 1:nrow(xy)
   if (type == "k") {
+
+    if (n > nrow(xy)) {
+      n <- nrow(xy)
+      warning(paste0("Locoh, type k, n > number of points, set n to number of points (", n, ")"))
+    }
+
     # 1. calc dist
     # 2. order by dist
     # 3. take n nearest
     n <- n - 1 # to be consistent with adehabitatHR -> check Getz paper
+
     abc1 <- lapply(ind, function(i) ind[order(sqrt((xy[,1] - xy[i,1])^2 + (xy[,2] - xy[i,2])^2))][1:n])
   } else if (type == "r") {
     # 1. calc dist
@@ -154,17 +159,26 @@ rhrLoCoH <- function(xy, type="k", n=10, levels=95, min.pts=3, ud=FALSE, cud=FAL
   bb <- lapply(bb, function(x) SpatialPolygons(list(x)))
   bb <- lapply(bb, function(x) gUnaryUnion(x, row.names(x)))
 
-  for (i in 2:length(bb)) {
-    bb[[i]] <- gUnion(bb[[i]], bb[[i-1]], id=row.names(bb[[i]]))
+
+  if (length(bb) > 1) {
+    for (i in 2:length(bb)) {
+      bb[[i]] <- gUnion(bb[[i]], bb[[i-1]], id=row.names(bb[[i]]))
+    }
+    b <- do.call("rbind", bb)
+  } else {
+    b <- bb[[1]]
   }
 
-  b <- do.call("rbind", bb)
+  
   attribute.data <- data.frame(level=levels[as.numeric(row.names(b))+1], area=sapply(slot(b, "polygons"), function(x) slot(x, "area")))
   row.names(attribute.data) <- row.names(b)
+
+  
   
   b <- SpatialPolygonsDataFrame(b, data=attribute.data)
  # slot(b, "polygons") <- lapply(slot(b, "polygons"), checkPolygonsHoles)
  # b <- unionSpatialPolygons(b, as.character(b$level))
+
 
   proj4string(b) <- projString
 

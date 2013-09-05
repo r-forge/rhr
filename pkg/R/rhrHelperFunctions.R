@@ -306,39 +306,45 @@ alertError <- function(x, cat=TRUE) {
 #'
 #' plots results of rhrSchoener
 #' @param res from ttsi
-#' @param path where the plot should be safed
-#' @param toFirst2 only plot until critical value of 2 is first reached
+#' @param cvReached whether or not the critical value was passed
+#' @param cvReachedAt time interval at which the critical value was reached
 #' @export
 
-plotTTSI <- function(res, path=NULL, toFirst2=FALSE) {
+plotTTSI <- function(res, cvReached, cvReachedAt) {
 
-
-  if (toFirst2 && max(res[, 'V'], na.rm=TRUE) >= 2) {
-    res <- res[1:which(res[, 'V'] >= 2)[1],]
-  }
 
   v <- res[, 'V']
   m <- res[, 'm']
   n <- res[1, 'n']  # the actual number of points
+  cv <- res[, 'cv']  # confint
+  interval <- res[, 'interval'] # time interval
 
-  if (!is.null(path)) png(path)
-
-  # init plot
+  ## init plot
   pushViewport(viewport(x=0.5, y=0.5, width=0.9, height=0.9))
 
-  # header
+  ## header
   pushViewport(viewport(x=0.0, y=0.9, width=1, height=0.1, just=c("left", "bottom")))
   grid.text("Time to statistical independence")
   popViewport()
 
-  # first graph
+  ## first graph
   pushViewport(viewport(x=0.0, y=0.3, width=1, height=0.6, just=c("left", "bottom")))
   pushViewport(plotViewport(c(0.5,3,1,1)))
   pushViewport(dataViewport(c(1, length(m)), range(v, na.rm=TRUE))) # plotting region
   grid.yaxis(gp=gpar(cex=0.8))
-  grid.text("Schoeners V",x=unit(-3,"lines"),rot=90)
+  grid.text("Schoeners V",x=unit(-3,"lines"), rot=90)
   grid.lines(1:length(m), v, default.units="native")
-  if (max(v, na.rm=T) >= 1.9) grid.lines(c(1,length(m)), c(2,2), default.units="native", gp=gpar(col="red", lty=2))
+  if (cvReached) {
+    grid.lines(c(1,length(m)), c(2,2), default.units="native", gp=gpar(col="red", lty=2))
+
+    ## critical values
+    grid.lines(1:length(m), cv, default.units="native", gp=gpar(col="grey", lwd=2))
+
+    ## line where cv passed
+    ## At which interval was the cv passed
+    cvReachedAtInt <- which(interval == cvReachedAt)
+    grid.points(cvReachedAtInt, 2, default.units="native", gp=gpar(col="red", pch=2))
+  }
   popViewport(3)
 
   # second graph
@@ -346,15 +352,13 @@ plotTTSI <- function(res, path=NULL, toFirst2=FALSE) {
   pushViewport(plotViewport(c(3,3,0.5,1)))
   pushViewport(dataViewport(c(1, length(m)), range(c(m, n, na.rm=TRUE), na.rm=TRUE))) 
   grid.yaxis(gp=gpar(cex=0.8))
-  grid.xaxis(gp=gpar(cex=0.8))
+  grid.xaxis(gp=gpar(cex=0.8), at=pretty(1:length(m)), label=pretty(interval))
   grid.text("Time interval [seconds]",y=unit(-3,"lines"))
   grid.text("m",x=unit(-3,"lines"),rot=90)
   for (i in seq(m)) grid.lines(rep(i, 2), c(0, m[i]), default.units="native")
   # grid.lines(c(1,length(m)), c(n,n), default.units="native", gp=gpar(col="red", lty=2))
 
   popViewport(3)
-
-  if (!is.null(path)) dev.off()
 
 }
 
@@ -636,37 +640,20 @@ rhrHREstimator <- function(dat, call, params, ud, cud) {
 #' print for RhrHREstimator
 #' 
 #' generic print for RhrHREstimator
-#' @usage print(x, ...)
-#' @aliases print print.RhrHREstimator
 #' @param x RhrHREstimator object
-#' @param how how the output should be formated, can be either screen, html or grob
 #' @param ... ignored
 #' @method print RhrHREstimator
 #' @export
 
 print.RhrHREstimator <- function(x, ...) {
 
-  if (length(how) > 1) {
-    warning("only first element of what is used")
-  }
-
-  if (!how %in% c("screen", "html", "grob")) {
-    stop("how can only be screen, html or grob")
-  }
-
-  if (how == "screen") {
-    cat(paste0("class       : ", class(x)),
-        paste0("estimator   : ", x$parameters$name),
-        paste0("call        : ", deparse(x$call)),
-        paste0("n points    : ", nrow(x$dat)),
-        paste0("ud          : ", x$parameters$ud),
-        paste0("cud         : ", x$parameters$cud),
-        sep="\n")
-  }
-
-  if (how == "html") {
-    
-  }
+  cat(paste0("class       : ", class(x)),
+      paste0("estimator   : ", x$parameters$name),
+      paste0("call        : ", deparse(x$call)),
+      paste0("n points    : ", nrow(x$dat)),
+      paste0("ud          : ", x$parameters$ud),
+      paste0("cud         : ", x$parameters$cud),
+      sep="\n")
 }
 
 
@@ -720,7 +707,7 @@ rhrSetCUD <- function(x, cud, ...) {
 #' @param cud the cud, object of class raster
 #' @param ... further arguments, none implemented
 #' @export
-#' @method rhrSetUD RhrHREstimator
+#' @method rhrSetCUD RhrHREstimator
 
 rhrSetCUD.RhrHREstimator <- function(x, cud, ...) {
   if (!is(cud, "RasterLayer")) {
@@ -731,10 +718,24 @@ rhrSetCUD.RhrHREstimator <- function(x, cud, ...) {
 }
 
 
+#' Set the Set isopleth
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param iso the isoplethes
+#' @param ... further arguments, none implemented
+#' @export
+
 rhrSetIso <- function(x, iso, ...) {
   UseMethod("rhrSetIso", x)
 }
 
+
+#' Set isopleth
+#' 
+#' @param x an object of class rhrHREstimator
+#' @param iso the isoplethes
+#' @param ... further arguments, none implemented
+#' @method rhrSetIso RhrHREstimator
 
 rhrSetIso.RhrHREstimator <- function(x, iso, ...) {
   if (!inherits(iso, "SpatialPolygons")) {
@@ -839,7 +840,7 @@ ud <- function(x, ...) {
 }
 
 
-#' Set the UD
+#' Get the UD
 #' 
 #' @param x an object of class rhrHREstimator
 #' @param ... further arguments, none implemented
@@ -872,7 +873,7 @@ cud <- function(x, ...) {
 #' @param x an object of class rhrHREstimator
 #' @param ... further arguments, none implemented
 #' @export
-#' @method ud RhrHREstimator
+#' @method cud RhrHREstimator
 
 cud.RhrHREstimator <- function(x, ...) {
 
@@ -883,35 +884,6 @@ cud.RhrHREstimator <- function(x, ...) {
 }
 
 
-## Shamelessly copied from:
-## http://stackoverflow.com/questions/3478923/displaying-the-actual-parameter-list-of-the-function-during-execution
-## It is also available in the amer package, which has however been removed from CRAN
-expand.call <- function(definition=NULL,
-         call=sys.call(sys.parent(1)),
-         expand.dots = TRUE,
-         doEval=TRUE)
-{
-
-    safeDeparse <- function(expr){
-        #rm line breaks, whitespace             
-        ret <- paste(deparse(expr), collapse="")
-        return(gsub("[[:space:]][[:space:]]+", " ", ret))
-    }
-
-    call <- .Internal(match.call(definition, call, expand.dots))
-
-    #supplied args:
-    ans <- as.list(call)
-    if(doEval) ans[-1] <- lapply(ans[-1], eval)
-
-    #possible args:
-    frmls <- formals(safeDeparse(ans[[1]]))
-    #remove formal args with no presets:
-    frmls <- frmls[!sapply(frmls, is.symbol)]
-
-    add <- which(!(names(frmls) %in% names(ans)))
-    return(as.call(c(ans, frmls[add])))
-}
 
 #' Retrives the isopleths of an rhrHREstimator object
 #' 
@@ -935,3 +907,33 @@ isopleths <- function(x, ...) {
 isopleths.RhrHREstimator <- function(x, ...) {
     return(x$results$isopleths)
 }
+
+### Shamelessly copied from:
+### http://stackoverflow.com/questions/3478923/displaying-the-actual-parameter-list-of-the-function-during-execution
+### It is also available in the amer package, which has however been removed from CRAN
+# expand.call <- function(definition=NULL,
+#         call=sys.call(sys.parent(1)),
+#         expand.dots = TRUE,
+#         doEval=TRUE)
+#{
+#
+#    safeDeparse <- function(expr){
+#        #rm line breaks, whitespace             
+#        ret <- paste(deparse(expr), collapse="")
+#        return(gsub("[[:space:]][[:space:]]+", " ", ret))
+#    }
+#
+#    call <- .Internal(match.call(definition, call, expand.dots))
+#
+#    #supplied args:
+#    ans <- as.list(call)
+#    if(doEval) ans[-1] <- lapply(ans[-1], eval)
+#
+#    #possible args:
+#    frmls <- formals(safeDeparse(ans[[1]]))
+#    #remove formal args with no presets:
+#    frmls <- frmls[!sapply(frmls, is.symbol)]
+#
+#    add <- which(!(names(frmls) %in% names(ans)))
+#    return(as.call(c(ans, frmls[add])))
+#}

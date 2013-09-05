@@ -65,8 +65,6 @@ distancePointLine <- function(x, y, x1, y1, x2, y2) {
 #' plot for RhrHRCoreArea
 #' 
 #' generic plot for RhrHREstimator
-#' @usage plot(x, ...)
-#' @aliases plot plot.RhrHREstimator
 #' @param x RhrHRCoreArea object
 #' @param ... none implemented
 #' @method plot RhrHRCoreArea
