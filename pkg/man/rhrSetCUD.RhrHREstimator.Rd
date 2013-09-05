@@ -2,7 +2,7 @@
 \alias{rhrSetCUD.RhrHREstimator}
 \title{Set the CUD}
 \usage{
-  \method{rhrSetUD}{RhrHREstimator} (x, cud, ...)
+  \method{rhrSetCUD}{RhrHREstimator} (x, cud, ...)
 }
 \arguments{
   \item{x}{an object of class rhrHREstimator}

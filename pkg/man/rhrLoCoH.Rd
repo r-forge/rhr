@@ -55,7 +55,6 @@
 \examples{
 data(datSH)
 nrow(datSH)
-locoh <- rhrLoCoH(datSH[, 2:3], type="k", n=100, level=c(50, 90))
-spplot(locoh, 'level')
+locoh <- rhrLoCoH(datSH[1:100, 2:3], type="k", n=10, level=c(50, 90))
 }
 

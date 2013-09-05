@@ -1,9 +1,9 @@
 \name{plot.RhrHREstimator}
-\alias{plot}
 \alias{plot.RhrHREstimator}
 \title{plot for RhrHREstimator}
 \usage{
-  plot(x, ...)
+  \method{plot}{RhrHREstimator} (x, what = c("ud", "iso"),
+    draw = TRUE, useGE = FALSE, ...)
 }
 \arguments{
   \item{x}{RhrHREstimator object}
@@ -14,7 +14,7 @@
   \item{draw}{indicates whether the plot should be drawn or
   not. If this is \code{FALSE} a grob is returned.}
 
-  \item{userGE}{indicates wether or not google earth
+  \item{useGE}{indicates wether or not google earth
   satellite images should be use as background}
 
   \item{...}{none implemented}

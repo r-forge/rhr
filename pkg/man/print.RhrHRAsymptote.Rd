@@ -1,15 +1,13 @@
 \name{print.RhrHRAsymptote}
-\alias{print}
 \alias{print.RhrHRAsymptote}
 \title{print object of rhrHRAsymptote}
 \usage{
-  print(x, ...)
+  \method{print}{RhrHRAsymptote} (x, ...)
 }
 \arguments{
   \item{x}{RhrHRAsymptote}
 
-  \item{how}{should it be printed, this can be either
-  sceen, html or grob}
+  \item{...}{none implemented}
 }
 \description{
   print object of rhrHRAsymptote
