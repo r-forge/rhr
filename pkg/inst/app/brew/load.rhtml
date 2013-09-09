@@ -140,7 +140,7 @@ if (!is.null(req$POST())) {
     # each lines requires more than one field and same length
     testBody <- function(str, sep) {
       str <- strsplit(str, sep)
-      str <- sapply(str, length)
+      str <- head(sapply(str, length), -1)
       all(str == str[1]) & (str[1] > 1)
     }
 
@@ -172,7 +172,7 @@ if (!is.null(req$POST())) {
       cat(paste0("<pre>", paste(apply(head(dat, 10), 1, paste0, collapse="|"), collapse="\n"), "</pre>"))
     } else {
 
-	   cat('<div class="alert alert-error"><b>Something went wrong:</b> wrong field separator</div>')
+	   cat(paste0('<div class="alert alert-error"><b>--Something went wrong:</b> wrong field separator</div>', sep))
       cat(paste0("<pre>", paste0(head(str), collapse="\n"), "</pre>"))
     }
       
