@@ -8,7 +8,8 @@
   \item{x}{an object of class rhrHREstimator}
 }
 \value{
-  TRUE/FALSE
+  Returns \code{TRUE} if the \code{rhrHREstimator} has a
+  utilisation distribution, else it returns false.
 }
 \description{
   Checks if an rhrEstimator posses a cud

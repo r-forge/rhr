@@ -232,9 +232,9 @@ toHTML.htest <- function(x, cap=NULL, ...) {
 
 #' alert
 #'
-#' wraps string as twitter bootstrap alert
+#' wraps a string with html markup for a twitter bootstrap alert
 #' @param x a string
-#' @param cat whether it should be printed to sto or not
+#' @param cat if this \code{cat=TRUE} then the return string is wrapped with a \code{cat}.
 #' @export
 #' @author Johannes Signer
 #' @examples
@@ -777,7 +777,7 @@ hasUD.RhrHREstimator <- function(x) {
 #' 
 #' @param x an object of class rhrHREstimator
 #' @export
-#' @return TRUE/FALSE
+#' @return Returns \code{TRUE} if the \code{rhrHREstimator} has a utilisation distribution, else it returns false.
 
 hasCUD <- function(x) {
   UseMethod("hasUD", x)
@@ -789,6 +789,7 @@ hasCUD <- function(x) {
 #' @param x an object of class rhrHREstimator
 #' @export
 #' @method hasCUD RhrHREstimator
+#' @return Returns \code{TRUE} if the \code{rhrHREstimator} has a utilisation distribution, else it returns false.
 
 hasCUD.RhrHREstimator <- function(x) {
 
@@ -816,6 +817,7 @@ hasIsopleths <- function(x) {
 #' @param x an object of class rhrHREstimator
 #' @export
 #' @method hasIsopleths RhrHREstimator
+#' @return Returns \code{TRUE} if the \code{rhrHREstimator} has one or more isopleths, else it returns false.
 
 hasIsopleths.RhrHREstimator <- function(x) {
   if (inherits(x$results$isopleths, "SpatialPolygons")) {

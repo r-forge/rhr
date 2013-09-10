@@ -636,6 +636,24 @@ $(document).ready(function(){
 	}});
 
     /* ========================================================================== */
+    /* *****************************************************************************
+     * Button to un/check all analytical steps at once
+     *******************************************************************************/
+    $(document).on('click', "#btnUncheckAllSteps", function() {
+        $('input[name=selectStep]').prop("checked", false);
+    });
+
+    $(document).on('click', "#btnCheckAllSteps", function() {
+        $('input[name=selectStep]').prop("checked", true);
+    });
+
+    $(document).on('click', "#btnUncheckAllSteps1", function() {
+        $('input[name=selectStep]').prop("checked", false);
+    });
+
+    $(document).on('click', "#btnCheckAllSteps1", function() {
+        $('input[name=selectStep]').prop("checked", true);
+    });
 
     /* *****************************************************************************
      * Analyze

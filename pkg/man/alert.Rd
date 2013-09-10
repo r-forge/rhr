@@ -7,10 +7,12 @@
 \arguments{
   \item{x}{a string}
 
-  \item{cat}{whether it should be printed to sto or not}
+  \item{cat}{if this \code{cat=TRUE} then the return string
+  is wrapped with a \code{cat}.}
 }
 \description{
-  wraps string as twitter bootstrap alert
+  wraps a string with html markup for a twitter bootstrap
+  alert
 }
 \examples{
 alert("Calculation completed")
