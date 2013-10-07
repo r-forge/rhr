@@ -29,7 +29,7 @@
                  preAnalysis=list(siteFidelity=list(n=100), 
                    ttsi=list(interval=5 * 60 * 60, consec=TRUE, alpha=0.25, ntimes=3), 
                    asymptote=list(nIter=10, minNPts=50, increment=50, estimator=c("mcp"), level=95,
-                     nTimes=5, tolTotArea=95)), 
+                     nTimes=5, tolTotArea=5, sampling="sequential")), 
                  estimator=list(ca=list(res=100),
                    mcp=list(level=95), 
                    kde=list(resolution=100, buffer=1000, level=95, bandwidth="href", bandwidthValue=100), 

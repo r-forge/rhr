@@ -117,7 +117,7 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
       tempol <- isopleths(x)
       tempol@data$id <- rownames(tempol@data)
       tempolPoints <- try(fortify(tempol, region="id"))
-      tempolDF <- join(tempolPoints, tempol@data, by="id")
+      tempolDF <- plyr::join(tempolPoints, tempol@data, by="id")
 
       pIso <- ggplot(tempolDF, aes(x=long, y=lat, group=group, color=factor(level))) + 
         geom_point(data=x$dat, aes(x=lon, y=lat, group=NULL, color=NULL), alpha=0.1) +

@@ -34,7 +34,8 @@ if (config$todo$doAsymptote) {
                                                ns=ns,
                                                nrep=as.numeric(asym$nIter),
                                                tolTotArea=as.numeric(asym$tolTotArea)/100,
-                                               nTimes=as.numeric(asym$nTimes)))
+                                               nTimes=as.numeric(asym$nTimes),
+                                               sampling=asym$sampling))
       if (!is(resAsym[[i]]$mcpAsym, "try-error")) {
         p <- plot(resAsym[[i]]$mcpAsym, draw=FALSE)
         resAsym[[i]]$mcpPlot <- grid.grabExpr(print(p))

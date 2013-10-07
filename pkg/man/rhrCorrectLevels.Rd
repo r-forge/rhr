@@ -6,9 +6,9 @@
     default.level = 95)
 }
 \arguments{
-  \item{str}{A string with that contains the level,
-  seperated by comas. If there are no suitable levels, then
-  the default.level is used.}
+  \item{str}{A string that contains the level, seperated by
+  comas (usually provided through the GUI). If there are no
+  suitable levels, then the default.level is used.}
 
   \item{low}{lower bound for levels}
 
@@ -17,6 +17,6 @@
   \item{default.level}{is the default level}
 }
 \description{
-  correct Levels at which a home range should be calculated
+  correct levels at which a home range should be calculated
 }
 

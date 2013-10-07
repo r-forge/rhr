@@ -7,9 +7,8 @@
 #' @param xrange vector of length 2, with xmin and xmax for the UD
 #' @param yrange vector of length 2, with ymin and ymax for the UD
 #' @param res the resolution for the ud. 
-#' @param h bandwidth, either a string ("href", "lscv") or an actual value
-#' @param lscv.n number of iterations for lscv
-#' @param tol the tolerace for lscv 
+#' @param h bandwidth, either a string ("href", "lscv", or "hpi") or an actual value
+#' @param extent an optional extent, by which the x and y range are exteded. A value of 0 means no extent and a value of 1 means that the extent is doubled.
 #' @return object of class \code{RhrHREstimator}
 #' @export
 #' @author Johannes Signer 
@@ -17,33 +16,21 @@
 #' data(datSH)
 #' \dontrun{ 
 #' # Kernel with href bandwidth estimation
-#' k1 <- rhrKDE(datSH[, 2:3], h="href", resolution=100)
+#' k1 <- rhrKDE(datSH[, 2:3], h="href", res=100)
+#' plot(k1)
 #' 
 #' # what is the actually estimated bandwidth?
-#' k1$h$h
-#' 
-#' # Return results as an object of class raster
-#' k1 <- rhrKDE(datSH[, 2:3], h="href", resolution=100, return.raster=TRUE)
-#' k1$data$rast
-#' plot(k1$data$rast)
+#' k1$parameters$h
 #' 
 #' # Kernel with href bandwidth estimation
-#' k2 <- rhrKDE(datSH[, 2:3], h="lscv", resolution=100)
+#' k2 <- rhrKDE(datSH[, 2:3], h="lscv", res=100)
+#' plot(k2)
 #' 
 #' # what is the actually estimated bandwidth?
-#' k2$h$h
-#' 
-#' # Return results as an object of class raster
-#' k2 <- rhrKDE(datSH[, 2:3], h="lscv", resolution=100, return.raster=TRUE)
-#' k1$data$rast
-#' plot(k1$data$rast)
-#'
-#' # Compare
-#' par(mfrow=c(2,1))
-#' plot(k1)
-#' plot(k2)}
+#' k2$parameters$h
+#' }
 
-rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=95, h="href",lscv.n=100, tol=1) {
+rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=95, h="href", extent=0) {
   # load libraries
   require(KernSmooth)
 
@@ -90,24 +77,6 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
     sigma * nrow(xy)^(-1/6)
   }
 
-  ## Least Square Cross Validation
-  lscv <- function(h, xy, tol=tol) {
-    # h: vector of length 2 with min and max bandwidth
-    # xy: data.frame with 2 col, first for x and second for y
-    # tol: the tolerance, see ?optimize 	  
-    
-    n <- nrow(xy)	
-    d <- (as.vector(as.matrix(dist(xy, diag=T, upper=T))) )
-	
-    hlp <- function(h, xy, d) {
-      d <- d^2 / h^2
-      # Formula as fund on p. 20 of HRT Manual, possibly also by Worton et al 1995
-      sum((1/(4 * pi) * exp(-d/4) - 1/pi * exp(-d/2)) / (n^2 * h^2)) + 1 /(pi * n * h^2)
-    }
-	
-    return(optimize(hlp, range(h), tol=tol, xy=xy, d=d)$minimum)
-
-  }
 
   # Create out raster
   r1 <- rasterFromXYVect(xy, xrange=xrange, yrange=yrange, res=res)
@@ -117,6 +86,7 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
   xrange <- c(xmin(r1), xmax(r1))
   yrange <- c(ymin(r1), ymax(r1))
   gridsize <- c(ncolumns, nrows)
+
 
   ## Calculate bandwidth
   if (tolower(h) == "href") {
@@ -133,25 +103,13 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
     hres$method <- "hpi"
 
   } else if (tolower(h) == "lscv") {
-    # tolerance for optimizer
-    tol <- 1
-    # atm range of possible h values is hard coded
-    hrange <- href(xy)
-    hrange <- c(0.1 * hrange, 2 * hrange)
-
-    # try to find bandwidth
-    h <- lscv(hrange, xy, tol=tol)
-
-    # check wether or not LSCV converged or not
-    hasConverged <- TRUE
-    if (h <= hrange[1] - tol | h >= hrange[2] + tol) {
-      warning("LSCV did not converge")
-      hasConverged <- FALSE
-    }
-    h <- c(h, h)
     hres$method <- "lscv"
-    hres$hasConverged <- hasConverged
 
+    ## Calculate home range with adehabitatHR::kernelUD and extract the reference value
+    htmp <- kernelUD(SpatialPoints(xy), h="LSCV", grid=grid)
+    h <- htmp@h
+    hres$h <- h
+    hres$converged <- htmp@h$convergence
   } else {
     hres$method <- "user specified"
   }
@@ -160,12 +118,27 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
   hres$h <- h
 
   ## ---------------------------------------------------------------------------- #
+  ## Estimate kernels
+  
+  ## Create Raster
+  kde <- bkde2D(xy, bandwidth=h, range.x=list(xrange, yrange), gridsize=gridsize)
+
+  ## Did h converged, only relevant for LSCV, hence default is NA
+  hres$converged <- NA
+
+  if (h[1] == "LSCV") {
+    hres$h <- kde@h$h
+    hres$converged <- kde@h$convergence
+  }
+
+  ## ---------------------------------------------------------------------------- #
   ## Prepare output
   
   ## call constructor for output
   out <- rhrHREstimator(xy, call=match.call(),
                         params=list(name="kde", method=hres$method, levels=levels,
                           h=hres$h, 
+                          converged=hres$convergence,
                           ud=ud,
                           cud=cud,
                           args=argsIn,
@@ -174,21 +147,14 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
                         cud=cud)
 
   # ---------------------------------------------------------------------------- #
-  ## Estimate kernels
-  
-  ## Create Raster
-  kde <- bkde2D(xy, bandwidth=h, range.x=list(xrange, yrange), gridsize=gridsize)
-
-  # ---------------------------------------------------------------------------- #
   ## Finish output
-  
-  r <- kde$fhat
-  r1 <- raster(t(r)[ncol(r):1,], xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2])
+  r1 <- raster(t(kde$fhat)[ncol(r):1,], xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2])
+
   
 
   # standardize
   v <- r1[]
-  v <- v / sum(v)
+  v <- v / sum(v, na.rm=TRUE)
   udFromDat <- setValues(r1, v)
 
   v <- cumsum(v[order(-v)])[order(order(-v))]

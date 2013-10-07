@@ -417,12 +417,12 @@ if (!is.null(req$POST())) {
 </tr>
 </table>
 
-    <br>
     <div class="btn-group">
       <button id="btnCheckAllSteps1" class="btn btn-mini" type="button"> Check All </button>
       <button id="btnUncheckAllSteps1" class="btn btn-mini" type="button"> Uncheck All </button>
     </div>
 
+    <br>
     <br>
 
 <!-- Button to start everything -->
@@ -434,11 +434,6 @@ if (!is.null(req$POST())) {
 </section>
 
 
-<!---- 
-    <footer>
-      <p>&copy; Johannes Signer 2012</p>
-    </footer>
-    ---->
 
 </div><!--/.fluid-container-->
 
@@ -667,6 +662,16 @@ if (!is.null(req$POST())) {
 		    </div>
 		  </div>
 
+		  <div class="control-group">
+		    <label class="control-label" for="modalAsymptoteInputSampling">Sampling regime</label>
+		    <div class="controls">
+                      <select id="modalAsymptoteInputSampling">
+			<option value='sequential'>sequential</option>
+			<option value='random'>random</option>
+                      </select>  
+		    </div>
+		  </div>
+
 
 		  <div class="control-group">
 		    <label class="control-label" for="modalAsymptoteSelectEstimator">Calculate asymptote for:</label>
@@ -753,7 +758,7 @@ if (!is.null(req$POST())) {
   <div class="controls">
                 <select id="modalKDESelectBandwidth" >
                   <option value='lscv'>Least Square Cross Validation</option>
-                  <option value='plugin'>Plugin in the Equation</option>
+                  <option value='hpi'>Plugin in the Equation</option>
                   <option value='href'>Reference Bandwidth</option>
                   <option value='user'>User specified Value</option>
                 </select> <br> 

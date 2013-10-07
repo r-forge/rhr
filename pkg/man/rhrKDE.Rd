@@ -4,7 +4,7 @@
 \usage{
   rhrKDE(xy, xrange = NA, yrange = NA, res = 100,
     ud = TRUE, cud = TRUE, levels = 95, h = "href",
-    lscv.n = 100, tol = 1)
+    extent = 0)
 }
 \arguments{
   \item{xy}{data.frame with two columns. The first column
@@ -28,12 +28,12 @@
 
   \item{res}{the resolution for the ud.}
 
-  \item{h}{bandwidth, either a string ("href", "lscv") or
-  an actual value}
+  \item{h}{bandwidth, either a string ("href", "lscv", or
+  "hpi") or an actual value}
 
-  \item{lscv.n}{number of iterations for lscv}
-
-  \item{tol}{the tolerace for lscv}
+  \item{extent}{an optional extent, by which the x and y
+  range are exteded. A value of 0 means no extent and a
+  value of 1 means that the extent is doubled.}
 }
 \value{
   object of class \code{RhrHREstimator}
@@ -45,7 +45,7 @@
 data(datSH)
 \dontrun{
 # Kernel with href bandwidth estimation
-k1 <- rhrKDE(datSH[, 2:3], h="href", resolution=100)
+k1 <- rhrKDE(datSH[, 2:3], h="href", res=100)
 
 # what is the actually estimated bandwidth?
 k1$h$h

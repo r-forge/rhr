@@ -188,11 +188,14 @@ rhrLoCoH <- function(xy, type="k", n=10, levels=95, min.pts=3, ud=FALSE, cud=FAL
   }
 
   r1 <- rasterFromXYVect(xy, xrange=xrange, yrange=yrange, res=res)
-  cud <- rasterize(b, r1, field="level", fun=min) / 100
-### NOT WORKING YET
+  cud <- rasterize(b, r1, field="level", fun="min") / 100
   ud <- (1 - cud) / sum(1 - cud[], na.rm=T)
 
   # locoh at levls
+  if (!any(b$level %in% levels.o)) {
+    levels.o <- b$level[which.min(abs(b$level - levels.o))]
+  }
+
   locoh <- b[b$level %in% levels.o,]
 
   out <- rhrSetIso(out, locoh)

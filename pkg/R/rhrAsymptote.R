@@ -2,15 +2,28 @@
 #' 
 #' calculate home range asymptote
 #' @param x RhrHREstimator object
-#' @param ns numeric vector of the number of samples to be taken
+#' @param ns numeric vector of the number of samples to be taken at each step
 #' @param nrep the number of replicates for each sample size
-#' @param tolTotArea tolerance to the total area
+#' @param tolTotArea tolerance to the total area (that is the area using all points)
 #' @param nTimes the number of times the confidence interval is required to be within tolerated total area
-#' @return RhrHRAsymptote
+#' @param sampling this should be either random or sequential. See notes for details.
+#' @note Bootstrapped home ranges are calculated for different sample sizes. Starting from very few samples until the sample size approaches the total number of points. Home range sizes are then plotted against the sample sizes. Laver (2005, 2005) suggested to use the following cutoff value: the number of location estimates at which the 95 \% confidence interval of the bootstrapped home-range estimates is within a specified percentage of the total home range size (that is the size of the home range with all relocations) for at least n times. Harris 1990 suggested to use random sampling for discontinuous radio tracking data and sequential sampling for continuous radio tracking data. 
+#' @return An object of class \code{RhrHRAsymptote}
+#' @references Peter N Laver. Cheetah of the serengeti plains: a home range analysis. Master's thesis, Virginia Polytechnic Institute and State University, 2005
+#' @references Peter N. Laver and Marcella J. Kelly. A critical review of home range studies. The Journal of Wildlife Management, 72(1):290-298, 2008
 #' @export
+#' @examples
+#' \dontrun{
+#' ## calculate home range asymptote for kernel density estimation
+#' ## first calculate the home range
+#' data(datSH)
+#' hr <- rhrKDE(datSH[, 2:3], h="href")
+#' hra <- rhrAsymptote(hr)
+#' plot(hra)
+#' }
 
 
-rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=0.95, nTimes=5) {
+rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=0.05, nTimes=5, sampling="sequential") {
 
   ## Input checks
   if (!is(x, "RhrHREstimator")) {
@@ -45,6 +58,10 @@ rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=
     stop("nTimes should be > 0")
   }
 
+  if (!sampling %in% c("random", "sequential")) {
+    stop("sampling should be either random or sequential")
+  }
+
   if (max(ns) > nrow(dat(x))) {
     ns <- ns[ns <= nrow(dat(x))]
   }
@@ -63,9 +80,23 @@ rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=
   providedArgs <- parameters(x)$args
   for (i in seq_along(providedArgs)) if (is.character(providedArgs[[i]])) providedArgs[[i]] <- shQuote(providedArgs[[i]])
 
-  b <- parse(text=paste0(est, "(dat(x)[sample(1:nrow(dat(x)), ", ns, ", replace=FALSE),],",
-               paste(names(providedArgs), providedArgs, sep="=",
-                     collapse=","), ")"))
+  ## Figure out samples
+  if (sampling == "sequential") {
+                                        # b <- parse(text=paste0(est, "(dat(x)[sample(1:nrow(dat(x)), ", ns, ", replace=FALSE),],",
+                                        #              paste(names(providedArgs), providedArgs, sep="=",
+                                        #                    collapse=","), ")"))
+    b <- parse(text=paste0(est, "((local <- dat(x)[1:", ns, ", ])[sample(1:nrow(local), replace=TRUE),],",
+                 paste(names(providedArgs), providedArgs, sep="=",
+                       collapse=","), ")"))
+  } else if (sampling == "random") {
+    b <- parse(text=paste0(est,
+                 "((local <- dat(x)[sample(1:nrow(dat(x)),", ns,
+                 ", replace=FALSE), ])[sample(1:nrow(local), replace=TRUE),],",
+                 paste(names(providedArgs), providedArgs, sep="=",
+                       collapse=","), ")"))
+
+  }
+
 
   ## use envir in enval, to make sure x is searched at the right place
   bb <- replicate(nrep, lapply(b, eval, envi=environment()), simplify=FALSE)
@@ -82,8 +113,8 @@ rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=
   totalA <- areas(eval(parse(text=paste0(est, "(dat(x),",
                                paste(names(providedArgs), providedArgs, sep="=",
                                      collapse=","), ")")), envir=environment()))
-  totalA$lower <- totalA$area * tolTotArea
-  totalA$upper <- totalA$area * (2 - tolTotArea)
+  totalA$lower <- totalA$area * (1 - tolTotArea)
+  totalA$upper <- totalA$area * (1 + tolTotArea)
 
       
   ## calculate confidence intervals
@@ -112,7 +143,7 @@ rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=
                             ns=asymReached)
 
   ## plot
-  out <- list(asymtotes=asymReached, confints=do.call("rbind", confints), hrAreas=bb, call=match.call(),
+  out <- list(asymptote=asymReached, confints=do.call("rbind", confints), hrAreas=bb, call=match.call(),
               params=list(ns=ns, tolTotArea=tolTotArea), totalA=totalA, hrEstimator=x)
   class(out) <- "RhrHRAsymptote"
   out
@@ -130,8 +161,8 @@ rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=
 print.RhrHRAsymptote <- function(x, ...) {
 
   cat(paste0("class                    : ", class(x)),
-      paste0("asymptote calculated for : ", paste0(x$asymtotes$level, collapse=",")),
-      paste0("asypotote reached at     : ", paste0(x$asymtotes$ns, collapse=",")),
+      paste0("asymptote calculated for : ", paste0(x$asymptote$level, collapse=",")),
+      paste0("asypotote reached at     : ", paste0(x$asymptote$ns, collapse=",")),
       sep="\n")
 
 }
@@ -166,7 +197,7 @@ plot.RhrHRAsymptote <- function(x, draw=TRUE, ...) {
                    level=rep(totalA$level, each=length(unique(ns))))
   
   ## When were the asymtotes reaches?
-  asymR <- x$asymtotes
+  asymR <- x$asymptote
   asymR <- asymR[complete.cases(asymR), ]
 
   

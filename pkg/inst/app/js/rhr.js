@@ -382,6 +382,7 @@ $(document).ready(function(){
 	$('#modalAsymptoteInputNTimes').val(config.preAnalysis.asymptote.nTimes);
 	$('#modalAsymptoteInputTolTotArea').val(config.preAnalysis.asymptote.tolTotArea);
 	$('#modalAsymptoteSelectEstimator').val(config.preAnalysis.asymptote.estimator);
+	$('#modalAsymptoteInputSampling').val(config.preAnalysis.asymptote.sampling);
 	$('#modalAsymptote').modal('show');
     });
 
@@ -402,6 +403,7 @@ $(document).ready(function(){
 	    config.preAnalysis.asymptote.estimator = $("#modalAsymptoteSelectEstimator").val();
 	    config.preAnalysis.asymptote.nTimes = $("#modalAsymptoteInputNTimes").val();
 	    config.preAnalysis.asymptote.tolTotArea = $("#modalAsymptoteInputTolTotArea").val();
+	    config.preAnalysis.asymptote.sampling = $("#modalAsymptoteInputSampling").val();
 
 	} else {
 	    alert("Invalid value");

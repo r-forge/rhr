@@ -11,18 +11,18 @@ pdf(filename, width=width,height=height)
   
 grid.newpage()
 
-# Outermost margins
+## Outermost margins
 pushViewport(viewport(x=unit(35, "mm"),
                       y=unit(12.5, "mm"),
                       width=unit(163.5, "mm"),
                       height=unit(272, "mm"),
                       just=c("left", "bottom"),
                       gp=gpar(lineheight=1, fontsize=11)))
-    # page frame        
+    ## page frame        
     grid.rect(gp=gpar(lwd=0.2))
 
-# ============================================================================ # 
-# Global settings
+## ============================================================================ # 
+## Global settings
 
 global <- list()
 global$h1 <- list()
@@ -47,17 +47,17 @@ global$h3$size <- 12
 global$line$size <- 5.5
 
 
-# ============================================================================ # 
-# Prepare 2nd to nth page
+## ============================================================================ # 
+## Prepare 2nd to nth page
 
 repItems <- list()
 repH <- c()
 
-# ---------------------------------------------------------------------------- # 
+## ---------------------------------------------------------------------------- # 
 ## Site fidelity
 
 if (config$todo$doSiteFidelity) {
-  # infoblock
+  ## infoblock
   repItems[[length(repItems) + 1]] <- global$h1$grob("Site fidelity") 
   repH <- c(repH, global$h1$size)
   repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
@@ -69,17 +69,17 @@ if (config$todo$doSiteFidelity) {
   repH <- c(repH, global$line$size)
 
   
-  # Results
+  ## Results
   repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
   repH <- c(repH, global$h2$size)
 
-  # add results
+  ## add results
   for (i in seq_along(sfs)) {
-    # header
+    ## header
     repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
     repH <- c(repH, global$h3$size)
 
-    # CI for simulated data
+    ## CI for simulated data
     tmp <- sfs[[i]]$fidelity.results
     names(tmp)[3:4] <- c("CI lower (sim)", "CI upper (sim)")
     tmp[, 1] <- c("Linearity Index", "MSD")
@@ -88,12 +88,12 @@ if (config$todo$doSiteFidelity) {
     repH <- c(repH, 15)
 
 
-    # plots
+    ## plots
     p <- sfPlots[[i]]
     repItems[[length(repItems) + 1]] <- p
     repH <- c(repH, 100)
 
-    # Recom
+    ## Recom
     sfR <- strsplit(sfs[[i]]$msg, " ")[[1]]
     sfR.lines <- cumsum(nchar(sfR)) %/% 65
     sfR.nlines <- max(sfR.lines)
@@ -101,7 +101,7 @@ if (config$todo$doSiteFidelity) {
 
     sfR.grob <- textGrob(label=sfR.str) 
 
-    # Draw a Green Box to highlight key findings
+    ## Draw a Green Box to highlight key findings
     sfR.rect.grob <- rectGrob(width=0.95, height=unit(5 * sfR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
                                                                                    alpha=0.34))
     
@@ -115,12 +115,12 @@ if (config$todo$doSiteFidelity) {
   repH <- c(repH, 15)
 }
 
-# ---------------------------------------------------------------------------- # 
+## ---------------------------------------------------------------------------- # 
 ## TTSI
 
 if (config$todo$doTTSI & config$config$dateTime) {
-  # infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Time To Statistical Independence") 
+  ## infoblock
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Time to statistical independence") 
   repH <- c(repH, global$h1$size)
   repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
   repH <- c(repH, global$h2$size)
@@ -144,20 +144,20 @@ if (config$todo$doTTSI & config$config$dateTime) {
   repH <- c(repH, global$line$size)
 
   
-  # Results
+  ## Results
   repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
   repH <- c(repH, global$h2$size)
 
-  # add results
+  ## add results
   for (i in seq_along(ttsiPlots)) {
     repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
     repH <- c(repH, global$h3$size)
 
-    # plots
+    ## plots
     repItems[[length(repItems) + 1]] <- ttsiPlots[[i]]
     repH <- c(repH, 80)
 
-    # Recom
+    ## Recom
     ttsiR <- strsplit(resTTSI[[i]]$msg, " ")[[1]]
     ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
     ttsiR.nlines <- max(ttsiR.lines)
@@ -165,7 +165,7 @@ if (config$todo$doTTSI & config$config$dateTime) {
 
     ttsiR.grob <- textGrob(label=ttsiR.str) 
 
-    # Draw a Green Box to highlight key findings
+    ## Draw a Green Box to highlight key findings
     ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
                                                                                    alpha=0.34))
     
@@ -174,11 +174,13 @@ if (config$todo$doTTSI & config$config$dateTime) {
   }
   
 } else if (config$todo$doTTSI & !config$config$dateTime) {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Time To Statistical Independence: date and time not provided") -> rTTSI.not
+  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Time to statistical independence: date and time not provided") -> rTTSI.not
   repItems[[length(repItems) + 1]] <- rTTSI.not 
   repH <- c(repH, 15)
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Time To Statistical Independence was not requested") -> rTTSI.not
+  textGrob(y=0.5, just=c("left", "center"),
+           x=0, gp=gpar(fontface="italic"),
+           label="time to Statistical independence was not requested") -> rTTSI.not
   repItems[[length(repItems) + 1]] <- rTTSI.not 
   repH <- c(repH, 15)
 }
@@ -233,6 +235,12 @@ if (config$todo$doAsymptote) {
                                               textGrob(x=0.0, just=c("left", "bottom"), label="tolerance to total area"),
                                               textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
                                                label=config$preAnalysis$asymptote$tolTotArea)))
+  repH <- c(repH, global$line$size)
+
+  repItems[[length(repItems) + 1]] <- gTree(children=gList(
+                                              textGrob(x=0.0, just=c("left", "bottom"), label="sampling"),
+                                              textGrob(x=0.7, just=c("left", "bottom"), gp=gpar(fontfamily="mono"),
+                                               label=config$preAnalysis$asymptote$sampling)))
   repH <- c(repH, global$line$size)
 
   repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
@@ -332,7 +340,7 @@ if (config$todo$doAsymptote) {
 
 if (config$todo$doCA) {
   # infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Core Area Estimation") 
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Core area estimation") 
   repH <- c(repH, global$h1$size)
   repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
   repH <- c(repH, global$h2$size)
@@ -372,7 +380,7 @@ if (config$todo$doCA) {
 
 if (config$todo$doMCP) {
   # infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Minimum Convex Polygon") 
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Minimum convex polygon") 
   repH <- c(repH, global$h1$size)
   repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
   repH <- c(repH, global$h2$size)
@@ -411,12 +419,12 @@ if (config$todo$doMCP) {
   repH <- c(repH, 15)
 }
 
-# ---------------------------------------------------------------------------- # 
+## ---------------------------------------------------------------------------- # 
 ## KDE
 
 if (config$todo$doKDE) {
-  # infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Kernel Density Estimation") 
+  ## infoblock
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Kernel density estimation") 
   repH <- c(repH, global$h1$size)
   repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
   repH <- c(repH, global$h2$size)
@@ -449,17 +457,17 @@ if (config$todo$doKDE) {
   repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
   repH <- c(repH, global$h2$size)
 
-  # add results
+  ## add results
   for (i in seq_along(kdePlots)) {
-    # header
+    ## header
     repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
     repH <- c(repH, global$h3$size)
 
-    # plots
+    ## plots
     repItems[[length(repItems) + 1]] <- kdePlots[[i]]
     repH <- c(repH, 80)
 
-    # areas
+    ## areas
     tt <- data.frame(data.frame(resKDEsContours[[i]]))
     tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
     names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
@@ -483,12 +491,12 @@ if (config$todo$doKDE) {
   repH <- c(repH, 15)
 }
 
-# ---------------------------------------------------------------------------- # 
+## ---------------------------------------------------------------------------- # 
 ## LoCoH
 
 if (config$todo$doLocoh) {
-  # infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Local Convex Hull") 
+  ## infoblock
+  repItems[[length(repItems) + 1]] <- global$h1$grob("Local convex hull") 
   repH <- c(repH, global$h1$size)
   repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
   repH <- c(repH, global$h2$size)
@@ -509,16 +517,17 @@ if (config$todo$doLocoh) {
   repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
   repH <- c(repH, global$h2$size)
 
-  # add results
+  ## add results
   for (i in seq_along(locohPlots)) {
-    # header
+    ## header
     repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
     repH <- c(repH, global$h3$size)
 
-    # plots
+    ## plots
     repItems[[length(repItems) + 1]] <- locohPlots[[i]]
     repH <- c(repH, 80)
-    # areas
+
+    ## areas
     tt <- data.frame(data.frame(isopleths(resLocohs[[i]])))
     tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
     names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
@@ -530,22 +539,24 @@ if (config$todo$doLocoh) {
                                                  just=c("left", "bottom"),
                                                  gp=gpar(fontfamily="mono"),
                                                  label=c("Locoh", "Value of n",
-                                                   formatC(round(resLocohs[[i]]$parameters$n, 2), big.mark=",", format="f", drop0trailing = TRUE)))
+                                                   formatC(round(resLocohs[[i]]$parameters$n, 2),
+                                                           big.mark=",", format="f", drop0trailing = TRUE)))
     repH <- c(repH, 5)
   }
   
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Local convex hull not requested") -> rLocoh.not
+  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Local convex hull was not not requested") -> rLocoh.not
   repItems[[length(repItems) + 1]] <- rLocoh.not 
   repH <- c(repH, 15)
 }
 
-# ============================================================================ #
-# Summary of parameters
+## ============================================================================ #
+## Summary of parameters
 
 repItems[[length(repItems) + 1]] <- global$h1$grob("Summary of parameters used")
 repH <- c(repH, 20)
 
+## Site fidelity
 if (config$todo$doSiteFidelity) {
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
                                                just=c("left", "bottom"),
@@ -555,6 +566,7 @@ if (config$todo$doSiteFidelity) {
   repH <- c(repH, 5)
 }
 
+## TTSI
 if (config$todo$doTTSI) {
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
                                                just=c("left", "bottom"),
@@ -576,7 +588,7 @@ if (config$todo$doTTSI) {
   repH <- c(repH, 5)
 }
 
-
+## Asymptote
 if (config$todo$doAsymptote) {
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
                                                just=c("left", "bottom"),
@@ -607,6 +619,12 @@ if (config$todo$doAsymptote) {
                                                gp=gpar(fontfamily="mono"),
                                                label=c("Asymptote", "number of replications",
                                                  config$preAnalysis$asymptote$nTimes))
+  repH <- c(repH, 5)
+  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
+                                               just=c("left", "bottom"),
+                                               gp=gpar(fontfamily="mono"),
+                                               label=c("Asymptote", "sampling",
+                                                 config$preAnalysis$asymptote$sampling))
   repH <- c(repH, 5)
   repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
                                                just=c("left", "bottom"),
@@ -791,17 +809,17 @@ nPages <- max(onWhichPage)
         grid.text("Input data", just="left", x=0, gp=gpar(fontface="bold", fontsize=18))
     popViewport()
 
-    # Filename and format
+    ## Filename and format
     pushViewport(viewport(y=unit(180, "mm"), width=unit(153.5, "mm"), height=unit(10, "mm"), just="bottom"))
         grid.text("Relocations read from: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
         grid.text(config$fileName, y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0.7, gp=gpar(fontfamily="mono"))
     popViewport()
 
-    # Remap fields
-    # strShorten, make sure field names from user input are not to long
+    ## Remap fields
+    ## strShorten, make sure field names from user input are not to long
     pushViewport(viewport(y=unit(140, "mm"), width=unit(153.5, "mm"), height=unit(30, "mm"), just="bottom"))
         # title
-        grid.text("This file contained the following column names, which were remaped to:",
+        grid.text("This file contained the following column names, which were remapped to:",
                   y=unit(1, "npc") - unit(1, "lines"),
                   just=c("left", "bottom"), x=0)
         # id
@@ -818,7 +836,7 @@ nPages <- max(onWhichPage)
         grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$lat, gp=gpar(fontfamily="mono"))
         grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.25, label="to", gp=gpar(fontface="italic"))
         grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.30, label="lat")
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.40, label="this is the lat")
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.40, label="this is the latitude")
 
         # date
         grid.text(y=unit(1, "npc") - unit(6, "lines"), just=c("left", "bottom"), x=0.00, label=config$mapFields$date['date'], gp=gpar(fontfamily="mono"))
@@ -845,10 +863,14 @@ nPages <- max(onWhichPage)
 
         grid.text("The restricted spatial bounding box was: ", y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0)
         # bbox restricted
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=paste("xmin:", config$spBbxRestricted['xmin']))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.25, label=paste("xmax:", config$spBbxRestricted['xmax']))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.50, label=paste("ymin:", config$spBbxRestricted['ymin']))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.75, label=paste("ymax:", config$spBbxRestricted['ymax']))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"),
+                  x=0.00, label=paste("xmin:", config$spBbxRestricted['xmin']))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"),
+                  x=0.25, label=paste("xmax:", config$spBbxRestricted['xmax']))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"),
+                  x=0.50, label=paste("ymin:", config$spBbxRestricted['ymin']))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"),
+                  x=0.75, label=paste("ymax:", config$spBbxRestricted['ymax']))
 
     popViewport()
 
@@ -856,30 +878,33 @@ nPages <- max(onWhichPage)
     if (config$config$dateTime) {
     pushViewport(viewport(y=unit(85, "mm"), width=unit(153.5, "mm"), height=unit(20, "mm"), just="bottom"))
         grid.text("The temporal bounding box was: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
-        # bbox total
+        ## bbox total
         grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00, label=paste("tmin: ", config$temporalBbx$tmin))
         grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.50, label=paste("tmax: ", config$temporalBbx$tmax))
 
         grid.text("The restricted temporal bounding box was: ", y=unit(1, "npc") - unit(4, "lines"), just=c("left", "bottom"), x=0)
-        # bbox restricted
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.00, label=paste("tmin: ", config$temporalBbxRestricted$tmin))
-        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"), x=0.50, label=paste("tmax: ", config$temporalBbxRestricted$tmax))
-
+        ## bbox restricted
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"),
+                  x=0.00, label=paste("tmin: ", config$temporalBbxRestricted$tmin))
+        grid.text(y=unit(1, "npc") - unit(5, "lines"), just=c("left", "bottom"),
+                  x=0.50, label=paste("tmax: ", config$temporalBbxRestricted$tmax))
     popViewport()
   }
 
     ## Number of relocations
     pushViewport(viewport(y=unit(65, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
-        grid.text("Number of relcations: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
+        grid.text("Number of relocations: ", y=unit(1, "npc") - unit(1, "lines"), just=c("left", "bottom"), x=0)
 
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00, label="Whole dataset")
-        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.70, label=config$n$initialN, gp=gpar(fontfamily="mono"))
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.00,
+                  label="Whole dataset")
+        grid.text(y=unit(1, "npc") - unit(2, "lines"), just=c("left", "bottom"), x=0.70,
+                  label=config$n$initialN, gp=gpar(fontfamily="mono"))
 
         grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.00, label="Restricted dataset")
         grid.text(y=unit(1, "npc") - unit(3, "lines"), just=c("left", "bottom"), x=0.70, label=config$n$restrictedN, gp=gpar(fontfamily="mono"))
     popViewport()
 
-    # footer
+    ## footer
     pushViewport(viewport(y=unit(0, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
         grid.lines(c(0,1), c(1,1))
         grid.text("Input data", x=0, just="left", gp=gpar(cex=0.7))
@@ -888,8 +913,8 @@ nPages <- max(onWhichPage)
 popViewport()
 grid.newpage()
 
-# ============================================================================ #
-# Next pages
+## ============================================================================ #
+## Next pages
 
 for (page in 1:nPages) {
     pushViewport(viewport(x=unit(35, "mm"),
@@ -899,17 +924,17 @@ for (page in 1:nPages) {
                           just=c("left", "bottom"),
                           gp=gpar(lineheight=1, fontsize=11)))
 
-        # extract and heights for this page
+        ## extract and heights for this page
         thisPageRepItems <- repItems[onWhichPage == page]
         thisPageRepH <- repH[onWhichPage == page]
 
-        # page frame        
+        ## page frame        
         grid.rect(gp=gpar(lwd=0.2))
 
-        # content viewport
+        ## content viewport
         pushViewport(viewport(y=unit(15, "mm"), width=unit(153.5, "mm"), height=unit(257, "mm"), just="bottom"))
 
-        # Add items to page
+        ## Add items to page
         for (i in 1:length(thisPageRepItems)) {
           if (i == 1) {
             where <- 255
@@ -926,7 +951,7 @@ for (page in 1:nPages) {
         }
         popViewport()
 
-        # footer
+        ## footer
         pushViewport(viewport(y=unit(0, "mm"), width=unit(153.5, "mm"), height=unit(15, "mm"), just="bottom"))
             grid.lines(c(0,1), c(1,1))
             grid.text("Input data", x=0, just="left", gp=gpar(cex=0.7))
@@ -937,8 +962,8 @@ for (page in 1:nPages) {
 }
 
 
-# ============================================================================ #
-# Session info
+## ============================================================================ #
+## Session info
 pushViewport(viewport(width=0.95, height=0.95))
 grid.rect(gp=gpar(lwd=0.2))
 pushViewport(viewport(width=0.95))

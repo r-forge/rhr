@@ -95,7 +95,7 @@ rhrMCP <- function(xy, levels=95, ud=FALSE, cud=FALSE, xrange=NA, yrange=NA, res
 
   if (ud) {
     r1 <- rasterFromXYVect(xy, xrange=xrange, yrange=yrange, res=res)
-    cud <- rasterize(bb, r1, field="level", fun=min) / 100
+    cud <- rasterize(bb, r1, field="level", fun="min") / 100
     ud <- (1 - cud) / sum(1 - cud[], na.rm=T)
 
     ## mcp at levls
