@@ -23,6 +23,7 @@
   \item{"sqm"}{square meter} \item{"ha"}{hectar}
   \item{"sqkm"}{square kilometer} \item{"sqft"}{square
   feet} \item{"acres"}{acres} \item{"sqyd"}{square yard}
-  \item{"sqmi"}{square mile} }
+  \item{"sqmi"}{square mile} \item{"ius"}{input unit
+  squared} }
 }
 

@@ -46,30 +46,18 @@ data(datSH)
 \dontrun{
 # Kernel with href bandwidth estimation
 k1 <- rhrKDE(datSH[, 2:3], h="href", res=100)
+plot(k1)
 
 # what is the actually estimated bandwidth?
-k1$h$h
-
-# Return results as an object of class raster
-k1 <- rhrKDE(datSH[, 2:3], h="href", resolution=100, return.raster=TRUE)
-k1$data$rast
-plot(k1$data$rast)
+k1$parameters$h
 
 # Kernel with href bandwidth estimation
-k2 <- rhrKDE(datSH[, 2:3], h="lscv", resolution=100)
+k2 <- rhrKDE(datSH[, 2:3], h="lscv", res=100)
+plot(k2)
 
 # what is the actually estimated bandwidth?
-k2$h$h
-
-# Return results as an object of class raster
-k2 <- rhrKDE(datSH[, 2:3], h="lscv", resolution=100, return.raster=TRUE)
-k1$data$rast
-plot(k1$data$rast)
-
-# Compare
-par(mfrow=c(2,1))
-plot(k1)
-plot(k2)}
+k2$parameters$h
+}
 }
 \author{
   Johannes Signer

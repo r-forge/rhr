@@ -18,13 +18,20 @@ if (config$todo$doKDE) {
 
 
   # run analysis
-  resKDEs <- lapply(seq_along(datSub), function(i)
-                                rhrKDE(xy=datSub[[i]][, c('lon', 'lat')],
+  resKDEs <- lapply(seq_along(datSub), function(i) {
+
+    if (config$config$useGM) {
+      dat <- SpatialPoints(datSub[[i]][, c('lon', 'lat')])
+      proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
+    } else {
+      dat <- datSub[[i]][, c('lon', 'lat')]
+    }
+                                rhrKDE(xy=dat,
                                              h=h,
                                              xrange=config$estimator$kde$xrange[[i]],
                                              yrange=config$estimator$kde$yrange[[i]],
                                              levels=kdeLevels,
-                                             res=as.numeric(kde$resolution)))
+                                             res=as.numeric(kde$resolution))})
              
 
   resKDEsUDs <- lapply(resKDEs, ud)

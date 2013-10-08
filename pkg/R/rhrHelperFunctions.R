@@ -302,65 +302,6 @@ alertError <- function(x, cat=TRUE) {
   }
 }
 
-#' plot ttsi
-#'
-#' plots results of rhrSchoener
-#' @param res from ttsi
-#' @param cvReached whether or not the critical value was passed
-#' @param cvReachedAt time interval at which the critical value was reached
-#' @export
-
-plotTTSI <- function(res, cvReached, cvReachedAt) {
-
-
-  v <- res[, 'V']
-  m <- res[, 'm']
-  n <- res[1, 'n']  # the actual number of points
-  cv <- res[, 'cv']  # confint
-  interval <- res[, 'interval'] # time interval
-
-  ## init plot
-  pushViewport(viewport(x=0.5, y=0.5, width=0.9, height=0.9))
-
-  ## header
-  pushViewport(viewport(x=0.0, y=0.9, width=1, height=0.1, just=c("left", "bottom")))
-  grid.text("Time to statistical independence")
-  popViewport()
-
-  ## first graph
-  pushViewport(viewport(x=0.0, y=0.3, width=1, height=0.6, just=c("left", "bottom")))
-  pushViewport(plotViewport(c(0.5,3,1,1)))
-  pushViewport(dataViewport(c(1, length(m)), range(v, na.rm=TRUE))) # plotting region
-  grid.yaxis(gp=gpar(cex=0.8))
-  grid.text("Schoeners V",x=unit(-3,"lines"), rot=90)
-  grid.lines(1:length(m), v, default.units="native")
-  if (cvReached) {
-    grid.lines(c(1,length(m)), c(2,2), default.units="native", gp=gpar(col="red", lty=2))
-
-    ## critical values
-    grid.lines(1:length(m), cv, default.units="native", gp=gpar(col="grey", lwd=2))
-
-    ## line where cv passed
-    ## At which interval was the cv passed
-    cvReachedAtInt <- which(interval == cvReachedAt)
-    grid.points(cvReachedAtInt, 2, default.units="native", gp=gpar(col="red", pch=2))
-  }
-  popViewport(3)
-
-  # second graph
-  pushViewport(viewport(x=0.0, y=0.0, width=1, height=0.3, just=c("left", "bottom")))
-  pushViewport(plotViewport(c(3,3,0.5,1)))
-  pushViewport(dataViewport(c(1, length(m)), range(c(m, n, na.rm=TRUE), na.rm=TRUE))) 
-  grid.yaxis(gp=gpar(cex=0.8))
-  grid.xaxis(gp=gpar(cex=0.8), at=pretty(1:length(m)), label=pretty(interval))
-  grid.text("Time interval [seconds]",y=unit(-3,"lines"))
-  grid.text("m",x=unit(-3,"lines"),rot=90)
-  for (i in seq(m)) grid.lines(rep(i, 2), c(0, m[i]), default.units="native")
-  # grid.lines(c(1,length(m)), c(n,n), default.units="native", gp=gpar(col="red", lty=2))
-
-  popViewport(3)
-
-}
 
 # ============================================================================ #
 #' strShorten

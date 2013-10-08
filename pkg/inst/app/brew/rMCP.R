@@ -4,8 +4,15 @@ if (config$todo$doMCP) {
 
   mcpLevels <- rhrCorrectLevels(config$estimator$mcp$level)
 
-  resMCPs <- lapply(datSub, function(x) rhrMCP(x[, c('lon', 'lat')],
-                                               level=mcpLevels))
+  resMCPs <- lapply(datSub, function(x) {
+                                          if (config$config$useGM) {
+                                            dat <- SpatialPoints(x[, c("lon", "lat")])
+                                            proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
+                                          } else {
+                                            dat <- x[, c("long", "lat")]
+                                          }
+                                          rhrMCP(dat, level=mcpLevels)
+                                        })
 
   mcpFilenamePlots <- paste0("rhr_MCP_id_", ids, ".png")
   mcpFilenameSHP <- paste0("rhr_MCP_id_", ids, ".shp")
@@ -15,6 +22,7 @@ if (config$todo$doMCP) {
   mcpPlots <- list()
 
   for (i in seq_along(resMCPs)) {
+
     p <- plot(resMCPs[[i]], useGE=config$config$useGM, what="iso", draw=FALSE)
 
     png(file=file.path(imagepath, mcpFilenamePlots[i]))

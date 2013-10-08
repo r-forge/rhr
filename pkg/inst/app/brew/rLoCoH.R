@@ -15,8 +15,14 @@ if (config$todo$doLocoh) {
           locoh$nValue <- max(dist(x[, c("lon", "lat")]))
         }
       } 
+    if (config$config$useGM) {
+      dat <- SpatialPoints(x[, c("lon", "lat")])
+      proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
+    } else {
+      dat <- x[, c("long", "lat")]
+    }
 
-      try(rhrLoCoH(x[, c('lon', 'lat')], level=locohLevels, type=locoh$type, n=locoh$nValue))
+      try(rhrLoCoH(dat[, c('lon', 'lat')], level=locohLevels, type=locoh$type, n=locoh$nValue))
     })
 
     ids <- names(datSub)

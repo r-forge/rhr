@@ -85,7 +85,7 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
       tempol <- spTransform(tempol, CRS("+proj=longlat +ellps=sphere +no_defs"))
       tempol@data$id <- rownames(tempol@data)
       tempolPoints <- fortify(tempol, region="id")
-      tempolDF <- join(tempolPoints, tempol@data, by="id")
+      tempolDF <- plyr::join(tempolPoints, tempol@data, by="id")
 
 
       bb <- bbox(tempol)

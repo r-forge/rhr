@@ -100,12 +100,12 @@ if (config$todo$doAsymptote) {
     if ("mcp" %in% asym$estimator) {
       res$write(h4("Minimum Convex Polygon Asymptote"))
       if (!is.null(resAsym[[i]]$mcpAsym)) {
-        tt <- resAsym[[i]]$mcpAsym$asymtotes
+        tt <- resAsym[[i]]$mcpAsym$asymptote
         tt$ns <- ifelse(is.na(tt$ns), "not reached", tt$ns)
         names(tt) <- c("Level", "Number of Points")
         res$write(toHTML(tt))
         res$write(img(paste0(imageurl, paste0("rhr_AsymptotePlot_id_", ids[i], "_mcp.png")), cap="Asym for MCP"))
-        resAsym[[i]]$mcpMsg <- ifelse(any(!is.na(resAsym[[i]]$mcpAsym$asymtotes$ns)), "Assymptote was reached",  "No assymptote reached")
+        resAsym[[i]]$mcpMsg <- ifelse(any(!is.na(resAsym[[i]]$mcpAsym$asymptote$ns)), "Assymptote was reached",  "No assymptote reached")
 
       } else { 
         resAsym[[i]]$mcpMsg <- "Something went wrong, possibly not enough points"
@@ -116,11 +116,11 @@ if (config$todo$doAsymptote) {
     if ("kde" %in% asym$estimator) {
       res$write(h4("Kernel Density Estimation Asymptote"))
       if (!is.null(resAsym[[i]]$kdeAsym)) {
-        tt <- resAsym[[i]]$kdeAsym$asymtotes
+        tt <- resAsym[[i]]$kdeAsym$asymptote
         tt$ns <- ifelse(is.na(tt$ns), "not reached", tt$ns)
         names(tt) <- c("Level", "Number of Points")
         res$write(toHTML(tt))
-        resAsym[[i]]$kdeMsg <- ifelse(any(!is.na(resAsym[[i]]$kdeAsym$asymtotes$ns)), "Assymptote was reached",  "No assymptote reached")
+        resAsym[[i]]$kdeMsg <- ifelse(any(!is.na(resAsym[[i]]$kdeAsym$asymptote$ns)), "Assymptote was reached",  "No assymptote reached")
         res$write(img(paste0(imageurl, paste0("rhr_AsymptotePlot_id_", ids[i], "_kde.png")), cap="Asym for KDE"))
 
       } else { 

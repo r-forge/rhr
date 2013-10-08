@@ -22,6 +22,7 @@
 #' \item{"acres"}{acres}
 #' \item{"sqyd"}{square yard}
 #' \item{"sqmi"}{square mile}
+#' \item{"ius"}{input unit squared}
 #' }
 #' @export
 
@@ -32,12 +33,12 @@ rhrConvertUnit <- function(x, inUnit="m", outUnit="ha") {
                 paste0(c("ido", "m", "km", "ft", "yd", "mi"), collapse=",")))
   }
 
-  if (!outUnit %in% c("sqm", "ha", "sqkm", "sqft", "acres", "sqyd", "sqmi")) {
+  if (!outUnit %in% c("sqm", "ha", "sqkm", "sqft", "acres", "sqyd", "sqmi", "ius")) {
     stop(paste0("outUnit is not valid. It should be one of: ",
-                paste0(c("sqm", "ha", "sqkm", "sqft", "acres", "sqyd", "sqmi"), collapse=",")))
+                paste0(c("sqm", "ha", "sqkm", "sqft", "acres", "sqyd", "sqmi", "ius"), collapse=",")))
   }
 
-  if (inUnit == "ido") {
+  if (inUnit == "ido" || outUnit == "ius") {
     return(x)
   } else if (inUnit == "m") {
     if (outUnit == "sqm") {

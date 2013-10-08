@@ -5,14 +5,14 @@
     <!-- Bootstrap -->
     <style type="text/css">
       body {
-      padding-top: 60px;
-      padding-bottom: 40px;
+        padding-top: 60px;
+        padding-bottom: 40px;
       }
 
       .map-fixed {
-      padding: 9x 0;
-      position: fixed;
-      width : 20%;
+        padding: 9x 0;
+        position: fixed;
+        width : 20%;
       }
     </style>
 
@@ -37,7 +37,7 @@
           <a class="brand" href="#">Reproducible Home Range Analysis</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
-              Forest Zoology and Forest Conservation - University of G&oumlttingen </p>
+            Department of Wildlife Management - University of G&oumlttingen </p>
             <ul class="nav">
               <li class="active"><a href="#">Setup</a></li>
             </ul>
@@ -47,826 +47,790 @@
     </div>
 
     <!--
-	============================================ -->
+    ============================================ -->
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span12">
-          
+
           <div class="hero-unit" id="top">
             <h1>Reproducible Home Range analysis with R</h1>
             <p>This is a GUI to the rhr R-Package for conducting home range analysis</p>
           </div>
-          
+
           <!-- Load Data
-               ============================================================== -->
+          ============================================================== -->
           <section id="sdata">
-              <h1>Load Data</h1>
-            <p>Load data from a <code>*.csv</code> or <code>*.txt</code> file. You can specify the deliminator, number of lines to skip and decimal separator below.</p>
-
-            <form name="loadData" id="loadData" method="POST" enctype="multipart/form-data" class="form-horizontal">
-	      <fieldset>
-
-		  <div class="control-group">
-		    <label class="control-label" for="uploadPath">Select file</label>
-		    <div class="controls">
-		      <input type="file" id="uploadPath" name="uploadPath"><br>
-		    </div>
-		  </div>
-
-		  <div class="control-group">
-		    <label class="control-label" for="uploadSep">Field Separator</label>
-		    <div class="controls">
-                      <select id="uploadSep" name="uploadSep">
-			<option value='comma'>Comma (,)</option>
-			<option value='semi'>Semi colon (;)</option>
-			<option value='tab'>Tabulator (\t)</option>
-                      </select>  
-		    </div>
-		  </div>
-
-		  <div class="control-group">
-		    <label class="control-label" for="uploadSkip">Skip lines</label>
-		    <div class="controls">
-		      <input type="text" id="uploadSkip" name="uploadSkip"><br>
-		    </div>
-		  </div>
-
-		  <div class="control-group">
-		    <label class="control-label" for="uploadSepDec">Decimal Separator</label>
-		    <div class="controls">
-                      <select id="uploadSepDec" name="uploadSepDec">
-			<option value='comma'>Comma (,)</option>
-			<option value='point'>Point(.)</option>
-                      </select>  
-		    </div>
-		  </div>
-
-		  <div class="control-group">
-		    <div class="controls">
-		      <input type="submit" value="Upload" class="btn btn-primary">
-		    </div>
-		  </div>
-
-	      </fieldset>
-            </form>
-
-            <% 
-res <- Rook::Response$new()
-
-if (!is.null(req$POST())) {
-  name		<- req$POST()[['uploadPath']]
-  sep		<- req$POST()[['uploadSep']]
-  skip		<- as.numeric(req$POST()[['uploadSkip']])
-  sepDec	<- req$POST()[['uploadSepDec']]
-
-  if (!is.null(name)) {
-
-
-    totalN <- length(readLines(name$tempfile))
-    if (skip >= totalN) {
-	   cat('<div class="alert alert-error"><b>Something went wrong:</b> you want to skip (', skip, ') more lines than there are in the file (', totalN, ').</div>')
-	   stop()
-		   }
-		   
-    str <- readLines(name$tempfile, n=60 + skip)
-
-	# asign sep
-   sep <- switch(sep, comma=",", tab="\t", semi=";")
-
-                                        # asign decimal separator
-   sepDec <- switch(sepDec, comma=",", point=".")
-
-    # test if a separator works for the Body
-    # each lines requires more than one field and same length
-    testBody <- function(str, sep) {
-      str <- strsplit(str, sep)
-      str <- head(sapply(str, length), -1)
-      all(str == str[1]) & (str[1] > 1)
-    }
-
-    if (skip != 0) {
-       str <- tail(str, -skip)
-    }
-
-    if (testBody(str, sep=sep)) {
-      # everything is ok
-
-      tryCatch({
-      dat <- read.table(name$tempfile,
-	     sep=sep, skip=skip, dec=sepDec, header=TRUE,
-	     stringsAsFactors=FALSE)
-      }, error=function(e) {
-	   cat('<div class="alert alert-error"><b>Something went wrong:</b>', e, '</div>')
-      f <- "no data loaded"
-
-	     })
-      f <- c(NA, names(dat))
-
-      alert(paste0('<b>Data</b> (', name[1], ') successfully loaded'))
-
-      # the frist lines of 
-      p("Current header of your is (fields are separated by <code>|</code>)")
-      cat(paste0("<pre>", paste(names(dat), collapse="|"), "</pre>"))
-
-      p("The first 10 lines of your data are (fields are separated by <code>|</code>):")
-      cat(paste0("<pre>", paste(apply(head(dat, 10), 1, paste0, collapse="|"), collapse="\n"), "</pre>"))
-    } else {
-
-	   cat(paste0('<div class="alert alert-error"><b>--Something went wrong:</b> wrong field separator</div>', sep))
-      cat(paste0("<pre>", paste0(head(str), collapse="\n"), "</pre>"))
-    }
-      
-    
-  } else {
-    cat('<div class="alert alert-error"><b>Something went wrong:</b> No input file selected</div>')
-    f <- "no data loaded"
-
-  }
-} else if (!is.null(datFromR)) {
-  dat <- datFromR
-  f <- c(NA, names(datFromR))
-  cat(paste0('<div class="alert alert-success"><b>Data</b> read from R</div>'))
-} else {
-  f <- "no data loaded"
-}
-
-%>
-
-		<div id="result1"></div>
-		<!--- to be remvoed
-		<a href="#" id="show_hide">show/hide</a>
-		<div id="headDat"></div>
-		---->
-
-		<!-- Mapping fields
-		============================================================== -->
-		<hr>
-		<h1>Map fields</h1>
-		<p>In order to conduct a home range analysis the following information is required: longitude, latitude, date, time and id for each relocation<p>
-
-		<form name="formmapFields" method="POST">
-		  <table class="table table-striped">
-		    <tr>
-                      <th>Required Data</th>
-                      <th>Available Data</th>
-                      <th>Additional Arguments</th>
-		    </tr>
-		    <tr>
-                      <td>Id</td>
-                      <td>
-			<select id="selid">
-			  <% cat(paste0('<option id="id" value=', f, '>', f, '</option>')) %>
-			</select>   
-                      </td>
-                      <td>none</td>
-		    </tr>
-		    <tr>
-                      <td>Latitude</td>
-                      <td>
-			<select id="sellat">
-			  <% cat(paste0('<option id="lat" value=', f, '>', f, '</option>')) %>
-			</select>   
-                      </td>
-                      <td>none</td>
-		    </tr>
-		    <tr>
-                      <td>Longitude</td>
-                      <td>
-			<select id="sellon">
-			  <% cat(paste0('<option value=', f, '>', f, '</option>')) %>
-			</select>   
-                      </td>
-                      <td>none</td>
-		    </tr>
-		    <tr>
-                      <td>Date</td>
-                      <td>
-			<select id="seldate">
-			  <% cat(paste0('<option id="date" value=', f, '>', f, '</option>')) %>
-			</select>   
-                      </td>
-                      <td>
-			<select id="seldateformat">
-			  <option value='ymd'>ymd</option>
-			  <option value='dmy'>dmy</option>
-			  <option value='mdy'>mdy</option>
-			</select>  
-                      </td>
-		    </tr>
-		    <td>Time</td>
-		    <td>
-                      <select id="seltime">
-			<% cat(paste0('<option value=', f, '>', f, '</option>')) %>
-                      </select>   
-		    </td>
-		    <td>
-                      <select id="seltimeformat">
-			<option value='hms'>hms</option>
-			<option value='hm'>hm</option>
-                      </select>  
-		    </td>
-</tr>
-</table>
-<input type="button" id="btnMapFields" name="map" value="Map Fields" class="btn btn-block btn-large btn-primary">
-</form>
-
-</section>
-
-<!-- Apply restrictions
-     ============================================================== -->
-<section id="stime">
-  <hr>
-    <h1>Apply spatial and temproal restrictions</h1>
-
-    <p>Apply a bounding box within which relocations are considered.</p>
-
-    <form name="formSpRestriction" method="POST">
-      <div id="restriction">
-        <div id="hrAnalysisPre"><%alert('Load and remap data first') %></div>
-      </div>
-
-      <div id="res2"></div>
-
-    </form>
-</section>
-
-          <!-- Configure
-               ============================================================== -->
-          <section id="sconf">
-	    <hr>
-              <h1>Additional Settings</h1>
-	    <div id="hrConfig">
-	    <p>Set the number of cores of your computer to be used, the spatial reference system and other setting for the analysis here:
-	      <input type="button" class="btn btn-large btn-primary btn-block" id="btnModalConfigOpen" value="Configure additional settings">
-	      <ul>
-		<li> The spatial reference system needs to be set, if the output as kml and/or correctly projected shapfile is desired. </li>
-		</ul>
-	    </p>
-	    </div>
-	    <div id="hrConfigPre1"><%alert('Load and remap data first') %></div>
-	  </section>
-
-<!-- Select analysis
-     ============================================================== -->
-<section>
-  <hr>
-    <h1>Choose Analytical Steps</h1>
-  <div id="hrAnalysis">
-
-    <div class="btn-group">
-      <button id="btnCheckAllSteps" class="btn btn-mini" type="button"> Check All </button>
-      <button id="btnUncheckAllSteps" class="btn btn-mini" type="button"> Uncheck All </button>
-    </div>
-
-    <br>
-    <br>
-    
-    <table>
-      <table class="table table-striped">
-        <tr>
-          <th>Include</th>
-          <th>Step</th>
-          <th>Change properties</th>
-        </tr>
-
-        <!-- Site fidelity -->
-        <tr>
-          <td>
-            <input type="checkbox" id="doSiteFidelity", name="selectStep">
-          </td>
-          <td>Site Fidelity</td>
-          <td>
-	    <input type="button" class="btn" id="btnModalSiteFidelityOpen" value="Change">
-          </td>
-
-        </tr>
-
-        <!-- TTSI -->
-        <tr>
-          <td>
-            <input type="checkbox" id="doTTSI", name="selectStep">
-          </td>
-          <td>Time to Statistical Independence</td>
-          <td>
-	    <input type="button" class="btn" id="btnModalTTSIOpen" value="Change">
-          </td>
-        </tr>
-
-
-          <!-- MCP -->
-          <tr>
-            <td>
-              <input type="checkbox" id="doMCP", name="selectStep">
-            </td>
-            <td>Minimum Convex Polygon</td>
-</td>
-<td>
-  <input type="button" class="btn" id="btnModalMCPOpen" value="Change">
-
-</td>
-
-</tr>
-
-<!-- KDE -->
-<tr>
-  <td>
-    <input type="checkbox" id="doKDE", name="selectStep">
-  </td>
-  <td>Kernel Density Estimation</td>
-</td>
-<td>
-  <input type="button" class="btn" id="btnModalKDEOpen" value="Change">
-</td>
-</tr>
-
-<!-- Locoh -->
-<tr>
-  <td>
-    <input type="checkbox" id="doLocoh", name="selectStep">
-  </td>
-  <td>Local Convex Hull</td>
-</td>
-<td>
-  <input type="button" class="btn" id="btnModalLocohOpen" value="Change">
-</td>
-
-<!-- Asymptote -->
-<tr>
-  <td>
-    <input type="checkbox" id="doAsymptote", name="selectStep">
-  </td>
-  <td>Asymptote</td>
-  <td>
-    <input type="button" class="btn" id="btnModalAsymptoteOpen" value="Change">
-  </td>
-
-</tr>
-
-<!-- Core Area -->
-</tr>
-<tr>
-  <td>
-    <input type="checkbox" id="doCA", name="selectStep">
-  </td>
-  <td>Core Area</td>
-</td>
-<td>
-  <input type="button" class="btn" id="btnModalCAOpen" value="Change">
-</td>
-
-</tr>
-</table>
-
-    <div class="btn-group">
-      <button id="btnCheckAllSteps1" class="btn btn-mini" type="button"> Check All </button>
-      <button id="btnUncheckAllSteps1" class="btn btn-mini" type="button"> Uncheck All </button>
-    </div>
-
-    <br>
-    <br>
-
-<!-- Button to start everything -->
-<button id="hrAnalyze" class="btn btn-block btn-large btn-primary">Analyze</button>
-
-
-</div>
-<div id="hrAnalysisPre1"><%alert('Load and remap data first') %></div>
-</section>
-
-
-
-</div><!--/.fluid-container-->
-
-<!-- Dialog Boxes aka modals
-     ============================================================== -->
-<!--- Config -->
-          <div id="modalConfig" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-              <button type="button" class="close" id="btnModalConfigCancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Configure</h3>
-            </div>
-            <div class="modal-body">
-
-              <form id="modalConfigInputForm" class="form-horizontal">
-		<fieldset>
-
-		  <div class="control-group" id="modalConfigInUnitDiv">
-		    <label class="control-label" for="modalConfigInUnit">Input unit</label>
-		    <div class="controls">
-		      <select id="modalConfigInUnit">
-			<option value='m'>meter</option>
-			<option value='km'>km</option>
-			<option value='ft'>foot</option>
-			<option value='yd'>yard</option>
-			<option value='mi'>mile</option>
-			<option value='geo'>lon/lat</option>
-			<option value='ido'>I don't know</option>
-		      </select>  
-		    </div>
-		  </div>
-
-		  <div class="control-group" id="modalConfigOutUnitDiv">
-		    <label class="control-label" for="modalConfigOutUnit">Output unit</label>
-		    <div class="controls">
-                      <select id="modalConfigOutUnit">
-			<option value='sqm'>square meters</option>
-			<option value='ha'>ha</option>
-			<option value='sqkm'>square km</option>
-			<option value='sqft'>square feet</option>
-			<option value='sqyd'>square yrads</option>
-			<option value='acres'>acres</option>
-			<option value='sqmi'>square miles</option>
-			<option value='ipus'>input units squared</option>
-                      </select>  
-		    </div>
-		  </div>
-		  
-		  <div id="modalConfigUnitsNotKnown" class="alert alert-info">
-		    <b>If input units</b> are geographical (i.e., not projected) or unknown, the output units will be the input unit squared.
-		  </div>
-
-
-		  <!-- nCores 
-		  <div class="control-group">
-		    <label class="control-label" for="modalConfigNCores">Number of Cores</label>
-		    <div class="controls">
-                      <input type="text" id="modalConfigNCores" name="modalConfigNCores" value="1" class="left"><br>
-		    </div>
-		  </div> -->
-
-		  <!-- EPSG -->
-		  <div class="control-group">
-		    <label class="control-label" for="modalConfigEPSG">Spatial Reference System (EPSG)</label>
-		    <div class="controls">
-                      <input type="text" id="modalConfigEPSG" name="modalConfigEPSG" value="1" class="left"><br>
-		    </div>
-		  </div>
-
-
-
-		  <!-- Export KML -->
-  <div class="control-group">
-  <label class="control-label" for="modalConfigExpKML">Export KML:</label>
-  <div class="controls">
-                  <input type="checkbox" id="modalConfigExpKML"><br>
-  <p class="help-block">In order to export KML, the EPSG needs be set</p>
-  </div>
-  </div>
-		  
-		  <!-- Use googlemaps -->
-  <div class="control-group">
-  <label class="control-label" for="modalConfigUseGM">Use google maps: </label>
-  <div class="controls">
-                  <input type="checkbox" id="modalConfigUseGM"><br>
-  <p class="help-block">Use google maps as background to plots, an internet connection is required for this feature.</p>
-  </div>
-  </div>
-
-		</fieldset>
-              </form>
-
-            </div>
-            <div class="modal-footer">
-              <button class="btn" aria-hidden="true" id="btnModalConfigCancel2">Close</button>
-              <button class="btn btn-primary" id="btnModalConfigSave">Save changes</button>
-            </div>
+          <h1>Load Data</h1>
+          <p>Load data from a <code>*.csv</code> or <code>*.txt</code> file. You can specify the deliminator, number of lines to skip and decimal separator below.</p>
+
+          <form name="loadData" id="loadData" method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <fieldset>
+
+              <div class="control-group">
+                <label class="control-label" for="uploadPath">Select file</label>
+                <div class="controls">
+                  <input type="file" id="uploadPath" name="uploadPath"><br>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="uploadSep">Field Separator</label>
+                <div class="controls">
+                  <select id="uploadSep" name="uploadSep">
+                    <option value='comma'>Comma (,)</option>
+                    <option value='semi'>Semi colon (;)</option>
+                    <option value='tab'>Tabulator (\t)</option>
+                  </select>  
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="uploadSkip">Skip lines</label>
+                <div class="controls">
+                  <input type="text" id="uploadSkip" name="uploadSkip"><br>
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="uploadSepDec">Decimal Separator</label>
+                <div class="controls">
+                  <select id="uploadSepDec" name="uploadSepDec">
+                    <option value='comma'>Comma (,)</option>
+                    <option value='point'>Point(.)</option>
+                  </select>  
+                </div>
+              </div>
+
+              <div class="control-group">
+                <div class="controls">
+                  <input type="submit" value="Upload" class="btn btn-primary">
+                </div>
+              </div>
+
+            </fieldset>
+          </form>
+
+          <% 
+            res <- Rook::Response$new()
+
+            if (!is.null(req$POST())) {
+              name		<- req$POST()[['uploadPath']]
+              sep		<- req$POST()[['uploadSep']]
+              skip		<- as.numeric(req$POST()[['uploadSkip']])
+              sepDec	<- req$POST()[['uploadSepDec']]
+
+              if (!is.null(name)) {
+
+
+                totalN <- length(readLines(name$tempfile))
+                if (skip >= totalN) {
+                  cat('<div class="alert alert-error"><b>Something went wrong:</b> you want to skip (', skip, ') more lines than there are in the file (', totalN, ').</div>')
+                  stop()
+                }
+
+                str <- readLines(name$tempfile, n=60 + skip)
+
+                ## asign sep
+                sep <- switch(sep, comma=",", tab="\t", semi=";")
+
+                ## asign decimal separator
+                sepDec <- switch(sepDec, comma=",", point=".")
+
+                # test if a separator works for the Body
+                # each lines requires more than one field and same length
+                testBody <- function(str, sep) {
+                  str <- strsplit(str, sep)
+                  str <- head(sapply(str, length), -1)
+                  all(str == str[1]) & (str[1] > 1)
+                }
+
+                if (skip != 0) {
+                  str <- tail(str, -skip)
+                }
+
+                if (testBody(str, sep=sep)) {
+                  # everything is ok
+
+                  tryCatch({
+                  dat <- read.table(name$tempfile,
+                                    sep=sep, skip=skip, dec=sepDec, header=TRUE,
+                                    stringsAsFactors=FALSE)
+                }, error=function(e) {
+                  cat('<div class="alert alert-error"><b>Something went wrong:</b>', e, '</div>')
+                  f <- "no data loaded"
+
+                })
+                f <- c(NA, names(dat))
+
+                alert(paste0('<b>Data</b> (', name[1], ') successfully loaded'))
+
+                # the frist lines of 
+                p("Current header of your is (fields are separated by <code>|</code>)")
+                cat(paste0("<pre>", paste(names(dat), collapse="|"), "</pre>"))
+
+                p("The first 10 lines of your data are (fields are separated by <code>|</code>):")
+                cat(paste0("<pre>", paste(apply(head(dat, 10), 1, paste0, collapse="|"), collapse="\n"), "</pre>"))
+                } else {
+
+                  cat(paste0('<div class="alert alert-error"><b>--Something went wrong:</b> wrong field separator</div>', sep))
+                  cat(paste0("<pre>", paste0(head(str), collapse="\n"), "</pre>"))
+                }
+
+
+              } else {
+                cat('<div class="alert alert-error"><b>Something went wrong:</b> No input file selected</div>')
+                f <- "no data loaded"
+
+              }
+            } else if (!is.null(datFromR)) {
+              dat <- datFromR
+              f <- c(NA, names(datFromR))
+              cat(paste0('<div class="alert alert-success"><b>Data</b> read from R</div>'))
+            } else {
+              f <- "no data loaded"
+            }
+
+          %>
+
+          <div id="result1"></div>
+          <!--- to be remvoed
+          <a href="#" id="show_hide">show/hide</a>
+          <div id="headDat"></div>
+          ---->
+
+          <!-- Mapping fields
+          ============================================================== -->
+          <hr>
+          <h1>Map fields</h1>
+          <p>In order to conduct a home range analysis the following information is required: longitude, latitude, date, time and id for each relocation<p>
+
+          <form name="formmapFields" method="POST">
+            <table class="table table-striped">
+              <tr>
+                <th>Required Data</th>
+                <th>Available Data</th>
+                <th>Additional Arguments</th>
+              </tr>
+              <tr>
+                <td>Id</td>
+                <td>
+                  <select id="selid">
+                    <% cat(paste0('<option id="id" value=', f, '>', f, '</option>')) %>
+                  </select>   
+                </td>
+                <td>none</td>
+              </tr>
+              <tr>
+                <td>Latitude</td>
+                <td>
+                  <select id="sellat">
+                    <% cat(paste0('<option id="lat" value=', f, '>', f, '</option>')) %>
+                  </select>   
+                </td>
+                <td>none</td>
+              </tr>
+              <tr>
+                <td>Longitude</td>
+                <td>
+                  <select id="sellon">
+                    <% cat(paste0('<option value=', f, '>', f, '</option>')) %>
+                  </select>   
+                </td>
+                <td>none</td>
+              </tr>
+              <tr>
+                <td>Date</td>
+                <td>
+                  <select id="seldate">
+                    <% cat(paste0('<option id="date" value=', f, '>', f, '</option>')) %>
+                  </select>   
+                </td>
+                <td>
+                  <select id="seldateformat">
+                    <option value='ymd'>ymd</option>
+                    <option value='dmy'>dmy</option>
+                    <option value='mdy'>mdy</option>
+                  </select>  
+                </td>
+              </tr>
+              <td>Time</td>
+              <td>
+                <select id="seltime">
+                  <% cat(paste0('<option value=', f, '>', f, '</option>')) %>
+                </select>   
+              </td>
+              <td>
+                <select id="seltimeformat">
+                  <option value='hms'>hms</option>
+                  <option value='hm'>hm</option>
+                </select>  
+              </td>
+            </tr>
+          </table>
+          <input type="button" id="btnMapFields" name="map" value="Map Fields" class="btn btn-block btn-large btn-primary">
+        </form>
+
+        </section>
+
+        <!-- Apply restrictions
+        ============================================================== -->
+        <section id="stime">
+        <hr>
+        <h1>Apply spatial and temproal restrictions</h1>
+
+        <p>Apply a bounding box within which relocations are considered.</p>
+
+        <form name="formSpRestriction" method="POST">
+          <div id="restriction">
+            <div id="hrAnalysisPre"><%alert('Load and remap data first') %></div>
           </div>
 
-          <!--- Site Fidelity -->
-          <div id="modalSiteFidelity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-              <button type="button" class="close" id="btnModalSiteFidelityCancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Site Fidelity</h3>
-            </div>
-            <div class="modal-body">
+          <div id="res2"></div>
 
-	      
-              <form id="modalSiteFidelityInputForm" class="form-horizontal">
-		<fieldset>
+        </form>
+        </section>
 
-		  <div class="control-group">
-		    <label class="control-label" for="modalSiteFidelityInputN">Number of bootstrap iterations</label>
-		    <div class="controls">
-                      <input type="text" id="modalSiteFidelityInputN" name="modalSiteFidelityInputN" value="1" class="left">
-		    </div>
-		  </div>
-		</fieldset>
-              </form>
+        <!-- Configure
+        ============================================================== -->
+        <section id="sconf">
+        <hr>
+        <h1>Additional Settings</h1>
+        <div id="hrConfig">
+          <p>Set the number of cores of your computer to be used, the spatial reference system and other setting for the analysis here:
+          <input type="button" class="btn btn-large btn-primary btn-block" id="btnModalConfigOpen" value="Configure additional settings">
+          <ul>
+            <li> The spatial reference system needs to be set, if the output as kml and/or correctly projected shapfile is desired. </li>
+          </ul>
+          </p>
+        </div>
+        <div id="hrConfigPre1"><%alert('Load and remap data first') %></div>
+        </section>
 
-	      
-            </div>
-            <div class="modal-footer">
-              <button class="btn" aria-hidden="true" id="btnModalSiteFidelityCancel2">Close</button>
-              <button class="btn btn-primary" id="btnModalSiteFidelitySave">Save changes</button>
-            </div>
+        <!-- Select analysis
+        ============================================================== -->
+        <section>
+        <hr>
+        <h1>Choose Analytical Steps</h1>
+        <div id="hrAnalysis">
+
+          <div class="btn-group">
+            <button id="btnCheckAllSteps" class="btn btn-mini" type="button"> Check All </button>
+            <button id="btnUncheckAllSteps" class="btn btn-mini" type="button"> Uncheck All </button>
           </div>
 
-          <!--- TTSI -->
-          <div id="modalTTSI" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-              <button type="button" class="close" id="btnModalTTSICancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Time To Statistical Independence</h3>
+          <br>
+          <br>
+
+          <table>
+            <table class="table table-striped">
+              <tr>
+                <th>Include</th>
+                <th>Step</th>
+                <th>Change properties</th>
+              </tr>
+
+              <!-- Site fidelity -->
+              <tr>
+                <td> <input type="checkbox" id="doSiteFidelity", name="selectStep"> </td>
+                <td>Site Fidelity</td>
+                <td> <input type="button" class="btn" id="btnModalSiteFidelityOpen" value="Change"> </td>
+              </tr>
+
+              <!-- TTSI -->
+              <tr>
+                <td> <input type="checkbox" id="doTTSI", name="selectStep"> </td>
+                <td>Time to Statistical Independence</td>
+                <td> <input type="button" class="btn" id="btnModalTTSIOpen" value="Change"> </td>
+              </tr>
+
+
+              <!-- MCP -->
+              <tr>
+                <td> <input type="checkbox" id="doMCP", name="selectStep"> </td>
+                <td>Minimum Convex Polygon</td>
+                <td> <input type="button" class="btn" id="btnModalMCPOpen" value="Change"> </td>
+              </tr>
+
+              <!-- KDE -->
+              <tr>
+                <td> <input type="checkbox" id="doKDE", name="selectStep"> </td>
+                <td>Kernel Density Estimation</td>
+                <td> <input type="button" class="btn" id="btnModalKDEOpen" value="Change"> </td>
+              </tr>
+
+              <!-- Locoh -->
+              <tr>
+                <td> <input type="checkbox" id="doLocoh", name="selectStep"> </td>
+                <td>Local Convex Hull</td>
+                <td> <input type="button" class="btn" id="btnModalLocohOpen" value="Change"> </td>
+
+                <!-- Asymptote -->
+                <tr>
+                  <td> <input type="checkbox" id="doAsymptote", name="selectStep"> </td>
+                  <td>Asymptote</td>
+                  <td> <input type="button" class="btn" id="btnModalAsymptoteOpen" value="Change"> </td>
+
+                </tr>
+
+                <!-- Core Area -->
+              </tr>
+              <tr>
+                <td> <input type="checkbox" id="doCA", name="selectStep"> </td>
+                <td>Core Area</td>
+                <td><input type="button" class="btn" id="btnModalCAOpen" value="Change"> </td>
+              </tr>
+            </table>
+
+            <div class="btn-group">
+              <button id="btnCheckAllSteps1" class="btn btn-mini" type="button"> Check All </button>
+              <button id="btnUncheckAllSteps1" class="btn btn-mini" type="button"> Uncheck All </button>
             </div>
-            <div class="modal-body">
 
-              <form id="modalTTSIInputForm" class="form-horizontal">
-		<fieldset>
-		  
-		  <div class="control-group">
-		    <label class="control-label" for="modalTTSIInputInterval">Time interval [seconds]</label>
-		    <div class="controls">
-                      <input type="text" id="modalTTSIInputInterval" name="modalTTSIInputInterval" value="1" class="left"><br>
-		    </div>
-		  </div>
+            <br>
+            <br>
 
-		  <div class="control-group">
-		    <label class="control-label" for="modalTTSIInputNTimes">Number of times above critical value</label>
-		    <div class="controls">
-                      <input type="text" id="modalTTSIInputNTimes" name="modalTTSIInputNTimes" value="3" class="left"><br>
-		    </div>
-		  </div>
+            <!-- Button to start everything -->
+            <button id="hrAnalyze" class="btn btn-block btn-large btn-primary">Analyze</button>
 
-		  <div class="control-group">
-		    <label class="control-label" for="modalTTSIConsec">Consecutive observations</label>
-		    <div class="controls">
-                      <select id="modalTTSIInputConsec">
-			<option value='TRUE'>TRUE</option>
-			<option value='FALSE'>FALSE</option>
-                      </select>  
-		    </div>
-		  </div>
 
-		</fieldset>
-              </form>
-
-            </div>
-            <div class="modal-footer">
-              <button class="btn" aria-hidden="true" id="btnModalTTSICancel2">Close</button>
-              <button class="btn btn-primary" id="btnModalTTSISave">Save changes</button>
-            </div>
           </div>
-
-          <!--- Asymptote -->
-          <div id="modalAsymptote" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-              <button type="button" class="close" id="btnModalAsymptoteCancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Home range asymptote</h3>
-            </div>
-            <div class="modal-body">
-
-              <form id="modalAsymptoteInputForm" class="form-horizontal">
-		<fieldset>
-		  
-		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteInputMinNPts">Minimum number of relocations</label>
-		    <div class="controls">
-                      <input type="text" id="modalAsymptoteInputMinNPts" name="modalAsymptoteInputMinNPts" value="1" class="left"><br>
-		    </div>
-		  </div>
-
-		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteInputIncrement">Number of points per increment</label>
-		    <div class="controls">
-                      <input type="text" id="modalAsymptoteInputIncrement" name="modalAsymptoteInputIncrement" value="1" class="left"><br>
-		    </div>
-		  </div>
-
-		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteInputNIter">Number of bootstrap iterations</label>
-		    <div class="controls">
-                      <input type="text" id="modalAsymptoteInputNIter" name="modalAsymptoteInputNIter" value="1" class="left"><br>
-		    </div>
-		  </div>
+          <div id="hrAnalysisPre1"><%alert('Load and remap data first') %></div>
+          </section>
 
 
-		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteInputLevel">At level(s)</label>
-		    <div class="controls">
-                      <input type="text" id="modalAsymptoteInputLevel" name="modalAsymptoteInputLevel" value="1" class="left"><br>
-		    </div>
-		  </div>
 
+        </div><!--/.fluid-container-->
 
-		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteInputNTimes">Number of times witin confidence interval</label>
-		    <div class="controls">
-                      <input type="text" id="modalAsymptoteInputNTimes" name="modalAsymptoteInputNTimes" value="1" class="left"><br>
-		    </div>
-		  </div>
-
-
-		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteInputTolTotArea">Tolerance to total area</label>
-		    <div class="controls">
-                      <input type="text" id="modalAsymptoteInputTolTotArea" name="modalAsymptoteInputTolTotArea" value="1" class="left"><br>
-		    </div>
-		  </div>
-
-		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteInputSampling">Sampling regime</label>
-		    <div class="controls">
-                      <select id="modalAsymptoteInputSampling">
-			<option value='sequential'>sequential</option>
-			<option value='random'>random</option>
-                      </select>  
-		    </div>
-		  </div>
-
-
-		  <div class="control-group">
-		    <label class="control-label" for="modalAsymptoteSelectEstimator">Calculate asymptote for:</label>
-		    <div class="controls">
-                      <select id="modalAsymptoteSelectEstimator" multiple="multiple">
-			<option value='kde'>Kernel Density Estimation</option>
-			<option value='mcp'>Minimum Convex Polygon</option>
-                      </select>
-                      <p class="help-block">For kernel density estimation with least square cross validation the asymptote may take a long time to compute</p>
-                      <p class="help-block">For the home range estimators the setting set within each estimator property window will be used.</p>
-		    </div>
-		  </div>
-		</fieldset>
-		
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button class="btn" aria-hidden="true" id="btnModalAsymptoteCancel2">Close</button>
-              <button class="btn btn-primary" id="btnModalAsymptoteSave">Save changes</button>
-            </div>
+        <!-- Dialog Boxes aka modals
+        ============================================================== -->
+        <!--- Config -->
+        <div id="modalConfig" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" id="btnModalConfigCancel1" aria-hidden="true">x</button>
+            <h3 id="myModalLabel">Configure</h3>
           </div>
+          <div class="modal-body">
 
-          <!--- MCP -->
-          <div id="modalMCP" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-              <button type="button" class="close" id="btnModalMCPCancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Minimum Convex Polygon</h3>
-            </div>
-            <div class="modal-body">
-              <form id="modalMCPInputForm" class="form-horizontal">
-                <fieldset>
-  <div class="control-group">
-  <label class="control-label" for="modalMCPInputLevel">Level(s): </label>
-  <div class="controls">
-                <input type="text" id="modalMCPInputLevel" name="modalMCPInputLevel" value="1" class="left"><br>
-            </div>
-            </div>
-  </fieldset>
-            </form>
-            </div>
-            <div class="modal-footer">
-              <button class="btn" aria-hidden="true" id="btnModalMCPCancel2">Close</button>
-              <button class="btn btn-primary" id="btnModalMCPSave">Save changes</button>
-            </div>
-          </div>
+            <form id="modalConfigInputForm" class="form-horizontal">
+              <fieldset>
 
-
-          <!--- KDE -->
-          <div id="modalKDE" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-              <button type="button" class="close" id="btnModalKDECancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Kernel Density Estimation</h3>
-            </div>
-            <div class="modal-body">
-
-              <form id="modalKDEInputForm" class="form-horizontal">
-                <fieldset>
-  <div class="control-group">
-  <label class="control-label" for="modalKDEInputResolution">Resolution: </label>
-  <div class="controls">
-                <input type="text" id="modalKDEInputResolution" name="modalKDEInputResolution" value="1" class="left"><br>
-	</div>
-	</div>
-
-		
-  <div class="control-group">
-  <label class="control-label" for="modalKDEInputBuffer">Buffer: </label>
-  <div class="controls">
-                <input type="text" id="modalKDEInputBuffer" name="modalKDEInputBuffer" value="1" class="left"><br>
-
-	</div>
-	</div>
-		
-  <div class="control-group">
-  <label class="control-label" for="modalKDEInputLevel">Levels: </label>
-  <div class="controls">
-                <input type="text" id="modalKDEInputLevel" name="modalKDEInputLevel" value="1" class="left"><br>
-
-	</div>
-	</div>
-		
-  <div class="control-group">
-  <label class="control-label" for="modalKDESelectBandwidth">Bandwidth: </label>
-  <div class="controls">
-                <select id="modalKDESelectBandwidth" >
-                  <option value='lscv'>Least Square Cross Validation</option>
-                  <option value='hpi'>Plugin in the Equation</option>
-                  <option value='href'>Reference Bandwidth</option>
-                  <option value='user'>User specified Value</option>
-                </select> <br> 
-	</div>
-	</div>
-
-                <div id="modalKDEBandwidthValue">
-  <div class="control-group">
-  <label class="control-label" for="modalKDEInputBandwidthValue">Bandwidth-Value: </label>
-  <div class="controls">
-                  <input type="text" id="modalKDEInputBandwidthValue" name="modalKDEInputBandwidthValue" value="1" class="right"><br>
-	</div>
-	</div>
+                <div class="control-group" id="modalConfigInUnitDiv">
+                  <label class="control-label" for="modalConfigInUnit">Input unit</label>
+                  <div class="controls">
+                    <select id="modalConfigInUnit">
+                      <option value='m'>meter</option>
+                      <option value='km'>km</option>
+                      <option value='ft'>foot</option>
+                      <option value='yd'>yard</option>
+                      <option value='mi'>mile</option>
+                      <option value='geo'>lon/lat</option>
+                      <option value='ido'>I don't know</option>
+                    </select>  
+                  </div>
                 </div>
 
-  </fieldset>
+                <div class="control-group" id="modalConfigOutUnitDiv">
+                  <label class="control-label" for="modalConfigOutUnit">Output unit</label>
+                  <div class="controls">
+                    <select id="modalConfigOutUnit">
+                      <option value='sqm'>square meters</option>
+                      <option value='ha'>ha</option>
+                      <option value='sqkm'>square km</option>
+                      <option value='sqft'>square feet</option>
+                      <option value='sqyd'>square yrads</option>
+                      <option value='acres'>acres</option>
+                      <option value='sqmi'>square miles</option>
+                      <option value='ius'>input units squared</option>
+                    </select>  
+                  </div>
+                </div>
+
+                <div id="modalConfigUnitsNotKnown" class="alert alert-info">
+                  <b>If input units</b> are geographical (i.e., not projected) or unknown, the output units will be the input unit squared.
+                </div>
+
+
+                <!-- nCores 
+                <div class="control-group">
+                  <label class="control-label" for="modalConfigNCores">Number of Cores</label>
+                  <div class="controls">
+                    <input type="text" id="modalConfigNCores" name="modalConfigNCores" value="1" class="left"><br>
+                  </div>
+                </div> -->
+
+                <!-- EPSG -->
+                <div class="control-group">
+                  <label class="control-label" for="modalConfigEPSG">Spatial Reference System (EPSG)</label>
+                  <div class="controls">
+                    <input type="text" id="modalConfigEPSG" name="modalConfigEPSG" value="1" class="left"><br>
+                  </div>
+                </div>
+
+
+
+                <!-- Export KML -->
+                <div class="control-group">
+                  <label class="control-label" for="modalConfigExpKML">Export KML:</label>
+                  <div class="controls">
+                    <input type="checkbox" id="modalConfigExpKML"><br>
+                    <p class="help-block">In order to export KML, the EPSG needs be set</p>
+                  </div>
+                </div>
+
+                <!-- Use googlemaps -->
+                <div class="control-group">
+                  <label class="control-label" for="modalConfigUseGM">Use google maps: </label>
+                  <div class="controls">
+                    <input type="checkbox" id="modalConfigUseGM"><br>
+                    <p class="help-block">Use google maps as background to plots, an internet connection is required for this feature.</p>
+                  </div>
+                </div>
+
+              </fieldset>
             </form>
-            </div>
-            <div class="modal-footer">
-              <button class="btn" aria-hidden="true" id="btnModalKDECancel2">Close</button>
-              <button class="btn btn-primary" id="btnModalKDESave">Save changes</button>
-            </div>
+
           </div>
+          <div class="modal-footer">
+            <button class="btn" aria-hidden="true" id="btnModalConfigCancel2">Close</button>
+            <button class="btn btn-primary" id="btnModalConfigSave">Save changes</button>
+          </div>
+        </div>
 
-          <!--- Locoh -->
-          <div id="modalLocoh" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-              <button type="button" class="close" id="btnModalLocohCancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Local Convex Hull</h3>
-            </div>
-            <div class="modal-body">
-
-              <!--- form -->
-              <form id="modalLocohInputForm" class="form-horizontal">
-                <fieldset>
-  <div class="control-group">
-  <label class="control-label" for="modalLocohSelectType">Type: </label>
-  <div class="controls">
-                <select id="modalLocohSelectType">
-                  <option value='k'>k nearest neighbours</option>
-                  <option value='r'>neighoubrs within radius r</option>
-                  <option value='a'>neighbours within cummulative distance a</option>
-                </select>  
-  </div>
-  </div>
+        <!--- Site Fidelity -->
+        <div id="modalSiteFidelity" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" id="btnModalSiteFidelityCancel1" aria-hidden="true">x</button>
+            <h3 id="myModalLabel">Site Fidelity</h3>
+          </div>
+          <div class="modal-body">
 
 
-  <div class="control-group" id="modalLocohCheckboxNDiv">
-  <label class="control-label" for="modalLocohCheckboxN">Determine n automatically: </label>
-  <div class="controls">
-                  <input type="checkbox" id="modalLocohCheckboxN"><br>
-  <p class="help-block">The value for size can be found automatically<p>
-  </div>
-  </div>
+            <form id="modalSiteFidelityInputForm" class="form-horizontal">
+              <fieldset>
 
-  
-  <div class="control-group" id="modalLocohNValueDiv">
-  <label class="control-label" for="modalLocohInputNValue">n</label>
-  <div class="controls">
-
-                  <input type="text" id="modalLocohInputNValue" name="modalLocohInputNValue" value="1" class="right"><br>
-
-  <p class="help-block">The actual value for N<p>
-  </div>
-  </div>
-  
-  <div class="control-group">
-  <label class="control-label" for="modalLocohInputLevel">Levels(s)</label>
-  <div class="controls">
-                <input type="text" id="modalLocohInputLevel" name="modalLocohInputLevel" value="1" class="left"><br>
-  <p class="help-block">Separate multiple levels with a comma<p>
-  </div>
-  </div>
-
-  
-                </fieldset>
+                <div class="control-group">
+                  <label class="control-label" for="modalSiteFidelityInputN">Number of bootstrap iterations</label>
+                  <div class="controls">
+                    <input type="text" id="modalSiteFidelityInputN" name="modalSiteFidelityInputN" value="1" class="left">
+                  </div>
+                </div>
+              </fieldset>
             </form>
-  
-            </div>
-            <div class="modal-footer">
-              <button class="btn" aria-hidden="true" id="btnModalLocohCancel2">Close</button>
-              <button class="btn btn-primary" id="btnModalLocohSave">Save changes</button>
-            </div>
-          </div>
 
-          <!--- Core Area -->
-          <div id="modalCA" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-header">
-              <button type="button" class="close" id="btnModalCACancel1" aria-hidden="true">x</button>
-              <h3 id="myModalLabel">Core Area</h3>
-            </div>
-            <div class="modal-body">
-              <form id="modalCAInputForm" class="form-horizontal">
-                <fieldset>
-		  <div class="control-group">
-		    <label class="control-label" for="modalCAInputForm">Resolution: </label>
-		    <div class="controls">
-                      <input type="text" id="modalCAInputRes" name="modalCAInputRes" value="1" class="left"><br>
-		    </div>
-		  </div>
-		</fieldset>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button class="btn" aria-hidden="true" id="btnModalCACancel2">Close</button>
-              <button class="btn btn-primary" id="btnModalCASave">Save changes</button>
-            </div>
-          </div>
 
-        </body>
-      </html>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" aria-hidden="true" id="btnModalSiteFidelityCancel2">Close</button>
+            <button class="btn btn-primary" id="btnModalSiteFidelitySave">Save changes</button>
+          </div>
+        </div>
+
+        <!--- TTSI -->
+        <div id="modalTTSI" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" id="btnModalTTSICancel1" aria-hidden="true">x</button>
+            <h3 id="myModalLabel">Time To Statistical Independence</h3>
+          </div>
+          <div class="modal-body">
+
+            <form id="modalTTSIInputForm" class="form-horizontal">
+              <fieldset>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalTTSIInputInterval">Time interval [seconds]</label>
+                  <div class="controls">
+                    <input type="text" id="modalTTSIInputInterval" name="modalTTSIInputInterval" value="1" class="left"><br>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalTTSIInputNTimes">Number of times above critical value</label>
+                  <div class="controls">
+                    <input type="text" id="modalTTSIInputNTimes" name="modalTTSIInputNTimes" value="3" class="left"><br>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalTTSIConsec">Consecutive observations</label>
+                  <div class="controls">
+                    <select id="modalTTSIInputConsec">
+                      <option value='TRUE'>TRUE</option>
+                      <option value='FALSE'>FALSE</option>
+                    </select>  
+                  </div>
+                </div>
+
+              </fieldset>
+            </form>
+
+          </div>
+          <div class="modal-footer">
+            <button class="btn" aria-hidden="true" id="btnModalTTSICancel2">Close</button>
+            <button class="btn btn-primary" id="btnModalTTSISave">Save changes</button>
+          </div>
+        </div>
+
+        <!--- Asymptote -->
+        <div id="modalAsymptote" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" id="btnModalAsymptoteCancel1" aria-hidden="true">x</button>
+            <h3 id="myModalLabel">Home range asymptote</h3>
+          </div>
+          <div class="modal-body">
+
+            <form id="modalAsymptoteInputForm" class="form-horizontal">
+              <fieldset>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalAsymptoteInputMinNPts">Minimum number of relocations</label>
+                  <div class="controls">
+                    <input type="text" id="modalAsymptoteInputMinNPts" name="modalAsymptoteInputMinNPts" value="1" class="left"><br>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalAsymptoteInputIncrement">Number of points per increment</label>
+                  <div class="controls">
+                    <input type="text" id="modalAsymptoteInputIncrement" name="modalAsymptoteInputIncrement" value="1" class="left"><br>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalAsymptoteInputNIter">Number of bootstrap iterations</label>
+                  <div class="controls">
+                    <input type="text" id="modalAsymptoteInputNIter" name="modalAsymptoteInputNIter" value="1" class="left"><br>
+                  </div>
+                </div>
+
+
+                <div class="control-group">
+                  <label class="control-label" for="modalAsymptoteInputLevel">At level(s)</label>
+                  <div class="controls">
+                    <input type="text" id="modalAsymptoteInputLevel" name="modalAsymptoteInputLevel" value="1" class="left"><br>
+                  </div>
+                </div>
+
+
+                <div class="control-group">
+                  <label class="control-label" for="modalAsymptoteInputNTimes">Number of times witin confidence interval</label>
+                  <div class="controls">
+                    <input type="text" id="modalAsymptoteInputNTimes" name="modalAsymptoteInputNTimes" value="1" class="left"><br>
+                  </div>
+                </div>
+
+
+                <div class="control-group">
+                  <label class="control-label" for="modalAsymptoteInputTolTotArea">Tolerance to total area</label>
+                  <div class="controls">
+                    <input type="text" id="modalAsymptoteInputTolTotArea" name="modalAsymptoteInputTolTotArea" value="1" class="left"><br>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalAsymptoteInputSampling">Sampling regime</label>
+                  <div class="controls">
+                    <select id="modalAsymptoteInputSampling">
+                      <option value='sequential'>sequential</option>
+                      <option value='random'>random</option>
+                    </select>  
+                  </div>
+                </div>
+
+
+                <div class="control-group">
+                  <label class="control-label" for="modalAsymptoteSelectEstimator">Calculate asymptote for:</label>
+                  <div class="controls">
+                    <select id="modalAsymptoteSelectEstimator" multiple="multiple">
+                      <option value='kde'>Kernel Density Estimation</option>
+                      <option value='mcp'>Minimum Convex Polygon</option>
+                    </select>
+                    <p class="help-block">For kernel density estimation with least square cross validation the asymptote may take a long time to compute</p>
+                    <p class="help-block">For the home range estimators the setting set within each estimator property window will be used.</p>
+                  </div>
+                </div>
+              </fieldset>
+
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" aria-hidden="true" id="btnModalAsymptoteCancel2">Close</button>
+            <button class="btn btn-primary" id="btnModalAsymptoteSave">Save changes</button>
+          </div>
+        </div>
+
+        <!--- MCP -->
+        <div id="modalMCP" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" id="btnModalMCPCancel1" aria-hidden="true">x</button>
+            <h3 id="myModalLabel">Minimum Convex Polygon</h3>
+          </div>
+          <div class="modal-body">
+            <form id="modalMCPInputForm" class="form-horizontal">
+              <fieldset>
+                <div class="control-group">
+                  <label class="control-label" for="modalMCPInputLevel">Level(s): </label>
+                  <div class="controls">
+                    <input type="text" id="modalMCPInputLevel" name="modalMCPInputLevel" value="1" class="left"><br>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" aria-hidden="true" id="btnModalMCPCancel2">Close</button>
+            <button class="btn btn-primary" id="btnModalMCPSave">Save changes</button>
+          </div>
+        </div>
+
+
+        <!--- KDE -->
+        <div id="modalKDE" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" id="btnModalKDECancel1" aria-hidden="true">x</button>
+            <h3 id="myModalLabel">Kernel Density Estimation</h3>
+          </div>
+          <div class="modal-body">
+
+            <form id="modalKDEInputForm" class="form-horizontal">
+              <fieldset>
+                <div class="control-group">
+                  <label class="control-label" for="modalKDEInputResolution">Resolution: </label>
+                  <div class="controls">
+                    <input type="text" id="modalKDEInputResolution" name="modalKDEInputResolution" value="1" class="left"><br>
+                  </div>
+                </div>
+
+
+                <div class="control-group">
+                  <label class="control-label" for="modalKDEInputBuffer">Buffer: </label>
+                  <div class="controls">
+                    <input type="text" id="modalKDEInputBuffer" name="modalKDEInputBuffer" value="1" class="left"><br>
+
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalKDEInputLevel">Levels: </label>
+                  <div class="controls">
+                    <input type="text" id="modalKDEInputLevel" name="modalKDEInputLevel" value="1" class="left"><br>
+
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalKDESelectBandwidth">Bandwidth: </label>
+                  <div class="controls">
+                    <select id="modalKDESelectBandwidth" >
+                      <option value='lscv'>Least Square Cross Validation</option>
+                      <option value='hpi'>Plugin in the Equation</option>
+                      <option value='href'>Reference Bandwidth</option>
+                      <option value='user'>User specified Value</option>
+                    </select> <br> 
+                  </div>
+                </div>
+
+                <div id="modalKDEBandwidthValue">
+                  <div class="control-group">
+                    <label class="control-label" for="modalKDEInputBandwidthValue">Bandwidth-Value: </label>
+                    <div class="controls">
+                      <input type="text" id="modalKDEInputBandwidthValue" name="modalKDEInputBandwidthValue" value="1" class="right"><br>
+                    </div>
+                  </div>
+                </div>
+
+              </fieldset>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" aria-hidden="true" id="btnModalKDECancel2">Close</button>
+            <button class="btn btn-primary" id="btnModalKDESave">Save changes</button>
+          </div>
+        </div>
+
+        <!--- Locoh -->
+        <div id="modalLocoh" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" id="btnModalLocohCancel1" aria-hidden="true">x</button>
+            <h3 id="myModalLabel">Local Convex Hull</h3>
+          </div>
+          <div class="modal-body">
+
+            <!--- form -->
+            <form id="modalLocohInputForm" class="form-horizontal">
+              <fieldset>
+                <div class="control-group">
+                  <label class="control-label" for="modalLocohSelectType">Type: </label>
+                  <div class="controls">
+                    <select id="modalLocohSelectType">
+                      <option value='k'>k nearest neighbours</option>
+                      <option value='r'>neighoubrs within radius r</option>
+                      <option value='a'>neighbours within cummulative distance a</option>
+                    </select>  
+                  </div>
+                </div>
+
+
+                <div class="control-group" id="modalLocohCheckboxNDiv">
+                  <label class="control-label" for="modalLocohCheckboxN">Determine n automatically: </label>
+                  <div class="controls">
+                    <input type="checkbox" id="modalLocohCheckboxN"><br>
+                    <p class="help-block">The value for size can be found automatically<p>
+                  </div>
+                </div>
+
+
+                <div class="control-group" id="modalLocohNValueDiv">
+                  <label class="control-label" for="modalLocohInputNValue">n</label>
+                  <div class="controls">
+
+                    <input type="text" id="modalLocohInputNValue" name="modalLocohInputNValue" value="1" class="right"><br>
+
+                    <p class="help-block">The actual value for N<p>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalLocohInputLevel">Levels(s)</label>
+                  <div class="controls">
+                    <input type="text" id="modalLocohInputLevel" name="modalLocohInputLevel" value="1" class="left"><br>
+                    <p class="help-block">Separate multiple levels with a comma<p>
+                  </div>
+                </div>
+
+
+              </fieldset>
+            </form>
+
+          </div>
+          <div class="modal-footer">
+            <button class="btn" aria-hidden="true" id="btnModalLocohCancel2">Close</button>
+            <button class="btn btn-primary" id="btnModalLocohSave">Save changes</button>
+          </div>
+        </div>
+
+        <!--- Core Area -->
+        <div id="modalCA" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div class="modal-header">
+            <button type="button" class="close" id="btnModalCACancel1" aria-hidden="true">x</button>
+            <h3 id="myModalLabel">Core Area</h3>
+          </div>
+          <div class="modal-body">
+            <form id="modalCAInputForm" class="form-horizontal">
+              <fieldset>
+                <div class="control-group">
+                  <label class="control-label" for="modalCAInputForm">Resolution: </label>
+                  <div class="controls">
+                    <input type="text" id="modalCAInputRes" name="modalCAInputRes" value="1" class="left"><br>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" aria-hidden="true" id="btnModalCACancel2">Close</button>
+            <button class="btn btn-primary" id="btnModalCASave">Save changes</button>
+          </div>
+        </div>
+
+      </body>
+    </html>

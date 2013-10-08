@@ -50,3 +50,4 @@ Collate:
     'plot.RhrHREstimator.R'
     'rhrConvertUnit.R'
     'rhrCorrectLevels.R'
+    'rhrTTSI.R'

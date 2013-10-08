@@ -85,7 +85,7 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
   nrows <- nrow(r1)
   xrange <- c(xmin(r1), xmax(r1))
   yrange <- c(ymin(r1), ymax(r1))
-  gridsize <- c(ncolumns, nrows)
+  gridsize <- c(nrows, ncolumns)
 
 
   ## Calculate bandwidth
@@ -148,9 +148,7 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
 
   # ---------------------------------------------------------------------------- #
   ## Finish output
-  r1 <- raster(t(kde$fhat)[ncol(r):1,], xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2])
-
-  
+  r1 <- raster(t(kde$fhat)[ncol(r1):1,], xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2])
 
   # standardize
   v <- r1[]
