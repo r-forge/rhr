@@ -7,39 +7,55 @@
 }
 \arguments{
   \item{xy}{data.frame with two columns. The first column
-  contains x coordinaes and the second column contains y
+  contains x coordinates and the second column contains y
   coordinates}
 
-  \item{levels}{a vector with the percentage of closest
+  \item{levels}{vector with the percentage of closest
   points to the centroid that are used to calculated MCP}
 
-  \item{ud}{a logical value, whether or not a utilitisation
-  distribution should be calculated}
+  \item{ud}{logical value, indicating whether or not a
+  utilization distribution should be calculated.}
 
-  \item{cud}{a logical value, whether or not a cumulative
-  utilitisation distribution should be calculated}
+  \item{cud}{a logical value, indicating whether or not a
+  cumulative utilization distribution should be calculated}
 
-  \item{xrange}{vector of length 2, with xmin and xmax for
-  the UD}
+  \item{xrange}{vector of length two, with xmin and xmax
+  for the UD}
 
-  \item{yrange}{vector of length 2, with ymin and ymax for
-  the UD}
+  \item{yrange}{vector of length two, with ymin and ymax
+  for the UD}
 
   \item{res}{the resolution for the ud.}
 }
 \value{
-  object of class \code{SpatialPolygonsDataFrame}
+  object of class \code{RhrHREstimator}
 }
 \description{
   Minimum Convex Polygon (MCP)
 }
+\note{
+  Computes the minimum convex polygon of a subset of
+  points. First the centroid of the home range is found
+  with \code{rgeos::gCentroid} and then the `100 - levels`
+  points are used to calculate a minimum convex polygon.
+}
 \examples{
 data(datSH)
+## Calculate mcp at one level
 mcp1 <- rhrMCP(datSH[, 2:3], levels=95)
+## Calculate mcp at several levels
 mcp2 <- rhrMCP(datSH[, 2:3], levels=c(50, 90, 95))
+
+## Area at each isopleth level
+areas(mcp2)
+
+## SptialPolygonsDataFrame of isopleth
+isopleths(mcp2)
 }
 \author{
-  Johannes Signer modified and adapted code from
-  \code{adehabitatHR::mcp}
+  Johannes Signer inspired from \code{adehabitatHR::mcp}
+}
+\seealso{
+  \code{adehabitatHR::mcp}, \code{rgeos::gConvexHull}
 }
 

@@ -1,0 +1,23 @@
+2013-10-24  Johannes Signer  <jmsigner@gmail.com>
+
+	* DESCRIPTION (Date):Updated version and date 
+
+	* R/plot.RhrHREstimator.R (plot.RhrHREstimator):removed breaks 
+
+	* inst/app/brew/rKDE.R:added rescale 
+
+	* inst/app/brew/load.rhtml: added rescale to kde modal 
+
+	* inst/app/js/rhr.js: added kde rescale
+
+2013-10-23  Johannes Signer  <jmsigner@gmail.com>
+
+	* R/rhrEstLoCoH.R: Updated documentation 
+
+2013-10-21  Johannes Signer  <jmsigner@gmail.com>
+
+	* DESCRIPTION (Depends): updated version 
+
+	* R/parameters.R (parameters): change something 
+	(parameters): did some more changes 
+

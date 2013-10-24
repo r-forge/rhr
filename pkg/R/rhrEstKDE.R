@@ -1,16 +1,38 @@
 #' Kernel Density Estimation (KDE)
 #'
-#' @param xy data.frame with two columns. The first column contains x coordinaes and the second column contains y coordinates
-#' @param levels a vector with the percentage of closest points to the centroid that are used to calculated MCP
-#' @param ud a logical value, whether or not a utilitisation distribution should be calculated
-#' @param cud a logical value, whether or not a cumulative utilitisation distribution should be calculated
-#' @param xrange vector of length 2, with xmin and xmax for the UD
-#' @param yrange vector of length 2, with ymin and ymax for the UD
-#' @param res the resolution for the ud. 
-#' @param h bandwidth, either a string ("href", "lscv", or "hpi") or an actual value
-#' @param extent an optional extent, by which the x and y range are exteded. A value of 0 means no extent and a value of 1 means that the extent is doubled.
+#' A function to estimate home ranges with kernel density estimation. 
+#'
+#' @param xy \code{data.frame} with two columns: x and y coordinates.
+#' @param levels numeric vector with the isopleth levels.
+#' @param h character ("href" or "hlscv") specifying the method to estimate the bandwidth or numeric value specifying the bandwidth.
+#' @param xrange numeric vector specifying min and max x for the output grid.
+#' @param yrange numeric vector specifying min and max y for the output grid.
+#' @param increaseExtend numeric value by which the x and y range are extended, see also \code{?extendrange}.
+#' @param trast a \code{RasterLayer} used as an template for the output grid.
+#' @param buffer numeric value to buffer the bounding box of points in map units from which the extent of the output grid will be retrieved.
+#' @param res numeric value specifying the resolution for the output grid. 
+#' @param gridsize a vector of length 2, specifying the number of rows and the number of columns for the ouput grid.
+#' @param ud logical value, indicating whether or not a utilization distribution should be calculated.
+#' @param cud logical value, indicating whether or not a cumulative utilization distribution should be calculated.
+#' @param rescale character value specifying if the data should be rescaled before calculating bandwidth. Possible values are: \code{unitvar} to rescale to unit variance, \code{unitx} to rescale data to variance of x and \code{none}.
+#' @param lscvSearch numeric vector of length 2, specifying lower and uper bound for candidate bandwidth (as portion of reference bandwidth) for estimating bandwidth with least squre cross validation.
+#' @param lscvWhichMin character value, specifying how candidate bandwidths are chosen with least squre cross validation. Possible values are: \code{global} or \code{local} minimum.
+
+#' @details The size and resolution of the resulting utilization distribution (UD) grid is influenced by \code{traster, xrange, yrange, increaseExtent, buffer, res, gridsize}. The size of the grid can be set either through a template raster (\code{traster}), \code{xrange} and \code{yrange} or \code{increaseExtend}. \code{traster} takes precedence over \code{xrange} and \code{yrange}, \code{buffer} and \code{grid}. If none of the previous arguments are provided, \code{xrange} and \code{yrange} are taken from the data.
+#'
+#' The resolution of the resulting UD grid can be set through either \code{res} or \code{gridsize}. \code{res} takes precedence over \code{gridsize}. If none of the previous arguments is provided the grid is set by default to a 100 by 100 grid.
+
+#' The bandwidth can be provided by the user or estimated through the reference bandwidth (this method is often refered to as the ad hoc method), plug in the euqtion method or the least square cross validation method. Reference bandwidth estimation is implemented as suggested by Silverman 1986. Plugin the equation method is wrapped from \code{KernSmooth::dpki} and a simple binned version Silverman's suggestion for least square cross validation is implemented.
+
+#' Kernels densities are estimated with \code{KernSmooth::bkde2d}. This is a binned approximation of 2D kernel density estimates (see \code{?KernSmooth::bkde2d} for more details. 
+#'
+
+#' @seealso \code{KernSmooth::bkde2d}, \code{KernSmooth::dpik}, \code{rhr::rhrHref}, \code{rhr::rhrHlscv}, \code{rhr::rhrHpi}
+
+
 #' @return object of class \code{RhrHREstimator}
 #' @export
+#' 
 #' @author Johannes Signer 
 #' @examples
 #' data(datSH)
@@ -30,14 +52,32 @@
 #' k2$parameters$h
 #' }
 
-rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=95, h="href", extent=0) {
-  # load libraries
-  require(KernSmooth)
+rhrKDE <- function(xy,
+                   levels=95,
+                   h="href",
+                   xrange=NULL,
+                   yrange=NULL,
+                   increaseExtent=NULL,
+                   trast=NULL,
+                   buffer=NULL,
+                   ud=TRUE,
+                   cud=TRUE,
+                   res=NULL,
+                   rescale="unitvar",
+                   lscvSearch=NULL,
+                   lscvWhichMin="global",
+                   gridsize=NULL) {
 
   argsIn <- as.list(environment())[-1]
   projString <- CRS(NA)  # contains the projection information
 
   ## Input checks
+  if (ncol(xy) > 2) {
+    xy <- xy[, 1:2]
+    warning("xy has more than 2 columns, only the first two are used")
+  }
+
+  
   ## Coordinates
   if(!is(xy, "data.frame")) {
     if(inherits(xy, "SpatialPoints")) {
@@ -47,6 +87,8 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
       stop(paste0("xy should be of class data.frame or SpatialPoints. The provided xy is of class ", class(xy)))
     }
   }
+
+  names(xy) <- c("x", "y")
 
   ## Levels
   if (!is(levels, "numeric")) {
@@ -63,73 +105,114 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
     stop(paste0("ud should be logical. the provided object is ", class(ud)))
   }
 
-  
-  # ---------------------------------------------------------------------------- #
-  ## Calculate bandwidth
-
-  # List to save results of h
-  hres <- list()
-
-
-  ## Reference bandwidth
-  href <- function(x) {
-    sigma <- sqrt(0.5 * (var(xy[,1]) + var(xy[,2])))       
-    sigma * nrow(xy)^(-1/6)
+  ## Is the bandwidth estimation valid
+  if (!is(h, "numeric")) {
+    if (!tolower(h) %in% c("hlscv", "href", "hpi")) {
+      stop("rhrKDE: bandwidth: unknown method requested")
+    }
   }
 
+  ## Create out raster
+  if (!is.null(trast)) {
+    ## use template, thats it
+    r1 <- trast
 
-  # Create out raster
-  r1 <- rasterFromXYVect(xy, xrange=xrange, yrange=yrange, res=res)
-  ## determine gridsize
-  ncolumns <- ncol(r1)
-  nrows <- nrow(r1)
-  xrange <- c(xmin(r1), xmax(r1))
-  yrange <- c(ymin(r1), ymax(r1))
-  gridsize <- c(nrows, ncolumns)
+  } else { ## !template raster provided
+    if (!is.null(xrange) & !is.null(yrange)) {
+      ## obtain raster from xrange
+      xrange <- xrange
+      yrange <- yrange
 
+    } else if (!is.null(increaseExtent)) {
+      ## figure out range from extent, i.e. extent input range by factor
+      xrange <- extendrange(xy[ , "x"], increaseExtend)
+      yrange <- extendrange(xy[ , "y"], increaseEextend)
+
+    } else if (!is.null(buffer)) {
+      ## figure out range from buffer, i.e. input range + buffer
+      xrange <- range(xy[, "x"]) + c(-buffer, buffer)
+      yrange <- range(xy[, "y"]) + c(-buffer, buffer)
+
+    } else {
+      ## take range from data
+      xrange <- range(xy[, "x"])
+      yrange <- range(xy[, "y"])
+    }
+
+    ## Figure out resolution
+    if (!is.null(res)) {
+      ## take resolution from input
+      ## if only one value is provided, double it
+      if (length(res) == 1L) {
+        res <- rep(res, 2)
+      }
+      resx <- res[1]
+      resy <- res[2]
+
+      rncol <- ceiling(diff(xrange) / resx)
+      rnrow <- ceiling(diff(yrange) / resy)
+
+    } else if (!is.null(gridsize)) {
+      ## take resolution from grid size
+      if (length(gridsize) == 1L) {
+        gridsize <- rep(gridsize, 2)
+      }
+       
+      rncol <- gridsize[1]
+      rnrow <- gridsize[2]
+
+    } else {
+      ## take default resolution of 100 * 100
+      rncol <- 100
+      rnrow <- 100
+    }
+
+    r1 <- raster(xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2],
+                 nrows=rnrow, ncols=rncol)
+  }
+  
+  
+  ## ---------------------------------------------------------------------------- #
+  ## Calculate bandwidth
+
+  ## List to save results of h
+  hres <- list()
 
   ## Calculate bandwidth
-  if (tolower(h) == "href") {
-    ## Formula from ?adehabitatHR::kernelUD
-    h <- href(xy)
-    h <- c(h, h)
+  if (is(h, "numeric")) {
+    hres$method <- "user specified"
+    if (length(h) == 1) {
+      hres$h <- c(h, h)
+    } else {
+      hres$h <- h[1:2]
+    }
+  } else if (tolower(h) == "href") {
+    hres$h <- rhrHref(xy, rescale=rescale)
     hres$method <- "href"
 
   } else if (tolower(h) == "hpi") {
     ## Do for each coordiante seperately
-    hx <- dpik(xy[,1], gridsize=ncolumns)
-    hy <- dpik(xy[,2], gridsize=nrows)
-    h <- c(hx, hy)
+    hres$h <- rhrHpi(xy, rescale=rescale)
     hres$method <- "hpi"
 
-  } else if (tolower(h) == "lscv") {
+  } else if (tolower(h) == "hlscv") {
+    ## Bin data
+    rr <- rasterize(xy, r1, fun="count")
+    aa <- rasterToPoints(rr)
     hres$method <- "lscv"
 
-    ## Calculate home range with adehabitatHR::kernelUD and extract the reference value
-    htmp <- kernelUD(SpatialPoints(xy), h="LSCV", grid=grid)
-    h <- htmp@h
-    hres$h <- h
-    hres$converged <- htmp@h$convergence
-  } else {
-    hres$method <- "user specified"
+    ## get candidate h's
+    h <- rhrHlscv(data.frame(aa), range=lscvSearch, whichMin=lscvWhichMin)
+    hres$h <- h$h
+    hres$converged <- h$converged
+    hres$vals <- h$res
   }
-
-  # add the acualt h to the result list of h
-  hres$h <- h
 
   ## ---------------------------------------------------------------------------- #
   ## Estimate kernels
   
   ## Create Raster
-  kde <- bkde2D(xy, bandwidth=h, range.x=list(xrange, yrange), gridsize=gridsize)
-
-  ## Did h converged, only relevant for LSCV, hence default is NA
-  hres$converged <- NA
-
-  if (h[1] == "LSCV") {
-    hres$h <- kde@h$h
-    hres$converged <- kde@h$convergence
-  }
+  kde <- bkde2D(xy, bandwidth=hres$h, range.x=list(xrange, yrange), gridsize=c(rncol, rnrow))
 
   ## ---------------------------------------------------------------------------- #
   ## Prepare output
@@ -138,7 +221,7 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
   out <- rhrHREstimator(xy, call=match.call(),
                         params=list(name="kde", method=hres$method, levels=levels,
                           h=hres$h, 
-                          converged=hres$convergence,
+                          converged=hres$convergenced,
                           ud=ud,
                           cud=cud,
                           args=argsIn,
@@ -148,7 +231,7 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
 
   # ---------------------------------------------------------------------------- #
   ## Finish output
-  r1 <- raster(t(kde$fhat)[ncol(r1):1,], xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2])
+  r1 <- raster(t(kde$fhat)[nrow(r1):1,], xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2])
 
   # standardize
   v <- r1[]
@@ -222,5 +305,6 @@ rhrKDE <- function(xy, xrange=NA, yrange=NA, res=100, ud=TRUE, cud=TRUE, levels=
 
 
 }
+
 
 

@@ -2,7 +2,8 @@
 \alias{dfGrob}
 \title{dfGrob}
 \usage{
-  dfGrob(x, start = 0.03, stop = 0.97, digits = 2)
+  dfGrob(x, start = 0.03, stop = 0.97, digits = 2,
+    bodyFont = "")
 }
 \arguments{
   \item{x}{a data.frame}
@@ -12,6 +13,8 @@
   \item{stop}{where to stop, default is 0.97}
 
   \item{digits}{to how many digists numbers are rounded}
+
+  \item{...}{additional arguments passed to gp}
 }
 \description{
   Create a grid representation for an object of class

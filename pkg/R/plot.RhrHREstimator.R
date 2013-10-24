@@ -17,7 +17,7 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
   doIso <- FALSE
   doUD <- FALSE
   
-  # What do I have to do?
+  ## What do I have to do?
   if ("ud" %in% what) {
     if (hasUD(x)) {
       doUD <- TRUE
@@ -57,21 +57,20 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
     p <- rasterToPoints(ud(x))
     df <- data.frame(p)
     names(df) <- c("x", "y", "ud")
-    breaks <- round(seq(min(df$ud), max(df$ud), len=8))
 
     if (useGE) {
       warning("GE for UD is not yet implemented")
       pUD <- ggplot(data=df) +
         geom_tile(aes(x=x, y=y, fill=ud)) +
           coord_equal() + scale_x_continuous(expand=c(0,0)) +
-            scale_fill_gradient(low="darkgreen", high="white", breaks=breaks) + 
+            scale_fill_gradient(low="darkgreen", high="white") + 
               scale_y_continuous(expand=c(0,0)) + labs(x=NULL, y=NULL) + theme_bw() +
                 coord_fixed()
     } else {
       pUD <- ggplot(data=df) +
         geom_tile(aes(x=x, y=y, fill=ud)) +
           coord_equal() + scale_x_continuous(expand=c(0,0)) +
-            scale_fill_gradient(low="darkgreen", high="white", breaks=breaks) + 
+            scale_fill_gradient(low="darkgreen", high="white") + 
               scale_y_continuous(expand=c(0,0)) + labs(x=NULL, y=NULL) + theme_bw() +
                 coord_fixed()
     }
@@ -107,7 +106,7 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
 
       pIso <- ggmap(get_googlemap(center=c(mean(lon), mean(lat)), zoom=l, maptype="hybrid")) + 
         geom_path(size=3, alpha=0.4, data=tempolDF, aes(x=long, y=lat, group=group, color=factor(level))) +
-          labs(colour="MCP Level", x="lon", y="lat") +
+          labs(colour="Level", x="lon", y="lat") +
             geom_path(size=0.2, colour="black", data=tempolDF, aes(x=long, y=lat, group=group)) +
               scale_color_manual(values=terrain.colors(10)) +
                 theme_bw()

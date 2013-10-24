@@ -243,6 +243,7 @@ $(document).ready(function(){
 	$('#modalConfigEPSG').val(config.config.epsg);
 	$('#modalConfigInUnit').val(config.config.inUnit);
 	$('#modalConfigOutUnit').val(config.config.outUnit);
+	$('#modalConfigDuplicates').val(config.config.duplicates);
 	$('#modalConfigExpKml').val(config.config.expKML);
 	$('#modalConfigUseGM').val(config.config.useGM);
 	$('#modalConfigUnitsNotKnown').hide();
@@ -275,6 +276,7 @@ $(document).ready(function(){
 	    config.config.epsg = $('#modalConfigEPSG').val();
 	    config.config.inUnit = $('#modalConfigInUnit').val();
 	    config.config.outUnit = $('#modalConfigOutUnit').val();
+	    config.config.duplicates = $('#modalConfigDuplicates').val();
 	    config.config.expKML = $('#modalConfigExpKML').prop('checked');
 	    config.config.useGM = $('#modalConfigUseGM').prop('checked');
 	} else {
@@ -517,6 +519,7 @@ $(document).ready(function(){
 	$('#modalKDEInputBuffer').val(config.estimator.kde.buffer);
 	$('#modalKDEInputLevel').val(config.estimator.kde.level);
 	$('#modalKDESelectBandwidth').val(config.estimator.kde.bandwidth);
+	$('#modalKDERescale').val(config.estimator.kde.rescale);
 	$('#modalKDEInputBandwidthValue').val(config.estimator.kde.bandwidthValue);
 	$('#modalKDE').modal('show');
 	if (config.estimator.kde.bandwidth == "user") {
@@ -541,6 +544,7 @@ $(document).ready(function(){
 	    config.estimator.kde.level = $('#modalKDEInputLevel').val();
 	    config.estimator.kde.bandwidth = $('#modalKDESelectBandwidth').val();
 	    config.estimator.kde.bandwidthValue = $('#modalKDEInputBandwidthValue').val();
+	    config.estimator.kde.rescale = $('#modalKDERescale').val();
 	} else {
 	    alert("Invalid value");
 	}

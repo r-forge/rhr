@@ -19,7 +19,7 @@ if (config$todo$doLocoh) {
       dat <- SpatialPoints(x[, c("lon", "lat")])
       proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
     } else {
-      dat <- x[, c("long", "lat")]
+      dat <- x[, c("lon", "lat")]
     }
 
       try(rhrLoCoH(dat[, c('lon', 'lat')], level=locohLevels, type=locoh$type, n=locoh$nValue))

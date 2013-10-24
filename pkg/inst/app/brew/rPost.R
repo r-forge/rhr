@@ -16,7 +16,7 @@ file.copy(list.files(datapath, full.names=TRUE, ignore.case=TRUE),
 file.copy(list.files(docpath, full.names=TRUE, ignore.case=TRUE),
           file.path(outdirAnalysis, "doc"))
 
-res$write(cat("Copied fiels <code>", outdirAnalysis, "</code>"))
+res$write(cat("Copied files to <code>", outdirAnalysis, "</code>"))
 
 # ============================================================================ #
 # Make data available for download

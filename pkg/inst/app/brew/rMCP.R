@@ -2,16 +2,16 @@
 res <- Response$new()
 if (config$todo$doMCP) {
 
-  mcpLevels <- rhrCorrectLevels(config$estimator$mcp$level)
+ # mcpLevels <- rhrCorrectLevels(config$estimator$mcp$level)
 
   resMCPs <- lapply(datSub, function(x) {
                                           if (config$config$useGM) {
                                             dat <- SpatialPoints(x[, c("lon", "lat")])
                                             proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
                                           } else {
-                                            dat <- x[, c("long", "lat")]
+                                            dat <- x[, c("lon", "lat")]
                                           }
-                                          rhrMCP(dat, level=mcpLevels)
+                                          rhrMCP(dat, level=config$estimator$mcp$level)
                                         })
 
   mcpFilenamePlots <- paste0("rhr_MCP_id_", ids, ".png")

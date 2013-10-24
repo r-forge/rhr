@@ -1,5 +1,7 @@
 #' Site fidelity
 #'
+#' 
+#'
 #' @param dat a data.frame with at least 2 columns. The first column contains the x-coordinates, the second column contains the y-coordinates 
 #' @param n the number of bootstrap iterations.
 #' @useDynLib rhr

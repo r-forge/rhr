@@ -1,22 +1,36 @@
 #' Schoener's ratio
 #'
-#' @param dat a data.frame with 3 columns. The first column contains x-coordinates, the second column contains y coordinates and the third column contains a timestamp as \code{POSIXct}. 
-#' @param interval The interval in seconds
-#' @param alpha The alpha value used to calculate the critical value
-#' @param minM The minimum number of pairs required, if m is smaller than this argument it will return NA.
-#' @param consec indicates whether or not the observations are consecutive
-#' @note This implementation uses the normal distribution as a sampling distribution. 
-#' @return \code{vector} vector of length three. V is Schoeners v, n the number of points and m the number of point pairs considered to calculated t2.
+#' @param dat data.frame with 3 columns. The first column contains x coordinates, the second column contains y coordinates and the third column contains a timestamp as \code{POSIXct}. 
+#' @param interval numeric value, the interval in seconds.
+#' @param alpha numeric value, alpha value used to calculate the critical value.
+#' @param minM numeric value, the minimum number of pairs required, if m is smaller than this argument it will return \code{NA}.
+#' @param consec locagical value, indicates whether or not the observations are consecutive or not.
+#' @note This implementation uses the normal distribution as a sampling distribution. Relocations are ordered by timestamp and then relocations are sampled based on \code{interval}. In cases when relocations are not spaced equally, i.e. no relocation is available exactly at the interval, the relocation directly thereafter is used.
+#' @return \code{vector} vector of length six. 
+#' \itemize{
+#'  \item{"V"}{Schoeners V}
+#'  \item{"m"}{Number of pairs used}
+#'  \item{"r2"}{Mean squared distance from the center of activity}
+#'  \item{"t2"}{Mean squared distance between relocations}
+#'  \item{"cv"}{Critical value}
+#'  \item{"m"}{The time interval in seconds}
+#' }
 #' @useDynLib rhr
 #' @export
 #' @author Johannes Signer 
-#' @references Swihart, R. and Slade N. 1985, Testing for indpendence of observations in animal movement, Ecology, 66(4), 1176 - 1184
+#' @references Swihart, R. and Slade N. 1985, Testing for indpendence of observations in animal movement, _Ecology_, 66(4), 1176 - 1184
 #' @examples
-#' set.seed(123)
+#' data(datSH)
+#' dat <- data.frame(datSH[, 2:3], as.numeric(ymd(datSH$day) + hms(datSH$time)))
+#' rhrSchoener(dat, interval=60)
 
 
-rhrSchoener <- function(dat, interval, alpha=0.25, minM=10, consec=TRUE) {
 
+rhrSchoener <- function(dat, interval, alpha=0.25, minM=10, consec=TRUE, meth=1) {
+
+  if (ncol(dat) < 3) {
+    stop("rhrSchoener: dat: three columns are required")
+  }
 
   ## User my not provide fixes in the right order, reorder them
   dat <- dat[order(dat[, 3]), ]
@@ -35,7 +49,7 @@ rhrSchoener <- function(dat, interval, alpha=0.25, minM=10, consec=TRUE) {
     warning("In rhrSchoener: removed duplicates")
   }
 
-  which <- tsub(dat[,1], dat[,2], as.numeric(dat[,3]), interval)
+  which <- tsub(dat[,1], dat[,2], as.numeric(dat[,3]), interval, meth)
 
   dat <- dat[as.logical(which),]
   m <- nrow(dat) - 1
@@ -54,7 +68,11 @@ rhrSchoener <- function(dat, interval, alpha=0.25, minM=10, consec=TRUE) {
   ecc <- sqrt(Reduce("/", eigen(cov(dat[, 1:2]))$values))
   
   ## Obtain critical value
-  s <- exp(-0.0502 + 0.173 * ecc - 0.0164 * ecc^2 - 0.433 * log(m))
+  if (consec) {
+    s <- exp(-0.0502 + 0.164 * ecc - 0.0156 * ecc^2 - 0.437 * log(m))
+  } else {
+    s <- exp(-0.0679 + 0.179 * ecc - 0.0169 * ecc^2 - 0.471 * log(m))
+  }
   cv <- 2 - (qnorm(1 - alpha) * s)
 
   return(c(V=V, m=m, r2=r2, t2=t2, cv=cv, interval=interval))
@@ -62,6 +80,6 @@ rhrSchoener <- function(dat, interval, alpha=0.25, minM=10, consec=TRUE) {
 
 
 ## function to calculate temporal subset
-tsub <- function(x, y, t, interval) {
-  .Call("t2cpp2", x, y, t, as.integer(interval), PACKAGE="rhr")
+tsub <- function(x, y, t, interval, which) {
+  .Call("t2cpp3", t, as.integer(interval), PACKAGE="rhr")
 }

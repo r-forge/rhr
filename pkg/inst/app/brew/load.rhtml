@@ -486,6 +486,18 @@
                   </div>
                 </div>
 
+                <!-- Duplicates -->
+                <div class="control-group" id="modalConfigDuplicatesDiv">
+                  <label class="control-label" for="modalConfigDuplicates">Duplicates</label>
+                  <div class="controls">
+                    <select id="modalConfigDuplicates">
+                      <option value='keep'>keep duplicates</option>
+                      <option value='jitter'>add random noise</option>
+                      <option value='remove'>remove</option>
+                    </select>  
+                  </div>
+                </div>
+
               </fieldset>
             </form>
 
@@ -683,7 +695,7 @@
         </div>
 
 
-        <!--- KDE -->
+        <!--- Modal-KDE -->
         <div id="modalKDE" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
           <div class="modal-header">
             <button type="button" class="close" id="btnModalKDECancel1" aria-hidden="true">x</button>
@@ -721,10 +733,21 @@
                   <label class="control-label" for="modalKDESelectBandwidth">Bandwidth: </label>
                   <div class="controls">
                     <select id="modalKDESelectBandwidth" >
-                      <option value='lscv'>Least Square Cross Validation</option>
-                      <option value='hpi'>Plugin in the Equation</option>
+                      <option value='hlscv'>Least Square Cross Validation</option>
+                     <!-- <option value='hpi'>Plugin in the Equation</option> Disabled for now -->
                       <option value='href'>Reference Bandwidth</option>
                       <option value='user'>User specified Value</option>
+                    </select> <br> 
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <label class="control-label" for="modalKDERescale">Rescale: </label>
+                  <div class="controls">
+                    <select id="modalKDERescale" >
+                      <option value='none'>No rescaling</option>
+                      <option value='unitvar'>Rescale to unit variance</option>
+                      <option value='xvar'>Rescale to x variance</option>
                     </select> <br> 
                   </div>
                 </div>

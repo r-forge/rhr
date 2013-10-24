@@ -365,6 +365,7 @@ ttestGrob <- function(x) {
 #' @param start where to start, default is 0.03
 #' @param stop where to stop, default is 0.97
 #' @param digits to how many digists numbers are rounded
+#' @param ... additional arguments passed to gp
 #' @export
 #' @author Johannes Signer
 #' @examples
@@ -373,7 +374,7 @@ ttestGrob <- function(x) {
 #' grid.draw(dfGrob(data.frame(id=1:10, class=letters[1:10], stringsAsFactors=FALSE)))
 #' popViewport()
 
-dfGrob <- function(x, start=0.03, stop=0.97, digits=2) {
+dfGrob <- function(x, start=0.03, stop=0.97, digits=2, bodyFont="") {
   xs <- seq(start, stop, length.out=(ncol(x)+1))
   xs <- xs[-length(xs)]
   l <- list()
@@ -383,7 +384,8 @@ dfGrob <- function(x, start=0.03, stop=0.97, digits=2) {
   for (i in 1:ncol(x)) if (is.numeric(x[1,i])) x[,i] <- round(x[,i], digits)
 
   for (i in 1:nrow(x))
-    l[[length(l) + 1]] <- textGrob(label=as.character(x[i,]), x=xs, y=unit(1, "npc") - unit(i + 1.5, "lines"), just=c("left", "bottom"))
+    l[[length(l) + 1]] <- textGrob(label=as.character(x[i,]), x=xs, y=unit(1, "npc") - unit(i + 1.5, "lines"), just=c("left", "bottom"),
+                                   gp=gpar(fontfamily=bodyFont))
 
   return(gTree(children=do.call("gList", l)))
 }

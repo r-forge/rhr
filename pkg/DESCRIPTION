@@ -1,8 +1,8 @@
 Package: rhr
 Type: Package
 Title: Package to calculate home range analysis and reproduce all steps
-Version: 0.02
-Date: 2012-07-09
+Version: 0.02.2
+Date: 2013-10-24
 Author: Johannes Signer
 Maintainer: <jmsigner@gmail.com>
 Description: Follow different steps to calculate homeranges
@@ -26,8 +26,7 @@ Depends:
     reshape2,
     ggmap,
     mapproj,
-    maptools,
-    adehabitatHR
+    maptools
 LinkingTo: Rcpp
 Collate:
     'fidelity.R'
@@ -51,3 +50,6 @@ Collate:
     'rhrConvertUnit.R'
     'rhrCorrectLevels.R'
     'rhrTTSI.R'
+    'rhrHref.R'
+    'rhrLSCV.R'
+    'rhrHpi.R'

@@ -6,18 +6,14 @@ if (config$todo$doKDE) {
   kde <- config$estimator$kde
   kdeLevels <- rhrCorrectLevels(kde$level)
 
-  # figure out bandwidth
+  ## figure out bandwidth
   if (kde$bandwidth == "user") {
     h <- as.numeric(kde$bandwidthValue)
   } else {
     h <- kde$bandwidth
   }
 
-  config$estimator$kde$xrange <- lapply(datSub, function(x) range(x[, "lon"]) + rep(as.numeric(kde$buffer), 2) * c(-1, 1))
-  config$estimator$kde$yrange <- lapply(datSub, function(x) range(x[, "lat"]) + rep(as.numeric(kde$buffer), 2) * c(-1, 1))
-
-
-  # run analysis
+  ## run analysis
   resKDEs <- lapply(seq_along(datSub), function(i) {
 
     if (config$config$useGM) {
@@ -26,14 +22,13 @@ if (config$todo$doKDE) {
     } else {
       dat <- datSub[[i]][, c('lon', 'lat')]
     }
-                                rhrKDE(xy=dat,
-                                             h=h,
-                                             xrange=config$estimator$kde$xrange[[i]],
-                                             yrange=config$estimator$kde$yrange[[i]],
-                                             levels=kdeLevels,
-                                             res=as.numeric(kde$resolution))})
+    rhrKDE(xy=dat,
+           h=h,
+           levels=kdeLevels,
+           buffer=as.numeric(kde$buffer),
+           rescale=kde$rescale,
+           res=as.numeric(kde$resolution))})
              
-
   resKDEsUDs <- lapply(resKDEs, ud)
   resKDEsContours <- lapply(resKDEs, isopleths)
 
@@ -52,36 +47,33 @@ if (config$todo$doKDE) {
 
     p <- plot(resKDEs[[i]], what="ud", draw=FALSE)
 
-    # plot
+    ## plot
     png(file=file.path(imagepath, kdeFilenamePlots[i]))
-    
     print(p)
-
     dev.off()
 
     kdePlots[[i]] <- grid.grabExpr(print(p))
 
-
     ## Contour lines
     p <- plot(resKDEs[[i]], what="iso", draw=FALSE, useGE=config$config$useGM)
 
-    # Save plots
+    ## Save plots
     png(file=file.path(imagepath, kdeFilenamePlotsContour[i]))
     print(p)
     dev.off()
     kdePlotsContours[[i]] <- grid.grabExpr(print(p))
 
-    # Save KDE as *.RData
+    ## Save KDE as *.RData
     saveRDS(resKDEsUDs[[i]], file=file.path(datapath, kdeFilenameRda[i]))
 
-    # Save KDE as *.tif
+    ## Save KDE as *.tif
     writeRaster(resKDEsUDs[[i]], file=file.path(datapath, kdeFilenameTIF[i]), overwrite=TRUE)
 
-    # Save contourLines
+    ## Save contourLines
     saveRDS(resKDEsContours[[i]], file=file.path(datapath, kdeContourFilenameRda[i]))
     writePolyShape(resKDEsContours[[i]], fn=file.path(datapath, kdeContourFilenameShp[i]))
 
-    # KML
+    ## KML
     if (config$config$expKML) {
         tmcp <- resKDEsContours[[i]] 
         proj4string(tmcp) <- CRS(paste0("+init=epsg:", config$config$epsg))
@@ -90,9 +82,9 @@ if (config$todo$doKDE) {
       }
   }
 
-  # ---------------------------------------------------------------------------- #
-  # add to report
-  res$write(p(paste0("Kernel density estimation (KDE) is one of the most widely used methods to calculate home ranges. In the first steps a kernel density estimation is calculated. From the kernel density a utility distribution (UD) is calculated. The resolution was <code>", config$estimator$kde$resolution,  "</code>, the bounding box of relocations was buffered with <code>", config$estimator$kde$buffer, "</code> units and band width was selected through <code>", config$estimator$kde$bandwidth, "</code>.")))
+  ## ---------------------------------------------------------------------------- #
+  ## add to report
+  res$write(p(paste0("Kernel density estimation (KDE) is one of the most widely used methods to calculate home ranges. In the first step a kernel density estimation is calculated. From the kernel density a utility distribution (UD) is calculated. The resolution was <code>", config$estimator$kde$resolution,  "</code>, the bounding box of relocations was buffered with <code>", config$estimator$kde$buffer, "</code> units and band width was selected through <code>", config$estimator$kde$bandwidth, "</code>.")))
   res$write(cat("<hr>"))
 
   for (i in seq_along(resKDEs)) {
