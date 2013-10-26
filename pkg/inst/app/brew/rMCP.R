@@ -55,7 +55,7 @@ if (config$todo$doMCP) {
   for (i in seq_along(resMCPs)) {
     res$write(h3(paste0("MCP for ", ids[i])))
     res$write(img(paste0(imageurl, mcpFilenamePlots[i]), cap=""))
-    tt <- data.frame(isopleths(resMCPs[[i]]))
+    tt <- rhrArea(resMCPs[[i]])
     
     tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
     names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
@@ -65,7 +65,7 @@ if (config$todo$doMCP) {
 
 
 } else {
-  res$write(alert("MCP not requested"))
+  res$write(rhrAlert("MCP not requested"))
 }
 res$finish()
 

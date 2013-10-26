@@ -109,7 +109,7 @@ if (config$todo$doAsymptote) {
 
       } else { 
         resAsym[[i]]$mcpMsg <- "Something went wrong, possibly not enough points"
-        res$write(alertWarning("Something went wrong, possibly not enough points"))
+        res$write(rhrAlert("Something went wrong, possibly not enough points", class="warning"))
       }
     }
 
@@ -125,13 +125,13 @@ if (config$todo$doAsymptote) {
 
       } else { 
         resAsym[[i]]$kdeMsg <- "Something went wrong, possibly not enough points"
-        res$write(alertWarning("Something went wrong, possibly not enough points"))
+        res$write(rhrAlert("Something went wrong, possibly not enough points", "warning"))
       }
     }
   }
 
 } else {
-  res$write(alert("The home range asymptote was not requested"))
+  res$write(rhrAlert("The home range asymptote was not requested"))
 }
 res$finish()
 

@@ -109,7 +109,7 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
           labs(colour="Level", x="lon", y="lat") +
             geom_path(size=0.2, colour="black", data=tempolDF, aes(x=long, y=lat, group=group)) +
               scale_color_manual(values=terrain.colors(10)) +
-                theme_bw()
+                theme_bw() + coord_fixed()
 
     } else {
       ## fortify poly

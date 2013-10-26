@@ -124,7 +124,7 @@
 
                 totalN <- length(readLines(name$tempfile))
                 if (skip >= totalN) {
-                  cat('<div class="alert alert-error"><b>Something went wrong:</b> you want to skip (', skip, ') more lines than there are in the file (', totalN, ').</div>')
+	          rhrAlert(paste0("<b>Something went wrong:</b> you want to skip (", skip, ") more lines than there are in the file (", totalN, ")"), class="error")
                   stop()
                 }
 
@@ -156,13 +156,13 @@
                                     sep=sep, skip=skip, dec=sepDec, header=TRUE,
                                     stringsAsFactors=FALSE)
                 }, error=function(e) {
-                  cat('<div class="alert alert-error"><b>Something went wrong:</b>', e, '</div>')
+	          rhrAlert(paste0('<b>Something went wrong:</b> ', e ), class="error")
                   f <- "no data loaded"
 
                 })
                 f <- c(NA, names(dat))
 
-                alert(paste0('<b>Data</b> (', name[1], ') successfully loaded'))
+                rhrAlert(paste0('<b>Data</b> (', name[1], ') successfully loaded'))
 
                 # the frist lines of 
                 p("Current header of your is (fields are separated by <code>|</code>)")
@@ -282,7 +282,7 @@
 
         <form name="formSpRestriction" method="POST">
           <div id="restriction">
-            <div id="hrAnalysisPre"><%alert('Load and remap data first') %></div>
+            <div id="hrAnalysisPre"><% rhrAlert('Load and remap data first') %></div>
           </div>
 
           <div id="res2"></div>
@@ -303,7 +303,7 @@
           </ul>
           </p>
         </div>
-        <div id="hrConfigPre1"><%alert('Load and remap data first') %></div>
+        <div id="hrConfigPre1"><% rhrAlert('Load and remap data first') %></div>
         </section>
 
         <!-- Select analysis
@@ -394,7 +394,7 @@
 
 
           </div>
-          <div id="hrAnalysisPre1"><%alert('Load and remap data first') %></div>
+          <div id="hrAnalysisPre1"><% rhrAlert('Load and remap data first') %></div>
           </section>
 
 
@@ -474,6 +474,15 @@
                   <div class="controls">
                     <input type="checkbox" id="modalConfigExpKML"><br>
                     <p class="help-block">In order to export KML, the EPSG needs be set</p>
+                  </div>
+                </div>
+
+                <!-- Export TIF -->
+                <div class="control-group">
+                  <label class="control-label" for="modalConfigExpTIF">Export TIF:</label>
+                  <div class="controls">
+                    <input type="checkbox" id="modalConfigExpTIF"><br>
+                    <p class="help-block">Enables to export raster as tif files.</p>
                   </div>
                 </div>
 

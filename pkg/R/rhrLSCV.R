@@ -16,9 +16,6 @@
 #' @references Carr and Rodges
 #' 
 #' @author Johannes Signer 
-#' @examples
-#' data(datSH)
-#' rhrHlscv(datSH[, 2:3])
 
 rhrHlscv <- function(xyz, range=c(0.1, 2), whichMin="global", rescale="unitvar", seqLength=100) {
 

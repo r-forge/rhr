@@ -47,7 +47,7 @@ mcp1 <- rhrMCP(datSH[, 2:3], levels=95)
 mcp2 <- rhrMCP(datSH[, 2:3], levels=c(50, 90, 95))
 
 ## Area at each isopleth level
-areas(mcp2)
+rhrArea(mcp2)
 
 ## SptialPolygonsDataFrame of isopleth
 isopleths(mcp2)

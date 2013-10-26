@@ -19,7 +19,7 @@
 #'  \item{"a"}{uses all neighbours that can be reached within a distance a. The distance to all points is calculated and then the cummulatively summed starting from the smallest until \code{a} is reached.}}
 #' @return object of class \code{RhrHREstimator}
 #' @author Johannes Signer 
-#' @references Getz, W. M., & Wilmers, C. C. (2004). A local nearest‐neighbor convex‐hull construction of home ranges and utilization distributions. _Ecography_, 27(4), 489-505.
+#' @references Getz, W. M., & Wilmers, C. C. (2004). A local nearest-neighbor convex-hull construction of home ranges and utilization distributions. _Ecography_, 27(4), 489-505.
 #' @references Getz, W. M., Fortmann-Roe, S., Cross, P. C., Lyons, A. J., Ryan, S. J., & Wilmers, C. C. (2007). LoCoH: nonparameteric kernel methods for constructing home ranges and utilization distributions. _PloS one_, 2(2), e207.
 #' @export
 #' @examples
@@ -28,7 +28,7 @@
 #' locoh <- rhrLoCoH(datSH[, 2:3], type="k", n=10, level=c(50, 90))
 #'
 #' ## area at isopleths
-#' areas(locoh)
+#' rhrArea(locoh)
 #'
 #' ## get isopleths
 #' iso <- isopleths(locoh)

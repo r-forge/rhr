@@ -244,7 +244,8 @@ $(document).ready(function(){
 	$('#modalConfigInUnit').val(config.config.inUnit);
 	$('#modalConfigOutUnit').val(config.config.outUnit);
 	$('#modalConfigDuplicates').val(config.config.duplicates);
-	$('#modalConfigExpKml').val(config.config.expKML);
+	$('#modalConfigExpKML').val(config.config.expKML);
+	$('#modalConfigExpTIF').val(config.config.expTIF);
 	$('#modalConfigUseGM').val(config.config.useGM);
 	$('#modalConfigUnitsNotKnown').hide();
 	$('#modalConfig').modal('show');
@@ -278,6 +279,7 @@ $(document).ready(function(){
 	    config.config.outUnit = $('#modalConfigOutUnit').val();
 	    config.config.duplicates = $('#modalConfigDuplicates').val();
 	    config.config.expKML = $('#modalConfigExpKML').prop('checked');
+	    config.config.expTIF = $('#modalConfigExpKML').prop('checked');
 	    config.config.useGM = $('#modalConfigUseGM').prop('checked');
 	} else {
 	    alert("Invalid value");

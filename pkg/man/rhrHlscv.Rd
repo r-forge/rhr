@@ -42,10 +42,6 @@
   returned, else the local minimum with the largest
   candidate bandwidth is returned.
 }
-\examples{
-data(datSH)
-rhrHlscv(datSH[, 2:3])
-}
 \author{
   Johannes Signer
 }

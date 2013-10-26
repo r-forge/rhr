@@ -103,14 +103,14 @@ rhrAsymptote <- function(x, ns=seq(100, nrow(dat(x)), 500), nrep=10, tolTotArea=
   bb <- do.call(rbind,
                 lapply(bb, function(x)
                        do.call(rbind, lapply(1:length(ns),
-                                             function(j) cbind(ns=ns[j], areas(x[[j]])))
+                                             function(j) cbind(ns=ns[j], rhrArea(x[[j]])))
                                )
                        )
                 )
 
   
   ## Calculate the total area, i.e. the area with all points
-  totalA <- areas(eval(parse(text=paste0(est, "(dat(x),",
+  totalA <- rhrArea(eval(parse(text=paste0(est, "(dat(x),",
                                paste(names(providedArgs), providedArgs, sep="=",
                                      collapse=","), ")")), envir=environment()))
   totalA$lower <- totalA$area * (1 - tolTotArea)

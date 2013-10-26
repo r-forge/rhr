@@ -1,4 +1,56 @@
+2013-10-25  Johannes Signer  <jmsigner@gmail.com>
+
+	* DESCRIPTION (Date): updated verion and date
+
+	* R/rhrEstMCP.R (rhrMCP): corrected nrow for ncol
+	(rhrMCP): fixed checking
+
+	* R/rhrCoreArea.R (plot.RhrHRCoreArea): added coord_fixed()
+
+	* R/plot.RhrHREstimator.R (lat2y): added coord_fixed()
+
+	* inst/app/brew/rLoCoH.R: improved msg
+
+	* inst/app/brew/rSiteFidelity.R: improved msg
+
+	* inst/app/brew/rCA.R: epx tif added
+
+	* inst/app/brew/rKDE.R: exp tif added
+
+	* inst/app/js/rhr.js: exp tif added
+
+	* inst/app/brew/initConfig.rhtml: export tif
+
+	* inst/app/brew/load.rhtml: export tif
+
 2013-10-24  Johannes Signer  <jmsigner@gmail.com>
+
+	* inst/app/brew/rCA.R: adjusted to new kernel method
+
+	* inst/app/brew/rMCP.R: fixed rhrAlert
+
+	* inst/app/brew/rCA.R: fixed rhrAlert
+
+	* inst/app/brew/load.rhtml: fixed rhrAlert
+
+	* R/rhrAlert.R (rhrAlert): merged all alert functions to rhrAlert
+
+	* R/rhrAsymptote.R (rhrAsymptote): adjusted rhrArea
+
+	* R/rhrEstLoCoH.R: updated exmaple
+
+	* R/rhrEstMCP.R: updated example
+
+	* R/rhrArea.R (rhrArea): Merged areas.R and rhrArea.R
+
+	* inst/tests/rhrMCP.R: Added first unit test for rhrMCP
+
+	* R/rhrEstMCP.R (rhrMCP): Additional input checks
+
+	* DESCRIPTION (Title): enhanced title
+	(Description): updated description.
+
+	* R/rhrCoreArea.R: improved docu.
 
 	* DESCRIPTION (Date):Updated version and date 
 

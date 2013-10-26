@@ -65,7 +65,7 @@ data(datSH)
 locoh <- rhrLoCoH(datSH[, 2:3], type="k", n=10, level=c(50, 90))
 
 ## area at isopleths
-areas(locoh)
+rhrArea(locoh)
 
 ## get isopleths
 iso <- isopleths(locoh)
@@ -79,7 +79,7 @@ parameters(locoh)
 }
 \references{
   Getz, W. M., & Wilmers, C. C. (2004). A local
-  nearest‐neighbor convex‐hull construction of home ranges
+  nearest-neighbor convex-hull construction of home ranges
   and utilization distributions. _Ecography_, 27(4),
   489-505.
 

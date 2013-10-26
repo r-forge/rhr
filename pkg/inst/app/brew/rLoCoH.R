@@ -7,20 +7,20 @@ if (config$todo$doLocoh) {
 
 
     resLocohs <- lapply(datSub, function(x) {
-    ## determine k for each animal 
-    if (locoh$n) {
+      ## determine k for each animal 
+      if (locoh$n) {
         if (locoh$type == "k") {
           locoh$nValue <- sqrt(nrow(x))
         } else if (locoh$type == "a") {
           locoh$nValue <- max(dist(x[, c("lon", "lat")]))
         }
       } 
-    if (config$config$useGM) {
-      dat <- SpatialPoints(x[, c("lon", "lat")])
-      proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
-    } else {
-      dat <- x[, c("lon", "lat")]
-    }
+      if (config$config$useGM) {
+        dat <- SpatialPoints(x[, c("lon", "lat")])
+        proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
+      } else {
+        dat <- x[, c("lon", "lat")]
+      }
 
       try(rhrLoCoH(dat[, c('lon', 'lat')], level=locohLevels, type=locoh$type, n=locoh$nValue))
     })
@@ -70,7 +70,7 @@ if (config$todo$doLocoh) {
       res$write(h3(paste0("Locoh for ", ids[i])))
 
       if (!is(resLocohs[[i]], "try-error")) {
-         res$write(p(paste0("Local Convex Hull type of <code>", resLocohs[[i]]$parameters$type, "</code> was calculated with value of <code>",  formatC(round(resLocohs[[i]]$parameters$n, 2), big.mark=",", format="f", drop0trailing = TRUE), "</code> ", config$config$inUnit, ".")))
+         res$write(p(paste0("Local Convex Hull type of <code>", resLocohs[[i]]$parameters$type, "</code> was calculated with value of <code>",  formatC(round(resLocohs[[i]]$parameters$n, 2), big.mark=",", format="f", drop0trailing = TRUE), "</code>.")))
 
 
         res$write(img(paste0(imageurl, locohFilenamePlots[i]), cap=""))
@@ -80,12 +80,12 @@ if (config$todo$doLocoh) {
          names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
         res$write(toHTML(data.frame(tt)))
       } else {
-        alertError("Something went wrong, did you provide enough points?")
+        rhrAlert("Something went wrong, did you provide enough points?", class="error")
       }
     }
 
 } else {
-  res$write(alert("LoCoH not requested"))
+  res$write(rhrAlert("LoCoH not requested"))
 }
 res$finish()
 

@@ -27,12 +27,11 @@ if (config$config$dateTime) {
 ## Add the number of relocations to the config list
 config$n$restrictedN <- nrow(datSub)
 
-## subset ind
+## subset only take the once that are requested
 datSub <- datSub[datSub$id %in% config$animal$id[as.logical(config$animal$include)],]
+
+## Split
 datSub <- split(datSub, datSub$id)
-
-
-
 
 ## Ids
 ids <- names(datSub)
@@ -58,6 +57,10 @@ if (config$config$duplicates == "jitter") {
     datSub[[i]] <- x[!whichDubplicates,]
   }
 }
+
+## Remove animals with less than 10 points
+datSub <- datSub[sapply(datSub, nrow) >= 10]
+
 
 ## Order data for each animal by timestamp if provided
 if (config$config$dateTime) {

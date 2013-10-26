@@ -1,19 +1,21 @@
 \name{rhrArea}
 \alias{rhrArea}
-\title{Generic Function to calculate area of a RhrEstimator*}
+\alias{rhrArea.RhrHREstimator}
+\title{Get areas from object of class RhrHREstimator}
 \usage{
   rhrArea(x, ...)
+
+  \method{rhrArea}{RhrHREstimator} (x, ...)
 }
 \arguments{
-  \item{x}{a RhrEstimator* object}
+  \item{x}{an object of class rhrHREstimator}
 
-  \item{...}{further parameters passed to the area
-  function}
+  \item{...}{further arguments, none implemented}
 }
 \value{
-  The area
+  \code{data.frame}
 }
 \description{
-  Generic Function to calculate area of a RhrEstimator*
+  Get areas from object of class RhrHREstimator
 }
 

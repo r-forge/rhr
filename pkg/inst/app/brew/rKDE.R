@@ -67,7 +67,9 @@ if (config$todo$doKDE) {
     saveRDS(resKDEsUDs[[i]], file=file.path(datapath, kdeFilenameRda[i]))
 
     ## Save KDE as *.tif
-    writeRaster(resKDEsUDs[[i]], file=file.path(datapath, kdeFilenameTIF[i]), overwrite=TRUE)
+    if (config$config$expTIF) {
+      writeRaster(resKDEsUDs[[i]], file=file.path(datapath, kdeFilenameTIF[i]), overwrite=TRUE)
+    }
 
     ## Save contourLines
     saveRDS(resKDEsContours[[i]], file=file.path(datapath, kdeContourFilenameRda[i]))
@@ -102,7 +104,7 @@ if (config$todo$doKDE) {
     res$write(toHTML(tt))
   }
 } else {
-  res$write(alert("KDE not requested"))
+  res$write(rhrAlert("KDE not requested"))
 }
 res$finish()
 

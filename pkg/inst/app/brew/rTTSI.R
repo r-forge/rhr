@@ -56,14 +56,14 @@ if (config$todo$doTTSI & config$config$dateTime) {
     } else {
         resTTSI[[i]]$msg <- paste0("Something went wrong while calculating TTSI")
     }
-    res$write(alert(resTTSI[[i]]$msg))
+    res$write(rhrAlert(resTTSI[[i]]$msg))
   }
 
 
 } else if (!config$config$dateTime) {
-   res$write(alert("Time to statistical independence was requested, but information about date and time of relocations was not provided"))
+   res$write(rhrAlert("Time to statistical independence was requested, but information about date and time of relocations was not provided"))
 } else {
-   res$write(alert("Time to statistical independence was not requested"))
+   res$write(rhrAlert("Time to statistical independence was not requested"))
  }
 res$finish()
 

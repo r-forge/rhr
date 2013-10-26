@@ -55,16 +55,16 @@ if (config$todo$doSiteFidelity) {
     res$write(toHTML(fidelity.results))
 
     if (sfs[[i]]$li.dat < li.ci[1] && sfs[[i]]$msd.dat < msd.ci[1]) {
-      sfs[[i]]$msg <- "The mean squared distance from the center of activity and the linearity index of the data are below the 95 % confidence interval of the simulated random trajectories. Therefore, site fidelity can be assumed and calculation of home ranges makes sense"
+      sfs[[i]]$msg <- "The mean squared distance from the center of activity and the linearity index of the data are below the 95 % confidence interval of the simulated random trajectories. Therefore, site fidelity can be assumed and calculation of a home range may be appropriate."
     } else {
-      sfs[[i]]$msg <- "Either the mean squared distance from the center of activity (MSD) or the linearity index (LI) of the data are above the 95 % confidence interval of the simulated random trajectories. Therefore, site fidelity can not be assumed and calculation of home ranges may be problematic"
+      sfs[[i]]$msg <- "Either the mean squared distance from the center of activity (MSD) or the linearity index (LI) of the data are above the 95 % confidence interval of the simulated random trajectories. Therefore, site fidelity can not be assumed and calculation of home ranges may be problematic."
     }
 
-   res$write(alert(sfs[[i]]$msg))
+   res$write(rhrAlert(sfs[[i]]$msg))
 
   }
 } else {
-  res$write(alert("Site fidelity not requested"))
+  res$write(rhrAlert("Site fidelity not requested"))
 }
 res$finish()
 

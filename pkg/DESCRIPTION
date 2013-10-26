@@ -1,12 +1,15 @@
 Package: rhr
 Type: Package
-Title: Package to calculate home range analysis and reproduce all steps
-Version: 0.02.2
-Date: 2013-10-24
+Title: Package to estimate home ranges through a graphical user interface.
+Version: 0.02.3
+Date: 2013-10-25
 Author: Johannes Signer
-Maintainer: <jmsigner@gmail.com>
-Description: Follow different steps to calculate homeranges
+Maintainer: Johannes Signer <jmsigner@gmail.com>
+Description: In this package several methods to analyze animal movement data
+    and home range estimation are implemented or wrapped from other packages.
 License: GPL-3
+URL: http://www.quantwild.de/rhr
+NeedsCompilation: yes
 Depends:
     Rcpp,
     raster,
@@ -39,7 +42,6 @@ Collate:
     'rhrGUI.R'
     'datSH-data.R'
     'parameters.R'
-    'areas.R'
     'dat.R'
     'rhrHelperFunctions.R'
     'rhrEstMCP.R'
@@ -53,3 +55,5 @@ Collate:
     'rhrHref.R'
     'rhrLSCV.R'
     'rhrHpi.R'
+    'isopleths.R'
+    'rhrAlert.R'

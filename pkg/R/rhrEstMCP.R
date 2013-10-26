@@ -20,7 +20,7 @@
 #' mcp2 <- rhrMCP(datSH[, 2:3], levels=c(50, 90, 95))
 #'
 #' ## Area at each isopleth level
-#' areas(mcp2)
+#' rhrArea(mcp2)
 #'
 #' ## SptialPolygonsDataFrame of isopleth
 #' isopleths(mcp2)
@@ -34,8 +34,11 @@ rhrMCP <- function(xy, levels=95, ud=FALSE, cud=FALSE, xrange=NA, yrange=NA, res
   ## Input checks
   ## Coordinates
   if(is(xy, "data.frame")) {
+    if (ncol(xy) > 2) {
+      warning("rhrMCP: xy: more than 2 columns, only the first 2 are used")
+    }
     xy <- SpatialPoints(xy)
-  } else if (inherits(xy, "SpatialPoints")) {
+  } else if (!inherits(xy, "SpatialPoints")) {
     projString <- proj4string(xy)
     stop(paste0("rhr: rhrMCP: xy should be of class data.frame or SpatialPoints. The provided xy is of class ", class(xy)))
   }
