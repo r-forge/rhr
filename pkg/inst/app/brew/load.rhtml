@@ -1,3 +1,36 @@
+<%
+
+plog <- c()
+
+catPro <- function(x, configuration=config, withTS=TRUE, pre=NULL) {
+	if (configuration$config$verbose) {
+	  if (withTS) {
+	      msg <-  paste0("* [", now(), "] : ", x, "\n", collapse="")
+	  } else {
+	      msg <- x
+	  }
+	  cat(pre, msg, file=stderr())
+	}
+	return(paste0(pre, msg, collapse=""))
+}
+
+cath1 <- function(x) {
+	msg <- paste0("* ", x)
+	sepb <- paste0(c("\n\n", rep("=", 60)), collapse="")
+	sepa <- paste0(c(rep("=", 60),"\n"),  collapse="")
+	msg <- paste0(c(sepb, msg, sepa, "\n"), collapse="\n")
+	return(msg)
+}	 
+
+cath2 <- function(x) {
+	msg <- paste0("* ", x)
+	sepb <- paste0(c("\n", rep("-", 60)), collapse="")
+	sepa <- paste0(c(rep("-", 60)),  collapse="")
+	msg <- paste0(c(sepb, msg, sepa, ""), collapse="\n")
+	return(msg)
+}	 
+%>
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -121,6 +154,8 @@
 
               if (!is.null(name)) {
 
+
+plog <- c(plog, catPro("trying to read data", pre=cath1("Reading data")))
 
                 totalN <- length(readLines(name$tempfile))
                 if (skip >= totalN) {
@@ -250,6 +285,9 @@
                     <option value='ymd'>ymd</option>
                     <option value='dmy'>dmy</option>
                     <option value='mdy'>mdy</option>
+                    <option value='ymd_hms'>ymd_hms</option>
+                    <option value='ymd_hm'>ymd_hm</option>
+                    <option value='ymd_h'>ymd_h</option>
                   </select>  
                 </td>
               </tr>
@@ -458,31 +496,46 @@
                   </div>
                 </div> -->
 
-                <!-- EPSG -->
+                <!-- Input EPSG -->
                 <div class="control-group">
-                  <label class="control-label" for="modalConfigEPSG">Spatial Reference System (EPSG)</label>
+                  <label class="control-label" for="modalConfigInEPSG">Input Spatial Reference System (EPSG)</label>
                   <div class="controls">
-                    <input type="text" id="modalConfigEPSG" name="modalConfigEPSG" value="1" class="left"><br>
+                    <input type="text" id="modalConfigInEPSG" name="modalConfigInEPSG" value="1" class="left"><br>
                   </div>
                 </div>
 
-
-
-                <!-- Export KML -->
+                <!-- Output EPSG -->
                 <div class="control-group">
-                  <label class="control-label" for="modalConfigExpKML">Export KML:</label>
+                  <label class="control-label" for="modalConfigOutEPSG">Output Spatial Reference System (EPSG)</label>
                   <div class="controls">
-                    <input type="checkbox" id="modalConfigExpKML"><br>
-                    <p class="help-block">In order to export KML, the EPSG needs be set</p>
+                    <input type="text" id="modalConfigOutEPSG" name="modalConfigOutEPSG" value="1" class="left"><br>
                   </div>
                 </div>
 
-                <!-- Export TIF -->
+                <!-- Verbose -->
                 <div class="control-group">
-                  <label class="control-label" for="modalConfigExpTIF">Export TIF:</label>
+                  <label class="control-label" for="modalConfigVerbose">Verbose mode:</label>
                   <div class="controls">
-                    <input type="checkbox" id="modalConfigExpTIF"><br>
-                    <p class="help-block">Enables to export raster as tif files.</p>
+                    <input type="checkbox" id="modalConfigVerbose"><br>
+                    <p class="help-block">This will print messages to stderr() informing about the progress of the analysis</p>
+                  </div>
+                </div>
+
+                <!-- Export data -->
+                <div class="control-group">
+                  <label class="control-label" for="modalConfigExpData">Export data:</label>
+                  <div class="controls">
+                    <input type="checkbox" id="modalConfigExpData"><br>
+                    <p class="help-block">This will write the data used for this analysis to the data directory of the analysis</p>
+                  </div>
+                </div>
+
+                <!-- Write Log -->
+                <div class="control-group">
+                  <label class="control-label" for="modalConfigWriteLog">Write Log:</label>
+                  <div class="controls">
+                    <input type="checkbox" id="modalConfigWriteLog"><br>
+                    <p class="help-block">Write log file</p>
                   </div>
                 </div>
 
@@ -572,11 +625,11 @@
                 </div>
 
                 <div class="control-group">
-                  <label class="control-label" for="modalTTSIConsec">Consecutive observations</label>
+                  <label class="control-label" for="modalTTSIConsec">Type of observations</label>
                   <div class="controls">
                     <select id="modalTTSIInputConsec">
-                      <option value='TRUE'>TRUE</option>
-                      <option value='FALSE'>FALSE</option>
+                      <option value='TRUE'>Consecutive</option>
+                      <option value='FALSE'>Non consecutive</option>
                     </select>  
                   </div>
                 </div>
@@ -741,7 +794,7 @@
                 <div class="control-group">
                   <label class="control-label" for="modalKDESelectBandwidth">Bandwidth: </label>
                   <div class="controls">
-                    <select id="modalKDESelectBandwidth" >
+                    <select id="modalKDESelectBandwidth">
                       <option value='hlscv'>Least Square Cross Validation</option>
                      <!-- <option value='hpi'>Plugin in the Equation</option> Disabled for now -->
                       <option value='href'>Reference Bandwidth</option>
@@ -753,7 +806,7 @@
                 <div class="control-group">
                   <label class="control-label" for="modalKDERescale">Rescale: </label>
                   <div class="controls">
-                    <select id="modalKDERescale" >
+                    <select id="modalKDERescale">
                       <option value='none'>No rescaling</option>
                       <option value='unitvar'>Rescale to unit variance</option>
                       <option value='xvar'>Rescale to x variance</option>

@@ -123,7 +123,10 @@ h4 <- function(x) {
 #' @export
 
 img <- function(address, cap="") {
-  cat(paste0("<img src='", address, "'>"))
+  cat(paste0(' <figure>
+    <img src="', address, '" alt="missing" />
+    <figcaption>', cap, '</figcaption>
+</figure> '))
 }
 
 # imgs <- function(address, cap="", cat=TRUE) {
@@ -162,31 +165,17 @@ code <- function(x) {
   paste0("<pre>", x, "</pre>")
 }
 
-#' toHTML
+#' rhrToHTML
 #'
-#' converts an R object to a data.frame
+#' converts an R data.frame to an html table
 
-#' @title toHTML: convert R objects as html
 #' @param x a R object
 #' @param cap caption
-#' @param cat warp output with cat
-#' @param ... additional arguments
-#' @rdname toHTML
-#' @export toHTML
+#' @param cat wrap output with cat
+#' @export 
 
-toHTML <- function(x, ...) {
-  UseMethod("toHTML", x)
-}
-
-
-#' @return \code{NULL}
-#'
-#' @rdname toHTML
-#' @method toHTML data.frame
-#' @S3method toHTML data.frame
-
-toHTML.data.frame <- function(x, cat=TRUE, ...) {
-  out <- "<table class='table table-striped'><tr>"
+rhrToHTML <- function(x, cat=TRUE, cap=NULL) {
+  out <- paste0("<table class='table table-striped'><caption align='bottom'>", cap, "</caption><tr>")
   h <- paste0("<th>", names(x), "</th>", collapse="")
   out <- paste0(out, h, "</tr>")
   # body
@@ -203,31 +192,6 @@ toHTML.data.frame <- function(x, cat=TRUE, ...) {
 }
 
 
-#' @return \code{NULL}
-#'
-#' @rdname toHTML
-#' @method toHTML summaryDefault
-#' @S3method toHTML summaryDefault
-
-toHTML.summaryDefault <- function(x, cap="", ...) {
-  out <- paste0("<table class='table table-striped'><caption align='bottom'>", cap, "</caption><tr><th>Min</th><th>1st Qu</th><th>Median</th><th>Mean</th><th>3rd Qu</th><th>Max</th></tr><tr>")
-  cat(paste0(out, paste0("<td>", x, "</td>", collapse=""), "</tr>", "</table>"))
-}
-
-#' @return \code{NULL}
-#'
-#' @rdname toHTML
-#' @method toHTML htest
-#' @S3method toHTML htest
-
-toHTML.htest <- function(x, cap=NULL, ...) {
-  if (is.null(cap)) {
-    cap <- paste0("Table: ", x$method, ": ", x$data.name) 
-  }
-  v <- c(x$statistic, x$parameter, x$p.value, x$alternative)
-  out <- paste0("<table class='table table-striped'><caption align='bottom'>", cap, "</caption><tr><th>Test statistic</th><th>df</th><th>p value</th><th>Alternative hypothesis</th></tr><tr>")
-  cat(paste0(out, paste0("<td>", v, "</td>", collapse=""), "</tr>", "</table>"))
-}
 
 
 

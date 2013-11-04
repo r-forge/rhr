@@ -1,3 +1,23 @@
+2013-11-04  Johannes Signer  <jmsigner@gmail.com>
+
+	* DESCRIPTION (Version): Updated to 0.03.1; major changes with the GUI
+
+2013-11-01  Johannes Signer  <jmsigner@gmail.com>
+
+	* inst/app/brew/reMap.R: adding ymd_h[ms]
+
+2013-10-31  Johannes Signer  <jmsigner@gmail.com>
+
+	* inst/app/js/rhr.js: added verbose
+
+2013-10-29  Johannes Signer  <jmsigner@gmail.com>
+
+	* R/rhrEstKDE.R (rhrKDE): fixed trast
+
+2013-10-28  Johannes Signer  <jmsigner@gmail.com>
+
+	* R/rhrHelperFunctions.R (img): added img caption
+
 2013-10-25  Johannes Signer  <jmsigner@gmail.com>
 
 	* DESCRIPTION (Date): updated verion and date

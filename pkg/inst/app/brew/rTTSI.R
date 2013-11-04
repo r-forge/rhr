@@ -3,62 +3,61 @@
 res <- Response$new()
 if (config$todo$doTTSI & config$config$dateTime) {
 
-  ttsi <- config$preAnalysis$ttsi
+  
+  alog <- c(alog, catPro("Init ttsi", pre=cath2("Time to statistical independence")))
 
-  ids <- names(datSub)
+  for (subcon in seq_along(ares$TTSI)) {
+    subconParams <- ares$TTSI[[subcon]]$params
 
-  ttsiFilenamePlots0 <- paste0("rhr_timeToStatisticalIndependencePlot_id_", ids, ".png")
-  ttsiPlots <- list()
+    for (animal in seq_along(ares$TTSI[[subcon]]$animals)) {
+      alog <- c(alog, catPro(paste0("starting with ttsi for ", ares$TTSI[[subcon]]$animals[[animal]]$name)))
 
+       allgood <- tryCatch({
 
-  resTTSI <- lapply(datSub, function(x) {
-    a <- try(rhrTTSI(x[, c("lon", "lat", "timestamp")], interval=ttsi$interval))
-    if (!inherits(a, "try-error")) {
-      p <- grid.grabExpr(plot(a))
-    } else {
-      p <- NA
-    }
-    list(res=a, plot=p)
-  })
+        ttsi <- rhrTTSI(datSub[[animal]][, c("lon", "lat", "timestamp")], interval=as.numeric(subconParams$interval),
+                        ntimes=as.numeric(subconParams$ntimes), 
+                        consec=as.logical(subconParams$consec))
 
+        ## Plot
+        p <-grid.grabExpr(plot(ttsi))
 
-  for (i in seq_along(resTTSI)) {
-    ## Save plots
-    if (!inherits(resTTSI[[i]]$res, "try-error")) {
-      png(file=file.path(imagepath, ttsiFilenamePlots0[i]))
-      grid.draw(resTTSI[[i]]$plot)
-      dev.off()
-      ttsiPlots[[i]] <- resTTSI[[i]]$plot
-    }
+        ares$TTSI[[subcon]]$animals[[animal]]$plots <- list()
+        ares$TTSI[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_TTSI_consec_", subconParams$consec, "_id_",
+                                                                   ares$TTSI[[subcon]]$animals[[animal]]$name, ".png"),
+                                                                 grob=p,
+                                                                 caption=paste0("TTSI ", ids[animal]))
+        ## Message
+        if (ttsi$cvReached) {
+          where <- ttsi$cvReachedAt
+          msg <- paste0("Time to statistical independence was reached at ", where,
+                                   " seconds, with ", ttsi$dat[which(ttsi$dat$interval == where), 'm'], " pairs")
+        } else {
+          msg <- paste0("Time to statistical independence was not reached")
+        }
 
- }
+        ares$TTSI[[subcon]]$animals[[animal]]$msgs <- list()
+        ares$TTSI[[subcon]]$animals[[animal]]$msgs[[1]] <- list(msg)
+        
+      }, error=function(e) return(e))
 
-
-
-  # --------------------------------------------------------------------------- #
-  # Add to report
-
-  res$write(p(paste0("Time to statistical independence calculates at which time intervall Schoeners V reaches the expected value of 2. The x-axis on the plots shows the time intervall in seconds and on the y axis m indicates the number of pairs (i.e., the number segments of the trajectory) and Schoeners V is calcualted as..")))
-
-  for (i in seq_along(resTTSI)) {
-    res$write(h3(paste0("TTSI for ", ids[i])))
-    if (!inherits(resTTSI[[i]]$res, "try-error")) {
-      if (resTTSI[[i]]$res$cvReached) {
-        where <- resTTSI[[i]]$res$cvReachedAt
-        resTTSI[[i]]$msg <- paste0("Time to statistical independence was reached at ",
-                                   where,
-                                   " seconds, with ", resTTSI[[i]]$res$dat[which(resTTSI[[i]]$res$dat$interval == where), 'm'], " pairs")
-
+      if (inherits(allgood, "error")) {
+        ares$TTSI[[subcon]]$animals[[animal]]$exit <- 1
+        ares$TTSI[[subcon]]$animals[[animal]]$error <- allgood
       } else {
-        resTTSI[[i]]$msg <- paste0("Time to statistical independence was not reached")
+        ares$TTSI[[subcon]]$animals[[animal]]$exit <- 0
       }
-      res$write(img(paste0(imageurl, ttsiFilenamePlots0[i]), cap=""))
-    } else {
-        resTTSI[[i]]$msg <- paste0("Something went wrong while calculating TTSI")
     }
-    res$write(rhrAlert(resTTSI[[i]]$msg))
   }
 
+  if (config$config$verbose) {
+    cat("Generating HTML output for TTSI \n", file=stderr())
+  }
+
+  showResultHTML(ares$TTSI, config$background$ttsi)
+
+  if (config$config$verbose) {
+    cat("Generated HTML output \n", file=stderr())
+  }
 
 } else if (!config$config$dateTime) {
    res$write(rhrAlert("Time to statistical independence was requested, but information about date and time of relocations was not provided"))

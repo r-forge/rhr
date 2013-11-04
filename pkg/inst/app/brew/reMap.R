@@ -21,7 +21,22 @@ if (id == "NA") {
   id <- 'newId'
 }
 
-if (date == "NA" || time == "NA") {
+plog <- c(plog, catPro("parsing date and time"))
+  
+if (date != "NA" & time == "NA") {
+  if (dateformat %in% c("ymd_h", "ymd_hm", "ymd_hms")) {
+    timestamp <- eval(parse(text=paste0(dateformat, "(dat[, date])")))  
+
+    datrm <- data.frame(id=dat[, id], lat=dat[, lat], lon=dat[, lon], timestamp=timestamp, stringsAsFactors=FALSE)
+    config$config$dateTime <- TRUE
+
+  } else {
+    ## Date is provided, no time
+    datrm <- data.frame(id=dat[, id], lat=dat[, lat], lon=dat[, lon], stringsAsFactors=FALSE)
+    config$config$dateTime <- FALSE
+  }
+} else if (date == "NA" & time == "NA") {
+  ## Date is provided, no time
   datrm <- data.frame(id=dat[, id], lat=dat[, lat], lon=dat[, lon], stringsAsFactors=FALSE)
   config$config$dateTime <- FALSE
 } else {
@@ -34,9 +49,6 @@ if (date == "NA" || time == "NA") {
 
 }
  
-  #--- datsubSplit <- datsub <- datrm
-  
-
   ## Add animal ids to config
   config$animal$ids <- unique(datrm$id)
   config$animal$include <- rep(1, length(config$animal$ids))

@@ -1,6 +1,6 @@
 <%
-res <- Response$new()
 
+res <- Response$new()
 
 filename <- file.path(docpath, "params.pdf")
 
@@ -27,9 +27,8 @@ pushViewport(viewport(x=unit(35, "mm"),
 global <- list()
 global$h1 <- list()
 global$h1$gpar <- gpar(fontface="bold", fontsize=18)
-global$h1$grob <- function(x) {
-  textGrob(x=0.0, y=0.2, just=c("left", "bottom"), gp=global$h1$gpar, label=x) 
-}
+global$h1$grob <- function(x) textGrob(x=0.0, y=0.2, just=c("left", "bottom"), gp=global$h1$gpar, label=x) 
+
 global$h1$size <- 18
 
 global$h2$gpar <- gpar(fontsize=16)
@@ -46,7 +45,133 @@ global$h3$grob <- function(x) {
 global$h3$size <- 12
 global$line$size <- 5.5
 
+global$hr <- function() linesGrob(y=c(0.2, 0.2))
+global$hrsize <- 3.3
+    
 
+global$textbox <- function(str) {
+    ## Recom
+    str <- strsplit(str, " ")[[1]]
+    strLines <- cumsum(nchar(str)) %/% 65
+    strLinesMax <- max(strLines)
+    str <- paste(tapply(str, strLines, function(x) paste(x, collapse=" ")), collapse="\n")
+
+    strGrob <- textGrob(label=str) 
+
+    ## Draw a Green Box to highlight key findings
+    strBorderGrob <- rectGrob(width=0.95, height=unit(global$line$size * strLinesMax + 6, "mm"),
+                              gp=gpar(fill="darkgreen", alpha=0.34))
+    
+    list(obj=gTree(children=gList(strBorderGrob, strGrob)),
+         size=global$line$size * strLinesMax + 14)
+  }
+
+showResultGrid <- function(context, name) {
+
+  obj <- list()
+  sz <- list()
+
+  obj[[1]] <- global$h1$grob(name)
+  sz[[1]] <- global$h1$size
+
+  ## cycle through subcontexts
+  for (subcon in seq_along(context)) {
+
+    ## If more than one subcontext is available give detials about them and extra headings, elso just continue
+    hasSeveralContexts <- length(context) > 1
+
+    if (hasSeveralContexts) {
+      obj[[length(obj) + 1]] <- global$h2$grob(context[[subcon]]$param$subContext)
+      sz[[length(sz) + 1]] <- global$h2$size
+    }
+
+    obj[[length(obj) + 1]] <- global$h3$grob("Settings")
+    sz[[length(sz) + 1]] <- global$h3$size
+
+    ## Write parameters
+    params <- params2df(context[[subcon]]$params[c(-1, -2)])
+    obj[[length(obj) + 1]] <- dfGrob(params, bodyFont="mono")
+    sz[[length(sz) + 1]] <- global$line$size * nrow(params) + 5
+
+    for (animal in seq_along(context[[subcon]]$animals)) {
+      thisAnimal <- context[[subcon]]$animals[[animal]]
+
+
+      obj[[length(obj) + 1]] <- global$h3$grob(paste0("Results for animal: ", thisAnimal$name))
+      sz[[length(sz) + 1]] <- global$h3$size
+
+      if (thisAnimal$exit == 0) {
+        ## Extra params
+        if (!is.na(thisAnimal$extraParams)) {
+          params <- params2df(thisAnimal$extraParams)
+          obj[[length(obj) + 1]] <- dfGrob(params, bodyFont="mono")
+          sz[[length(sz) + 1]] <- global$line$size * nrow(params) + 5
+        }
+
+        ## Plots
+        if (!is.na(thisAnimal$plots)) {
+          for (p in seq_along(thisAnimal$plots)) {
+            ## Write the plot
+            obj[[length(obj) + 1]]  <- thisAnimal$plots[[p]]$grob
+            sz[[length(sz) + 1]] <- 80
+            
+          }
+        }
+
+        ## Tables
+        if (!is.na(thisAnimal$tables)) {
+          for (table in seq_along(thisAnimal$tables)) {
+
+            tt <- thisAnimal$tables[[table]]$table
+            tt[, 1] <- as.character(tt[, 1])
+
+            obj[[length(obj) + 1]] <- dfGrob(tt, bodyFont="mono")
+            sz[[length(sz) + 1]] <- global$line$size * nrow(thisAnimal$tables[[table]]$table)
+          }
+        }
+
+        ## Messages
+        if (!is.na(thisAnimal$msgs)) {
+          for (msg in seq_along(thisAnimal$msgs)) {
+            ## include the table
+            m <- global$textbox(thisAnimal$msgs[[msg]][[1]])
+            obj[[length(obj) + 1]] <- m$obj
+            sz[[length(sz) + 1]] <- m$size
+          }
+        }
+      } else {
+        m <- global$textbox(as.character(thisAnimal$error))
+        obj[[length(obj) + 1]] <- m$obj
+        sz[[length(sz) + 1]] <- m$size
+      }
+    }
+  }
+  return(list(obj=obj, size=sz))
+}
+
+
+showAnimalsGrid <- function(animals, name) {
+
+  obj <- list()
+  sz <- list()
+
+  obj[[1]] <- global$h1$grob(name)
+  sz[[1]] <- global$h1$size
+
+  ## cycle through subcontexts
+  for (animal in animals) {
+
+    obj[[length(obj) + 1]] <- global$h3$grob(paste0("Data for animal: ", animal$summary$name))
+    sz[[length(sz) + 1]] <- global$h3$size
+
+    ## Write parameters
+    params <- params2df(animal$summary[-1])
+    obj[[length(obj) + 1]] <- dfGrob(params, bodyFont="mono")
+    sz[[length(sz) + 1]] <- global$line$size * nrow(params) + 5
+
+  }
+  return(list(obj=obj, size=sz))
+}
 ## ============================================================================ # 
 ## Prepare 2nd to nth page
 
@@ -54,644 +179,140 @@ repItems <- list()
 repH <- c()
 
 ## ---------------------------------------------------------------------------- # 
+## From estimator
+m <- showAnimalsGrid(ares$animals, "Information about animals") 
+repItems <- c(repItems, m$obj)
+repH <- c(repH, m$size)
+
+## ---------------------------------------------------------------------------- # 
+## From estimator
+
 ## Site fidelity
-
+name <- "Site fidelity"
 if (config$todo$doSiteFidelity) {
-  ## infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Site fidelity") 
-  repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
-  repH <- c(repH, global$h2$size)
-
-
-
-  repItems[[length(repItems) + 1]] <- dfGrob(data.frame(parameter=names(config$preAnalysis$siteFidelity),
-                                                        value=sapply(config$preAnalysis$siteFidelity, paste0, collapse=","), 
-                                                        stringsAsFactors=FALSE), 
-                                             bodyFont="mono")
-  repH <- c(repH, global$line$size * length(config$preAnalysis$siteFidelity))
-  
-  ## Results
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
-  repH <- c(repH, global$h2$size)
-
-  ## add results
-  for (i in seq_along(sfs)) {
-    ## header
-    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
-    repH <- c(repH, global$h3$size)
-
-    ## CI for simulated data
-    tmp <- sfs[[i]]$fidelity.results
-    names(tmp)[3:4] <- c("CI lower (sim)", "CI upper (sim)")
-    tmp[, 1] <- c("Linearity Index", "MSD")
-
-    repItems[[length(repItems) + 1]] <- dfGrob(tmp, digits=4)
-    repH <- c(repH, 15)
-
-
-    ## plots
-    p <- sfPlots[[i]]
-    repItems[[length(repItems) + 1]] <- p
-    repH <- c(repH, 100)
-
-    ## Recom
-    sfR <- strsplit(sfs[[i]]$msg, " ")[[1]]
-    sfR.lines <- cumsum(nchar(sfR)) %/% 65
-    sfR.nlines <- max(sfR.lines)
-    sfR.str <- paste(tapply(sfR, sfR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
-
-    sfR.grob <- textGrob(label=sfR.str) 
-
-    ## Draw a Green Box to highlight key findings
-    sfR.rect.grob <- rectGrob(width=0.95, height=unit(5 * sfR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
-                                                                                   alpha=0.34))
-    
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(sfR.rect.grob, sfR.grob))
-    repH <- c(repH, 5 * sfR.nlines + 6)
+  if (config$config$verbose) {
+    cat("* writing pdf for site fidelity \n", file=stderr())
   }
+  m <- showResultGrid(ares$siteFidelity, name) 
+  repItems <- c(repItems, m$obj)
+  repH <- c(repH, m$size)
   
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Site fidelity was not requested") -> rSF.not
-  repItems[[length(repItems) + 1]] <- rSF.not 
-  repH <- c(repH, 15)
+  repItems[[length(repItems) + 1]] <- global$h1$grob(name)
+  repH[[length(repH) + 1]] <- global$h1$size
+  m <- global$textbox(paste0(name, " not requested.")) 
+  repItems[[length(repItems) + 1]] <- m$obj
+  repH[[length(repH) + 1]] <- m$size + 2
 }
 
-## ---------------------------------------------------------------------------- # 
 ## TTSI
-
-if (config$todo$doTTSI & config$config$dateTime) {
-  ## infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Time to statistical independence") 
-  repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
-  repH <- c(repH, global$h2$size)
-
-  repItems[[length(repItems) + 1]] <- dfGrob(data.frame(parameter=names(config$preAnalysis$ttsi),
-                                                        value=sapply(config$preAnalysis$ttsi, paste0, collapse=","), 
-                                                        stringsAsFactors=FALSE), 
-                                             bodyFont="mono")
-  repH <- c(repH, global$line$size * length(config$preAnalysis$ttsi))
-
-  
-  ## Results
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
-  repH <- c(repH, global$h2$size)
-
-  ## add results
-  for (i in seq_along(ttsiPlots)) {
-    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
-    repH <- c(repH, global$h3$size)
-
-    ## plots
-    repItems[[length(repItems) + 1]] <- ttsiPlots[[i]]
-    repH <- c(repH, 80)
-
-    ## Recom
-    ttsiR <- strsplit(resTTSI[[i]]$msg, " ")[[1]]
-    ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
-    ttsiR.nlines <- max(ttsiR.lines)
-    ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
-
-    ttsiR.grob <- textGrob(label=ttsiR.str) 
-
-    ## Draw a Green Box to highlight key findings
-    ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
-                                                                                   alpha=0.34))
-    
-    repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
-    repH <- c(repH, 5 * ttsiR.nlines + 6)
+name <- "Time to statistical independence"
+if (config$todo$doTTSI) {
+  if (config$config$verbose) {
+    cat("* writing pdf for ttsi \n", file=stderr())
   }
-  
-} else if (config$todo$doTTSI & !config$config$dateTime) {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Time to statistical independence: date and time not provided") -> rTTSI.not
-  repItems[[length(repItems) + 1]] <- rTTSI.not 
-  repH <- c(repH, 15)
+  m <- showResultGrid(ares$TTSI, name) 
+  repItems <- c(repItems, m$obj)
+  repH <- c(repH, m$size)
 } else {
-  textGrob(y=0.5, just=c("left", "center"),
-           x=0, gp=gpar(fontface="italic"),
-           label="time to Statistical independence was not requested") -> rTTSI.not
-  repItems[[length(repItems) + 1]] <- rTTSI.not 
-  repH <- c(repH, 15)
+  repItems[[length(repItems) + 1]] <- global$h1$grob(name)
+  repH[[length(repH) + 1]] <- global$h1$size
+  m <- global$textbox(paste0(name, " not requested.")) 
+  repItems[[length(repItems) + 1]] <- m$obj
+  repH[[length(repH) + 1]] <- m$size + 2
 }
 
-# ---------------------------------------------------------------------------- # 
-## Asymptote
 
-if (config$todo$doAsymptote) {
-  ## infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Asymptote") 
-  repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
-  repH <- c(repH, global$h2$size)
-
-  repItems[[length(repItems) + 1]] <- dfGrob(data.frame(parameter=names(config$preAnalysis$asymptote),
-                                                        value=sapply(config$preAnalysis$asymptote, paste0, collapse=","), 
-                                                        stringsAsFactors=FALSE), 
-                                             bodyFont="mono")
-  repH <- c(repH, global$line$size * length(config$preAnalysis$asymptote))
-
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
-  repH <- c(repH, global$h2$size)
-
- ### Add plots
- for (i in seq_along(resAsym)) {
-
- ## header
-    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
-    repH <- c(repH, global$h3$size)
-
-    #if (resAsym[[i]]$exit != 0) {
-
-    #  ## Needs to go to a proper function
-    #  ttsiR <- strsplit(resAsym[[i]]$message, " ")[[1]]
-    #  ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
-    #  ttsiR.nlines <- max(ttsiR.lines)
-    #  ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
-
-    #  ttsiR.grob <- textGrob(label=ttsiR.str) 
-
-    #  ## Draw a Green Box to highlight key findings
-    #  ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
-    #                                                                                     alpha=0.34))
-    #  
-    #  repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
-    #  repH <- c(repH, 5 * ttsiR.nlines + 6)
-
-    #  next
-    #}
-
-    if ("mcp" %in% config$preAnalysis$asymptote$estimator) {
-      ## plots MCP
-      repItems[[length(repItems) + 1]] <- textGrob(y=unit(1, "npc") - unit(1, "lines"),
-                                                   x=0.0, just=c("left", "bottom"),
-                                                   label="Minimum Convex Polygon") 
-      repH <- c(repH, 5)
-      ## header
-      if (!is.null(resAsym[[i]]$mcpAsym)) {
-        repItems[[length(repItems) + 1]] <- resAsym[[i]]$mcpPlot
-        repH <- c(repH, 80)
-      } 
-
-      ## Needs to go to a proper function
-      ttsiR <- strsplit(resAsym[[i]]$mcpMsg, " ")[[1]]
-      ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
-      ttsiR.nlines <- max(ttsiR.lines)
-      ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
-      ttsiR.grob <- textGrob(label=ttsiR.str) 
-
-      ## Draw a Green Box to highlight key findings
-      ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
-                                                                                         alpha=0.34))
-      
-      repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
-      repH <- c(repH, 5 * ttsiR.nlines + 6)
-
-    }
-    
-    if ("kde" %in% config$preAnalysis$asymptote$estimator) {
-      ## plots KDE
-      repItems[[length(repItems) + 1]] <- textGrob(y=unit(1, "npc") - unit(1, "lines"),
-                                                   x=0.0, just=c("left", "bottom"),
-                                                   label="Kernel Density Estimation") 
-      repH <- c(repH, 5)
-
-      ## header
-      if (!is.null(resAsym[[i]]$kdeAsym)) {
-        repItems[[length(repItems) + 1]] <- resAsym[[i]]$kdePlot
-        repH <- c(repH, 80)
-      }
-      ## Needs to go to a proper function
-      ttsiR <- strsplit(resAsym[[i]]$kdeMsg, " ")[[1]]
-      ttsiR.lines <- cumsum(nchar(ttsiR)) %/% 65
-      ttsiR.nlines <- max(ttsiR.lines)
-      ttsiR.str <- paste(tapply(ttsiR, ttsiR.lines, function(x) paste(x, collapse=" ")), collapse="\n")
-      ttsiR.grob <- textGrob(label=ttsiR.str) 
-
-      ## Draw a Green Box to highlight key findings
-      ttsiR.rect.grob <- rectGrob(width=0.95, height=unit(5 * ttsiR.nlines + 6, "mm"), gp=gpar(fill="darkgreen",
-                                                                                         alpha=0.34))
-      repItems[[length(repItems) + 1]] <- gTree(children=gList(ttsiR.rect.grob, ttsiR.grob))
-      repH <- c(repH, 5 * ttsiR.nlines + 6)
-    }
-  }
-} else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Home range asymptote was not requested") -> rAsym.not
-  repItems[[length(repItems) + 1]] <- rAsym.not 
-  repH <- c(repH, 15)
-}
-
-## ---------------------------------------------------------------------------- # 
-## Core Area
-
-
-
-if (config$todo$doCA) {
-  # infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Core area estimation") 
-  repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
-  repH <- c(repH, global$h2$size)
-
-  repItems[[length(repItems) + 1]] <- dfGrob(data.frame(parameter=names(config$estimator$ca),
-                                                        value=sapply(config$estimator$ca, paste0, collapse=","), 
-                                                        stringsAsFactors=FALSE), 
-                                             bodyFont="mono")
-  repH <- c(repH, global$line$size * length(config$estimator$ca))
-
-  # Results
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
-  repH <- c(repH, global$h2$size)
-
-  # add results
-  for (i in seq_along(datSub)) {
-    ## header
-    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
-    repH <- c(repH, global$h3$size)
-
-      ## plots
-      repItems[[length(repItems) + 1]] <- resCa[[i]]$kdePlot1
-      repH <- c(repH, 80)
-
-      repItems[[length(repItems) + 1]] <- resCa[[i]]$kdePlot2
-      repH <- c(repH, 80)
-  }
-    
-  
-} else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Core Area not requested") -> rCA.not
-  repItems[[length(repItems) + 1]] <- rCA.not 
-  repH <- c(repH, 15)
-}
-
-# ---------------------------------------------------------------------------- # 
-## MCP
-
+### MCP
+name <- "Minimum convex polygon"
 if (config$todo$doMCP) {
-  # infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Minimum convex polygon") 
-  repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
-  repH <- c(repH, global$h2$size)
-
-  repItems[[length(repItems) + 1]] <- dfGrob(data.frame(parameter=names(config$estimator$mcp),
-                                                        value=sapply(config$estimator$mcp, paste0, collapse=","), 
-                                                        stringsAsFactors=FALSE), 
-                                             bodyFont="mono")
-  repH <- c(repH, global$line$size * length(config$estimator$mcp))
-
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
-  repH <- c(repH, global$h2$size)
-
- # add results
-  for (i in seq_along(mcpPlots)) {
-    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
-    repH <- c(repH, global$h3$size)
-
-    # plots
-    repItems[[length(repItems) + 1]] <- mcpPlots[[i]]
-    repH <- c(repH, 80)
-
-    # Areas
-    tt <- data.frame(isopleths(resMCPs[[i]]))
-    tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
-    names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
-    mcp.area <- dfGrob(tt)
-    
-    repItems[[length(repItems) + 1]] <- mcp.area
-    repH <- c(repH, 5 * (nrow(tt) + 1))
-
+  if (config$config$verbose) {
+    cat("* writing pdf for mcp \n", file=stderr())
   }
-  
+  m <- showResultGrid(ares$MCP, name) 
+  repItems <- c(repItems, m$obj)
+  repH <- c(repH, m$size)
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Minimum convex polygon not requested") -> rMCP.not
-  repItems[[length(repItems) + 1]] <- rMCP.not 
-  repH <- c(repH, 15)
+  repItems[[length(repItems) + 1]] <- global$h1$grob(name)
+  repH[[length(repH) + 1]] <- global$h1$size
+  m <- global$textbox(paste0(name, " not requested.")) 
+  repItems[[length(repItems) + 1]] <- m$obj
+  repH[[length(repH) + 1]] <- m$size + 2
 }
 
-## ---------------------------------------------------------------------------- # 
-## KDE
-
+### KDE
+name <- "Kernel density estimation"
 if (config$todo$doKDE) {
-  ## infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Kernel density estimation") 
-  repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
-  repH <- c(repH, global$h2$size)
-
-
-  repItems[[length(repItems) + 1]] <- dfGrob(data.frame(parameter=names(config$estimator$kde),
-                                                        value=sapply(config$estimator$kde, paste0, collapse=","), 
-                                                        stringsAsFactors=FALSE), 
-                                             bodyFont="mono")
-  repH <- c(repH, global$line$size * length(config$estimator$kde))
-
-
-  ## Results heading
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
-  repH <- c(repH, global$h2$size)
-
-  ## add results
-  for (i in seq_along(kdePlots)) {
-    ## header
-    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
-    repH <- c(repH, global$h3$size)
-
-    ## plots
-    repItems[[length(repItems) + 1]] <- kdePlots[[i]]
-    repH <- c(repH, 80)
-
-    ## areas
-    tt <- data.frame(data.frame(resKDEsContours[[i]]))
-    tt$area <- formatC(round(
-      rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2),
-                       big.mark=",", format="f", drop0trailing = TRUE)
-    
-    tt <- tt[ , c("level", "area")]
-    names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
-    
-    repItems[[length(repItems) + 1]] <- dfGrob(tt)
-    repH <- c(repH, ((nrow(tt) * 5) + 10))
-
-    
-
-    repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                 just=c("left", "bottom"),
-                                                 gp=gpar(fontfamily="mono"),
-                                                 label=c("KDE", "bandwidth value",
-                                                   round(resKDEs[[i]]$parameters$h, 2)))
-    repH <- c(repH, 5)
+  if (config$config$verbose) {
+    cat("* writing pdf for kernel density \n", file=stderr())
   }
-  
+  m <- showResultGrid(ares$KDE, name) 
+  repItems <- c(repItems, m$obj)
+  repH <- c(repH, m$size)
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Kernel density estimation not requested") -> rKDE.not
-  repItems[[length(repItems) + 1]] <- rKDE.not 
-  repH <- c(repH, 15)
+  repItems[[length(repItems) + 1]] <- global$h1$grob(name)
+  repH[[length(repH) + 1]] <- global$h1$size
+  m <- global$textbox(paste0(name, " not requested.")) 
+  repItems[[length(repItems) + 1]] <- m$obj
+  repH[[length(repH) + 1]] <- m$size + 2
 }
 
-## ---------------------------------------------------------------------------- # 
-## LoCoH
-
+### LoCoH
+name <- "Local convex hull"
 if (config$todo$doLocoh) {
-  ## infoblock
-  repItems[[length(repItems) + 1]] <- global$h1$grob("Local convex hull") 
-  repH <- c(repH, global$h1$size)
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Settings") 
-  repH <- c(repH, global$h2$size)
-
-  repItems[[length(repItems) + 1]] <- dfGrob(data.frame(parameter=names(config$estimator$locoh),
-                                                        value=sapply(config$estimator$locoh, paste0, collapse=","), 
-                                                        stringsAsFactors=FALSE), 
-                                             bodyFont="mono")
-  repH <- c(repH, global$line$size * length(config$estimator$locoh))
-
-
-  repItems[[length(repItems) + 1]] <- global$h2$grob("Results") 
-  repH <- c(repH, global$h2$size)
-
-  ## add results
-  for (i in seq_along(locohPlots)) {
-    ## header
-    repItems[[length(repItems) + 1]] <- global$h3$grob(names(datSub)[i])
-    repH <- c(repH, global$h3$size)
-
-    ## plots
-    repItems[[length(repItems) + 1]] <- locohPlots[[i]]
-    repH <- c(repH, 80)
-
-    ## areas
-    tt <- data.frame(data.frame(isopleths(resLocohs[[i]])))
-    tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
-    names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
-    
-    repItems[[length(repItems) + 1]] <- dfGrob(tt)
-    repH <- c(repH, ((nrow(isopleths(resLocohs[[i]])) * 5) + 10))
-
-    repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                 just=c("left", "bottom"),
-                                                 gp=gpar(fontfamily="mono"),
-                                                 label=c("Locoh", "Value of n",
-                                                   formatC(round(resLocohs[[i]]$parameters$n, 2),
-                                                           big.mark=",", format="f", drop0trailing = TRUE)))
-    repH <- c(repH, 5)
+  if (config$config$verbose) {
+    cat("* writing pdf for locoh \n", file=stderr())
   }
-  
+  m <- showResultGrid(ares$LoCoH, name) 
+  repItems <- c(repItems, m$obj)
+  repH <- c(repH, m$size)
 } else {
-  textGrob(y=0.5, just=c("left", "center"), x=0, gp=gpar(fontface="italic"), label="Local convex hull was not not requested") -> rLocoh.not
-  repItems[[length(repItems) + 1]] <- rLocoh.not 
-  repH <- c(repH, 15)
+  repItems[[length(repItems) + 1]] <- global$h1$grob(name)
+  repH[[length(repH) + 1]] <- global$h1$size
+  m <- global$textbox(paste0(name, " not requested.")) 
+  repItems[[length(repItems) + 1]] <- m$obj
+  repH[[length(repH) + 1]] <- m$size + 2
+}
+
+## Asymptote
+name <- "Asymptote"
+if (config$todo$doAsymptote) {
+  if (config$config$verbose) {
+    cat("* writing pdf for asymptote \n", file=stderr())
+  }
+  m <- showResultGrid(ares$Asymptote, name) 
+  repItems <- c(repItems, m$obj)
+  repH <- c(repH, m$size)
+} else {
+  repItems[[length(repItems) + 1]] <- global$h1$grob(name)
+  repH[[length(repH) + 1]] <- global$h1$size
+  m <- global$textbox(paste0(name, " not requested.")) 
+  repItems[[length(repItems) + 1]] <- m$obj
+  repH[[length(repH) + 1]] <- m$size + 2
+}
+
+### CA
+name <- "Core area"
+if (config$todo$doCA) {
+  if (config$config$verbose) {
+    cat("* writing pdf for core area \n", file=stderr())
+  }
+  m <- showResultGrid(ares$CA, name) 
+  repItems <- c(repItems, m$obj)
+  repH <- c(repH, m$size)
+} else {
+  repItems[[length(repItems) + 1]] <- global$h1$grob(name)
+  repH[[length(repH) + 1]] <- global$h1$size
+  m <- global$textbox(paste0(name, " not requested.")) 
+  repItems[[length(repItems) + 1]] <- m$obj
+  repH[[length(repH) + 1]] <- m$size + 2
 }
 
 ## ============================================================================ #
-## Summary of parameters
+## Plot it
 
-repItems[[length(repItems) + 1]] <- global$h1$grob("Summary of parameters used")
-repH <- c(repH, 20)
-
-## Site fidelity
-if (config$todo$doSiteFidelity) {
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Site fidelity", "n simulated trajectories",
-                                                 config$preAnalysis$siteFidelity$n))
-  repH <- c(repH, 5)
-}
-
-## TTSI
-if (config$todo$doTTSI) {
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("TTSI", "time interval [s]",
-                                                 config$preAnalysis$ttsi$interval))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("TTSI", "tolerance [s]",
-                                                 config$preAnalysis$ttsi$tolerance))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("TTSI", "type",
-                                                 config$preAnalysis$ttsi$type))
-  repH <- c(repH, 5)
-}
-
-## Asymptote
-if (config$todo$doAsymptote) {
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "minimum number of points",
-                                                 config$preAnalysis$asymptote$minNPts))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "number of iterations",
-                                                 config$preAnalysis$asymptote$nIter))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "increment per iteration",
-                                                 config$preAnalysis$asymptote$increment))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "estimator",
-                                                 config$preAnalysis$asymptote$estimator))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "number of replications",
-                                                 config$preAnalysis$asymptote$nTimes))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "sampling",
-                                                 config$preAnalysis$asymptote$sampling))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "level",
-                                                 config$preAnalysis$asymptote$level))
-  repH <- c(repH, 5)
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Asymptote", "tolerance to total area",
-                                                 config$preAnalysis$asymptote$tolTotArea))
-  repH <- c(repH, 5)
-
-  if ("kde" %in% config$preAnalysis$asymptote$estimator) {
-
-    repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                 just=c("left", "bottom"),
-                                                 gp=gpar(fontfamily="mono"),
-                                                 label=c("Asymptote - kde", "resolution",
-                                                   config$estimator$kde$resolution))
-    repH <- c(repH, 5)
-    repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                 just=c("left", "bottom"),
-                                                 gp=gpar(fontfamily="mono"),
-                                                 label=c("Asymptote - kde", "buffer",
-                                                   config$estimator$kde$buffer))
-    repH <- c(repH, 5)
-    repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                 just=c("left", "bottom"),
-                                                 gp=gpar(fontfamily="mono"),
-                                                 label=c("Asymptote - kde", "bandwidth",
-                                                   config$estimator$kde$bandwidth))
-    repH <- c(repH, 5)
-
-    if (config$estimator$kde$bandwidth == "user") {
-      repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                   just=c("left", "bottom"),
-                                                   gp=gpar(fontfamily="mono"),
-                                                   label=c("Asymptote - kde", "bandwidth value",
-                                                     config$estimator$kde$bandwidthValue))
-      repH <- c(repH, 5)
-    }
-  }
-}
-
-if (config$todo$doMCP) {
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("MCP", "level",
-                                                 paste0(config$estimator$mcp$level, collapse=",")))
-  repH <- c(repH, 5)
-}
-
-if (config$todo$doKDE) {
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("KDE", "level",
-                                                 config$estimator$kde$level))
-  repH <- c(repH, 5)
-
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("KDE", "resolution",
-                                                 config$estimator$kde$resolution))
-  repH <- c(repH, 5)
-
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("KDE", "buffer",
-                                                 config$estimator$kde$buffer))
-  repH <- c(repH, 5)
-  
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("KDE", "bandwidth",
-                                                 config$estimator$kde$bandwidth))
-  repH <- c(repH, 5)
-
-  if (config$estimator$kde$bandwidth == "user") {
-    repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                 just=c("left", "bottom"),
-                                                 gp=gpar(fontfamily="mono"),
-                                                 label=c("KDE", "bandwidth value",
-                                                   config$estimator$kde$bandwidthValue))
-    repH <- c(repH, 5)
-  }
-}
-
-if (config$todo$doLocoh) {
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("LoCoH", "level",
-                                                 config$estimator$locoh$level))
-  repH <- c(repH, 5)
-
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("LoCoH", "type",
-                                                 config$estimator$locoh$type))
-  repH <- c(repH, 5)
-
-  if (!config$estimator$locoh$n) {
-    repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                 just=c("left", "bottom"),
-                                                 gp=gpar(fontfamily="mono"),
-                                                 label=c("LoCoH", "n value",
-                                                   config$estimator$locoh$nValue))
-  } else {
-    repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                                 just=c("left", "bottom"),
-                                                 gp=gpar(fontfamily="mono"),
-                                                 label=c("LoCoH", "n value",
-                                                   "auto"))
-  }
-  repH <- c(repH, 5)
-}
-
-if (config$todo$doCA) {
-  repItems[[length(repItems) + 1]] <- textGrob(x=c(0.01, 0.3, 0.8),
-                                               just=c("left", "bottom"),
-                                               gp=gpar(fontfamily="mono"),
-                                               label=c("Core Area", "resolution",
-                                                 config$estimator$ca$res))
-  repH <- c(repH, 5)
-}
-# ============================================================================ #
-# Plot it
+## Unlist repH
+repH <- unlist(repH)
 
 # on which page does every element go?
 whichpage <- 1
@@ -938,6 +559,7 @@ popViewport()
 dev.off()
 
 res$write(cat(paste0("<a href='", docurl, "params.pdf'>Download Report</a>")))
+
 res$finish()
 
 %>

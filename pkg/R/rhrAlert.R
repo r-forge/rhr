@@ -7,13 +7,11 @@
 #' @export
 #' @return \code{character}
 
-rhrAlert <- function (x, cat = TRUE, class="info") 
-{
-
+rhrAlert <- function (x, cat = TRUE, class="info") {
   if (!class %in% c("info", "error", "success", "warning")) {
     stop("rhrAlert: class: unknown class requested")
   }
-  out <- paste0("<div class='alert alert-info'>", x, "</div>")
+  out <- paste0("<div class='alert ", class, "'>", x, "</div>")
   if (cat) {
     return(cat(out))
   }

@@ -116,6 +116,10 @@ rhrKDE <- function(xy,
   if (!is.null(trast)) {
     ## use template, thats it
     r1 <- trast
+    rnrow <- nrow(r1)
+    rncol <- ncol(r1)
+    xrange <- c(xmin(r1), xmax(r1))
+    yrange <- c(ymin(r1), ymax(r1))
 
   } else { ## !template raster provided
     if (!is.null(xrange) & !is.null(yrange)) {
@@ -167,9 +171,9 @@ rhrKDE <- function(xy,
       rnrow <- 100
     }
 
-    r1 <- raster(xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2],
-                 nrows=rnrow, ncols=rncol)
   }
+  r1 <- raster(xmn=xrange[1], xmx=xrange[2], ymn=yrange[1], ymx=yrange[2],
+               nrows=rnrow, ncols=rncol)
   
   
   ## ---------------------------------------------------------------------------- #

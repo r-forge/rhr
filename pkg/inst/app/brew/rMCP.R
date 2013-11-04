@@ -2,71 +2,63 @@
 res <- Response$new()
 if (config$todo$doMCP) {
 
- # mcpLevels <- rhrCorrectLevels(config$estimator$mcp$level)
+  alog <- c(alog, catPro("Init mcp", pre=cath2("Minimum convex polygon")))
 
-  resMCPs <- lapply(datSub, function(x) {
-                                          if (config$config$useGM) {
-                                            dat <- SpatialPoints(x[, c("lon", "lat")])
-                                            proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
-                                          } else {
-                                            dat <- x[, c("lon", "lat")]
-                                          }
-                                          rhrMCP(dat, level=config$estimator$mcp$level)
-                                        })
+  for (subcon in seq_along(ares$MCP)) {
+    subconParams <- ares$MCP[[subcon]]$params
 
-  mcpFilenamePlots <- paste0("rhr_MCP_id_", ids, ".png")
-  mcpFilenameSHP <- paste0("rhr_MCP_id_", ids, ".shp")
-  mcpFilenameKML <- paste0("rhr_MCP_id_", ids, ".kml")
-  mcpFilenameRda <- paste0("rhr_MCP_id_", ids, ".rda")
+    for (animal in seq_along(ares$MCP[[subcon]]$animals)) {
+      alog <- c(alog, catPro(paste0("starting with mcp for ", ares$MCP[[subcon]]$animals[[animal]]$name)))
 
-  mcpPlots <- list()
+      allgood <- tryCatch({
 
-  for (i in seq_along(resMCPs)) {
+        mcp <- rhrMCP(datSub[[animal]][, c("lon", "lat")], level=subconParams$level)
 
-    p <- plot(resMCPs[[i]], useGE=config$config$useGM, what="iso", draw=FALSE)
+        ## Plot
+        p <-grid.grabExpr(plot(mcp, useGE=config$config$useGM, what="iso"), warp=TRUE)
 
-    png(file=file.path(imagepath, mcpFilenamePlots[i]))
-    print(p)
-    dev.off()
+        ares$MCP[[subcon]]$animals[[animal]]$plots <- list()
+        ares$MCP[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_MCP_id_",
+                                                                  ares$MCP[[subcon]]$animals[[animal]]$name, ".png"),
+                                                                grob=p,
+                                                                caption=paste0("Minimum Convex Polygon for animal ", ids[animal]))
+        
+        ## Tables
+        tt <- rhrArea(mcp)
+        tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2),
+                           big.mark=",", format="f", drop0trailing = TRUE)
+        ares$MCP[[subcon]]$animals[[animal]]$tables <- list()
+        ares$MCP[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Mininum Convex Polygon areas")
 
-    mcpPlots[[i]] <- grid.grabExpr(print(p), wrap=TRUE)
+        ## Data
+        ares$MCP[[subcon]]$animals[[animal]]$data <- list()
+        ares$MCP[[subcon]]$animals[[animal]]$data$vect <- list()
+        ares$MCP[[subcon]]$animals[[animal]]$data$vect[[1]] <- list(data=isopleths(mcp),
+                                                                    filename=paste0("rhr_MCP_iso_id_",
+                                                                      ares$MCP[[subcon]]$animals[[animal]]$name))
 
-    ## Save RDS
-    saveRDS(isopleths(resMCPs[[i]]), file=file.path(datapath, mcpFilenameRda[i]))
-    ## Save Shp
-    writePolyShape(isopleths(resMCPs[[i]]), fn=file.path(datapath, mcpFilenameSHP[i]))
+        ## results
+        ares$MCP[[subcon]]$animals[[animal]]$res <- mcp
 
-    ## KML
-    if (config$config$expKML) {
-      tmcp <- isopleths(resMCPs[[i]])
-      proj4string(tmcp) <- CRS(paste0("+init=epsg:", config$config$epsg))
-      tmcp <- spTransform(tempol, CRS("+proj=longlat +ellps=sphere +no_defs"))
-      writeOGR(tmcp, file.name=file.path(datapath, mcpFilenameKML[i]), layer="level", driver="KML") 
+      }, error=function(e) return(e))
+
+      if (inherits(allgood, "error")) {
+        ares$MCP[[subcon]]$animals[[animal]]$exit <- 1
+        ares$MCP[[subcon]]$animals[[animal]]$error <- allgood
+      } else {
+        ares$MCP[[subcon]]$animals[[animal]]$exit <- 0
+      }
     }
-
   }
 
-  ## --------------------------------------------------------------------------- #
-  ## Add to report
-  res$write(p(paste0("Minimum convex polygon (MCP) is one of the older methods to calculate home ranges. It been shown that MCP estimates for home ranges are biased and often overestimated. The points used within a MCP are determined by calculating the centroid of all points and then desired percentage of closest points are selected. With the selected points a MCP is calculated.")))
+  alog <- c(alog, catPro("generating html output for mcp"))
 
-  res$write(cat('<hr>'))
-
-  for (i in seq_along(resMCPs)) {
-    res$write(h3(paste0("MCP for ", ids[i])))
-    res$write(img(paste0(imageurl, mcpFilenamePlots[i]), cap=""))
-    tt <- rhrArea(resMCPs[[i]])
-    
-    tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
-    names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
-    res$write(toHTML(tt))
-    
-  }
-
+  showResultHTML(ares$MCP, config$background$mcp)
 
 } else {
   res$write(rhrAlert("MCP not requested"))
 }
+
 res$finish()
 
 %>

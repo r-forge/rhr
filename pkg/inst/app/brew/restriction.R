@@ -1,6 +1,8 @@
 <%
 # Get data
 
+plog <- c(plog, catPro("Subsetting"))
+
 if (!is.null(a <- req$POST()[['timemin']])) config$temporalBbxRestricted$tmin <- as.character(a)
 if (!is.null(a <- req$POST()[['timemax']])) config$temporalBbxRestricted$tmax <- as.character(a)
 if (!is.null(a <- req$POST()[['lonmin']])) config$spBbxRestricted$xmin <- a

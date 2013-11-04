@@ -59,7 +59,7 @@ $(document).ready(function(){
     $("#modalKDEBandwidthValue").hide();
 
     // init config
-    $.get('initConfig.rhtml', function(json) {config = JSON.parse(json);
+    $.get('initConfig.R', function(json) {config = JSON.parse(json);
 					     });
 
 
@@ -240,12 +240,14 @@ $(document).ready(function(){
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalConfigOpen').click( function () {
 	$('#modalConfigNCores').val(config.config.ncores);
-	$('#modalConfigEPSG').val(config.config.epsg);
+	$('#modalConfigInEPSG').val(config.config.inEpsg);
+	$('#modalConfigOutEPSG').val(config.config.outEpsg);
 	$('#modalConfigInUnit').val(config.config.inUnit);
 	$('#modalConfigOutUnit').val(config.config.outUnit);
 	$('#modalConfigDuplicates').val(config.config.duplicates);
-	$('#modalConfigExpKML').val(config.config.expKML);
-	$('#modalConfigExpTIF').val(config.config.expTIF);
+	$('#modalConfigVerbose').prop("checked", config.config.verbose);
+	$('#modalConfigWriteLog').prop("checked", config.config.writeLog);
+	$('#modalConfigExpData').prop("checked", config.config.expData);
 	$('#modalConfigUseGM').val(config.config.useGM);
 	$('#modalConfigUnitsNotKnown').hide();
 	$('#modalConfig').modal('show');
@@ -274,12 +276,14 @@ $(document).ready(function(){
 	if ($("#modalConfigInputForm").valid()) {
 	    $('#modalConfig').modal('hide');
 	    config.config.ncores = $('#modalConfigNCores').val();
-	    config.config.epsg = $('#modalConfigEPSG').val();
+	    config.config.inEpsg = $('#modalConfigInEPSG').val();
+	    config.config.outEpsg = $('#modalConfigOutEPSG').val();
 	    config.config.inUnit = $('#modalConfigInUnit').val();
 	    config.config.outUnit = $('#modalConfigOutUnit').val();
 	    config.config.duplicates = $('#modalConfigDuplicates').val();
-	    config.config.expKML = $('#modalConfigExpKML').prop('checked');
-	    config.config.expTIF = $('#modalConfigExpKML').prop('checked');
+	    config.config.verbose = $('#modalConfigVerbose').prop('checked');
+	    config.config.expData = $('#modalConfigExpData').prop('checked');
+	    config.config.writeLog = $('#modalConfigWriteLog').prop('checked');
 	    config.config.useGM = $('#modalConfigUseGM').prop('checked');
 	} else {
 	    alert("Invalid value");
@@ -303,7 +307,7 @@ $(document).ready(function(){
 
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalSiteFidelityOpen').click( function () {
-	$('#modalSiteFidelityInputN').val(config.preAnalysis.siteFidelity.n);
+	$('#modalSiteFidelityInputN').val(config.analysis.siteFidelity.n);
 	$('#modalSiteFidelity').modal('show');
     });
 
@@ -318,7 +322,7 @@ $(document).ready(function(){
 	if ($("#modalSiteFidelityInputForm").valid()) {
 	    $('#modalSiteFidelity').modal('hide');
 	    var newVal = $('#modalSiteFidelityInputN').val();
-	    config.preAnalysis.siteFidelity.n = newVal;
+	    config.analysis.siteFidelity.n = newVal;
 
 	} else {
 	    alert("Invalid value");
@@ -336,9 +340,9 @@ $(document).ready(function(){
     
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalTTSIOpen').click( function () {
-	$('#modalTTSIInputInterval').val(config.preAnalysis.ttsi.interval);
-	$('#modalTTSIInputNTimes').val(config.preAnalysis.ttsi.ntimes);
-	$('#modalTTSIInputConsec').val(config.preAnalysis.ttsi.consec);
+	$('#modalTTSIInputInterval').val(config.analysis.ttsi.interval);
+	$('#modalTTSIInputNTimes').val(config.analysis.ttsi.ntimes);
+	$('#modalTTSIInputConsec').val(config.analysis.ttsi.consec);
 	$('#modalTTSI').modal('show');
     });
 
@@ -352,9 +356,9 @@ $(document).ready(function(){
     $('#btnModalTTSISave').click(function() {
 	if ($("#modalTTSIInputForm").valid()) {
 	    $('#modalTTSI').modal('hide');
-	    config.preAnalysis.ttsi.interval = $('#modalTTSIInputInterval').val();
-	    config.preAnalysis.ttsi.ntimes = $('#modalTTSIInputNTimes').val();
-	    config.preAnalysis.ttsi.consec = $('#modalTTSIInputConsec').val();
+	    config.analysis.ttsi.interval = $('#modalTTSIInputInterval').val();
+	    config.analysis.ttsi.ntimes = $('#modalTTSIInputNTimes').val();
+	    config.analysis.ttsi.consec = $('#modalTTSIInputConsec').val();
 
 	} else {
 	    alert("Invalid value");
@@ -379,14 +383,14 @@ $(document).ready(function(){
     
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalAsymptoteOpen').click( function () {
-	$('#modalAsymptoteInputMinNPts').val(config.preAnalysis.asymptote.minNPts);
-	$('#modalAsymptoteInputIncrement').val(config.preAnalysis.asymptote.increment);
-	$('#modalAsymptoteInputNIter').val(config.preAnalysis.asymptote.nIter);
-	$('#modalAsymptoteInputLevel').val(config.preAnalysis.asymptote.level);
-	$('#modalAsymptoteInputNTimes').val(config.preAnalysis.asymptote.nTimes);
-	$('#modalAsymptoteInputTolTotArea').val(config.preAnalysis.asymptote.tolTotArea);
-	$('#modalAsymptoteSelectEstimator').val(config.preAnalysis.asymptote.estimator);
-	$('#modalAsymptoteInputSampling').val(config.preAnalysis.asymptote.sampling);
+	$('#modalAsymptoteInputMinNPts').val(config.analysis.asymptote.minNPts);
+	$('#modalAsymptoteInputIncrement').val(config.analysis.asymptote.increment);
+	$('#modalAsymptoteInputNIter').val(config.analysis.asymptote.nIter);
+	$('#modalAsymptoteInputLevel').val(config.analysis.asymptote.level);
+	$('#modalAsymptoteInputNTimes').val(config.analysis.asymptote.nTimes);
+	$('#modalAsymptoteInputTolTotArea').val(config.analysis.asymptote.tolTotArea);
+	$('#modalAsymptoteSelectEstimator').val(config.analysis.asymptote.estimator);
+	$('#modalAsymptoteInputSampling').val(config.analysis.asymptote.sampling);
 	$('#modalAsymptote').modal('show');
     });
 
@@ -400,14 +404,14 @@ $(document).ready(function(){
     $('#btnModalAsymptoteSave').click(function() {
 	if ($("#modalAsymptoteInputForm").valid()) {
 	    $('#modalAsymptote').modal('hide');
-	    config.preAnalysis.asymptote.minNPts = $('#modalAsymptoteInputMinNPts').val();
-	    config.preAnalysis.asymptote.increment = $('#modalAsymptoteInputIncrement').val();
-	    config.preAnalysis.asymptote.nIter = $('#modalAsymptoteInputNIter').val();
-	    config.preAnalysis.asymptote.level = $('#modalAsymptoteInputLevel').val();
-	    config.preAnalysis.asymptote.estimator = $("#modalAsymptoteSelectEstimator").val();
-	    config.preAnalysis.asymptote.nTimes = $("#modalAsymptoteInputNTimes").val();
-	    config.preAnalysis.asymptote.tolTotArea = $("#modalAsymptoteInputTolTotArea").val();
-	    config.preAnalysis.asymptote.sampling = $("#modalAsymptoteInputSampling").val();
+	    config.analysis.asymptote.minNPts = $('#modalAsymptoteInputMinNPts').val();
+	    config.analysis.asymptote.increment = $('#modalAsymptoteInputIncrement').val();
+	    config.analysis.asymptote.nIter = $('#modalAsymptoteInputNIter').val();
+	    config.analysis.asymptote.level = $('#modalAsymptoteInputLevel').val();
+	    config.analysis.asymptote.estimator = $("#modalAsymptoteSelectEstimator").val();
+	    config.analysis.asymptote.nTimes = $("#modalAsymptoteInputNTimes").val();
+	    config.analysis.asymptote.tolTotArea = $("#modalAsymptoteInputTolTotArea").val();
+	    config.analysis.asymptote.sampling = $("#modalAsymptoteInputSampling").val();
 
 	} else {
 	    alert("Invalid value");
@@ -449,7 +453,7 @@ $(document).ready(function(){
     
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalCAOpen').click( function () {
-	$('#modalCAInputRes').val(config.estimator.ca.res);
+	$('#modalCAInputRes').val(config.analysis.ca.res);
 	$('#modalCA').modal('show');
     });
 
@@ -463,7 +467,7 @@ $(document).ready(function(){
     $('#btnModalCASave').click(function() {
 	if ($("#modalCAInputForm").valid()) {
 	    $('#modalCA').modal('hide');
-	    config.estimator.ca.res = $('#modalCAInputRes').val();
+	    config.analysis.ca.res = $('#modalCAInputRes').val();
 
 	} else {
 	    alert("Invalid value");
@@ -483,7 +487,7 @@ $(document).ready(function(){
     
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalMCPOpen').click( function () {
-	$('#modalMCPInputLevel').val(config.estimator.mcp.level);
+	$('#modalMCPInputLevel').val(config.analysis.mcp.level);
 	$('#modalMCP').modal('show');
     });
 
@@ -497,7 +501,7 @@ $(document).ready(function(){
     $('#btnModalMCPSave').click(function() {
 	if ($("#modalMCPInputForm").valid()) {
 	    $('#modalMCP').modal('hide');
-	    config.estimator.mcp.level = $('#modalMCPInputLevel').val();
+	    config.analysis.mcp.level = $('#modalMCPInputLevel').val();
 
 	} else {
 	    alert("Invalid value");
@@ -517,12 +521,12 @@ $(document).ready(function(){
     
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalKDEOpen').click( function () {
-	$('#modalKDEInputResolution').val(config.estimator.kde.resolution);
-	$('#modalKDEInputBuffer').val(config.estimator.kde.buffer);
-	$('#modalKDEInputLevel').val(config.estimator.kde.level);
-	$('#modalKDESelectBandwidth').val(config.estimator.kde.bandwidth);
-	$('#modalKDERescale').val(config.estimator.kde.rescale);
-	$('#modalKDEInputBandwidthValue').val(config.estimator.kde.bandwidthValue);
+	$('#modalKDEInputResolution').val(config.analysis.kde.resolution);
+	$('#modalKDEInputBuffer').val(config.analysis.kde.buffer);
+	$('#modalKDEInputLevel').val(config.analysis.kde.level);
+	$('#modalKDESelectBandwidth').val(config.analysis.kde.bandwidth);
+	$('#modalKDERescale').val(config.analysis.kde.rescale);
+	$('#modalKDEInputBandwidthValue').val(config.analysis.kde.bandwidthValue);
 	$('#modalKDE').modal('show');
 	if (config.estimator.kde.bandwidth == "user") {
 	    $('#modalKDEBandwidthValue').show();
@@ -541,12 +545,12 @@ $(document).ready(function(){
     $('#btnModalKDESave').click(function() {
 	if ($("#modalKDEInputForm").valid()) {
 	    $('#modalKDE').modal('hide');
-	    config.estimator.kde.resolution = $('#modalKDEInputResolution').val();
-	    config.estimator.kde.buffer = $('#modalKDEInputBuffer').val();
-	    config.estimator.kde.level = $('#modalKDEInputLevel').val();
-	    config.estimator.kde.bandwidth = $('#modalKDESelectBandwidth').val();
-	    config.estimator.kde.bandwidthValue = $('#modalKDEInputBandwidthValue').val();
-	    config.estimator.kde.rescale = $('#modalKDERescale').val();
+	    config.analysis.kde.resolution = $('#modalKDEInputResolution').val();
+	    config.analysis.kde.buffer = $('#modalKDEInputBuffer').val();
+	    config.analysis.kde.level = $('#modalKDEInputLevel').val();
+	    config.analysis.kde.bandwidth = $('#modalKDESelectBandwidth').val();
+	    config.analysis.kde.bandwidthValue = $('#modalKDEInputBandwidthValue').val();
+	    config.analysis.kde.rescale = $('#modalKDERescale').val();
 	} else {
 	    alert("Invalid value");
 	}
@@ -582,9 +586,9 @@ $(document).ready(function(){
     
     // Btn to open modal; in the same run the modal is initialized
     $('#btnModalLocohOpen').click( function () {
-	$('#modalLocohSelectType').val(config.estimator.locoh.type);
-	$('#modalLocohInputNValue').val(config.estimator.locoh.nValue);
-	$('#modalLocohInputLevel').val(config.estimator.locoh.level);
+	$('#modalLocohSelectType').val(config.analysis.locoh.type);
+	$('#modalLocohInputNValue').val(config.analysis.locoh.nValue);
+	$('#modalLocohInputLevel').val(config.analysis.locoh.level);
 	$('#modalLocoh').modal('show');
 	if (config.estimator.locoh.type == "r") {
 	    $('#modalLocohNValue').show();
@@ -604,10 +608,10 @@ $(document).ready(function(){
     $('#btnModalLocohSave').click(function() {
 	if ($("#modalLocohInputForm").valid()) {
 	    $('#modalLocoh').modal('hide');
-	    config.estimator.locoh.type = $('#modalLocohSelectType').val();
-	    config.estimator.locoh.n = $('#modalLocohCheckboxN').prop("checked");
-	    config.estimator.locoh.nValue = $('#modalLocohInputNValue').val();
-	    config.estimator.locoh.level = $('#modalLocohInputLevel').val();
+	    config.analysis.locoh.type = $('#modalLocohSelectType').val();
+	    config.analysis.locoh.n = $('#modalLocohCheckboxN').prop("checked");
+	    config.analysis.locoh.nValue = $('#modalLocohInputNValue').val();
+	    config.analysis.locoh.level = $('#modalLocohInputLevel').val();
 	} else {
 	    alert("Invalid value");
 	}

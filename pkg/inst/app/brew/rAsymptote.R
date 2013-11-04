@@ -3,131 +3,119 @@
 res <- Response$new()
 if (config$todo$doAsymptote) {
 
-  asym <- config$preAnalysis$asymptote
-  asym$level <- rhrCorrectLevels(asym$level)
-  resAsym <- list()
+  alog <- c(alog, catPro("Init asymptote", pre=cath2("Home range asymptote")))
 
-  for (i in 1:length(datSub)) {
-    x <- datSub[[i]]
-    resAsym[[i]] <- list()
+  for (subcon in seq_along(ares$Asymptote)) {
+    subconParams <- ares$Asymptote[[subcon]]$params
 
-    ## ============================================================================ # 
-    ## Are there sufficient points
-    
-    if (nrow(x) <= (2 * as.numeric(asym$minNPts))) {
-      resAsym[[i]]$exit <- 1
-      resAsym[[i]]$message <- "To few points"
-      next 
-    }
+    for (animal in seq_along(ares$Asymptote[[subcon]]$animals)) {
+      alog <- c(alog, catPro(paste0("starting with asymptote for ", ares$Asymptote[[subcon]]$animals[[animal]]$name)))
 
-    ns <- seq(as.numeric(asym$minNPts), nrow(x), as.numeric(asym$increment))
-    resAsym[[i]]$ns <- ns
-
-    ## ---------------------------------------------------------------------------- #
-    ## MCP
-
-    if ("mcp" %in% asym$estimator) {
-      resAsym[[i]]$mcp <- rhrMCP(x[, c("lon", "lat")], levels=asym$level)
-
-### Needs some cleaning up
-      resAsym[[i]]$mcpAsym <- try(rhrAsymptote(resAsym[[i]]$mcp,
-                                               ns=ns,
-                                               nrep=as.numeric(asym$nIter),
-                                               tolTotArea=as.numeric(asym$tolTotArea)/100,
-                                               nTimes=as.numeric(asym$nTimes),
-                                               sampling=asym$sampling))
-      if (!is(resAsym[[i]]$mcpAsym, "try-error")) {
-        p <- plot(resAsym[[i]]$mcpAsym, draw=FALSE)
-        resAsym[[i]]$mcpPlot <- grid.grabExpr(print(p))
-
-        ## save plot
-        png(file=file.path(imagepath, paste0("rhr_AsymptotePlot_id_", ids[i], "_mcp.png")))
-        print(p)
-        dev.off()
-      }
-    }
-    
-
-
-
-    ## ---------------------------------------------------------------------------- #
-    ## KDE
-
-    if ("kde" %in% asym$estimator) {
-
-      kde <- config$estimator$kde
-
-      ## figure out bandwidth
-      if (kde['bandwidth'] == "user") {
-        h <- as.numeric(kde['bandwidthValue'])
-      } else {
-        h <- kde['bandwidth']
+      ## Check if there are enough points
+      if (nrow(datSub[[animal]]) <= (2 * as.numeric(subconParams$minNPts))) {
+        ares$Asymptote[[subcon]]$animals[[animal]]$exit <- 1
+        ares$Asymptote[[subcon]]$animals[[animal]]$error <- "Not enough relocations"
+        next 
       }
 
+      ns <- seq(as.numeric(subconParams$minNPts), nrow(datSub[[animal]]), as.numeric(subconParams$increment))
 
-      config$estimator$kde$xrange <- lapply(datSub, function(x) range(x[, "lon"]) + rep(as.numeric(kde['buffer']), 2) * c(-1, 1))
-      config$estimator$kde$yrange <- lapply(datSub, function(x) range(x[, "lat"]) + rep(as.numeric(kde['buffer']), 2) * c(-1, 1))
+      if (subconParams$estimator == "mcp") {
 
-      resAsym[[i]]$kde <- rhrKDE(x[, c("lon", "lat")], levels=asym$level, h=h, xrange=config$estimator$kde$xrange[[i]],
-                                 yrange=config$estimator$kde$yrange, res=as.numeric(kde['resolution']))
+        if (!is.null(ares$MCP[[1]]$animals[[animal]])) {
 
-### Needs some cleaning up
-      resAsym[[i]]$kdeAsym <- try(rhrAsymptote(resAsym[[i]]$kde,
-                                               ns=ns,
-                                               nrep=as.numeric(asym$nIter),
-                                               tolTotArea=as.numeric(asym$tolTotArea)/100,
-                                               nTimes=as.numeric(asym$nTimes)))
-      if (!is(resAsym[[i]]$kdeAsym, "try-error")) {
-        p <- plot(resAsym[[i]]$kdeAsym, draw=FALSE)
-        resAsym[[i]]$kdePlot <- grid.grabExpr(print(p))
+          allgood <- tryCatch({
+            ## est asym 
+            asym <- rhrAsymptote(ares$MCP[[1]]$animals[[animal]]$res, ns=ns,
+                                 nrep=as.numeric(subconParams$nIter),
+                                 tolTotArea=as.numeric(subconParams$tolTotArea)/100,
+                                 nTimes=as.numeric(subconParams$nTimes),
+                                 sampling=subconParams$sampling)
 
-        ## save plot
-        png(file=file.path(imagepath, paste0("rhr_AsymptotePlot_id_", ids[i], "_kde.png")))
-        print(p)
-        dev.off()
+            ## Plot
+            p <- grid.grabExpr(print(plot(asym, draw=FALSE)))
+
+            ares$Asymptote[[subcon]]$animals[[animal]]$plots <- list()
+            ares$Asymptote[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_Asymptote_mcp_id_",
+                                                                            ares$Asymptote[[subcon]]$animals[[animal]]$name, ".png"),
+                                                                          grob=p,
+                                                                          caption=paste0("Asymptote for animal ", ids[animal]))
+        
+            ## Table
+            tt <- asym$asymptote
+            tt$ns <- ifelse(is.na(tt$ns), "not reached", tt$ns)
+            names(tt) <- c("Level", "Number of Points")
+
+            ares$Asymptote[[subcon]]$animals[[animal]]$tables <- list()
+            ares$Asymptote[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Asymptote")
+
+          }, error=function(e) return(e))
+
+          if (inherits(allgood, "error")) {
+            ares$Asymptote[[subcon]]$animals[[animal]]$exit <- 1
+            ares$Asymptote[[subcon]]$animals[[animal]]$error <- allgood
+          } else {
+            ares$Asymptote[[subcon]]$animals[[animal]]$exit <- 0
+          }
+        } else {
+          ares$Asymptote[[subcon]]$animals[[animal]]$exit <- 1
+          ares$Asymptote[[subcon]]$animals[[animal]]$error <- "MCP not available"
+        }
       }
 
-    }
+      if (subconParams$estimator == "kde") {
+
+        if (!is.null(ares$KDE[[1]]$animals[[animal]])) {
+
+          allgood <- tryCatch({
+            ## est asym 
+            asym <- rhrAsymptote(ares$KDE[[1]]$animals[[animal]]$res, ns=ns,
+                                 nrep=as.numeric(subconParams$nIter),
+                                 tolTotArea=as.numeric(subconParams$tolTotArea)/100,
+                                 nTimes=as.numeric(subconParams$nTimes),
+                                 sampling=subconParams$sampling)
+
+            ## Plot
+            p <- grid.grabExpr(print(plot(asym, draw=FALSE)))
+
+            ares$Asymptote[[subcon]]$animals[[animal]]$plots <- list()
+            ares$Asymptote[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_Asymptote_kde_id_",
+                                                                            ares$Asymptote[[subcon]]$animals[[animal]]$name, ".png"),
+                                                                          grob=p,
+                                                                          caption=paste0("Asymptote for animal ", ids[animal]))
+        
+            ## Table
+            tt <- asym$asymptote
+            tt$ns <- ifelse(is.na(tt$ns), "not reached", tt$ns)
+            names(tt) <- c("Level", "Number of Points")
+
+            ares$Asymptote[[subcon]]$animals[[animal]]$tables <- list()
+            ares$Asymptote[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Asymptote")
+
+          }, error=function(e) return(e))
+
+          if (inherits(allgood, "error")) {
+            ares$Asymptote[[subcon]]$animals[[animal]]$exit <- 1
+            ares$Asymptote[[subcon]]$animals[[animal]]$error <- allgood
+          } else {
+            ares$Asymptote[[subcon]]$animals[[animal]]$exit <- 0
+          }
+        } else {
+          ares$Asymptote[[subcon]]$animals[[animal]]$exit <- 1
+          ares$Asymptote[[subcon]]$animals[[animal]]$error <- "kde not available"
+        }
+      }  # finish kde
+    }  # finish animals
+  }  # finish subcon
+        
+  if (config$config$verbose) {
+    cat("Generating HTML output for Asymptote \n", file=stderr())
   }
 
+  showResultHTML(ares$Asymptote, config$background$asymptote)
 
-### Rewrite results
-  res$write(p(paste0("Description of Asymptote")))
-
-
-  for (i in 1:length(resAsym)) {
-    res$write(h3(paste0("Asymptote  for ", ids[i])))
-    if ("mcp" %in% asym$estimator) {
-      res$write(h4("Minimum Convex Polygon Asymptote"))
-      if (!is.null(resAsym[[i]]$mcpAsym)) {
-        tt <- resAsym[[i]]$mcpAsym$asymptote
-        tt$ns <- ifelse(is.na(tt$ns), "not reached", tt$ns)
-        names(tt) <- c("Level", "Number of Points")
-        res$write(toHTML(tt))
-        res$write(img(paste0(imageurl, paste0("rhr_AsymptotePlot_id_", ids[i], "_mcp.png")), cap="Asym for MCP"))
-        resAsym[[i]]$mcpMsg <- ifelse(any(!is.na(resAsym[[i]]$mcpAsym$asymptote$ns)), "Assymptote was reached",  "No assymptote reached")
-
-      } else { 
-        resAsym[[i]]$mcpMsg <- "Something went wrong, possibly not enough points"
-        res$write(rhrAlert("Something went wrong, possibly not enough points", class="warning"))
-      }
-    }
-
-    if ("kde" %in% asym$estimator) {
-      res$write(h4("Kernel Density Estimation Asymptote"))
-      if (!is.null(resAsym[[i]]$kdeAsym)) {
-        tt <- resAsym[[i]]$kdeAsym$asymptote
-        tt$ns <- ifelse(is.na(tt$ns), "not reached", tt$ns)
-        names(tt) <- c("Level", "Number of Points")
-        res$write(toHTML(tt))
-        resAsym[[i]]$kdeMsg <- ifelse(any(!is.na(resAsym[[i]]$kdeAsym$asymptote$ns)), "Assymptote was reached",  "No assymptote reached")
-        res$write(img(paste0(imageurl, paste0("rhr_AsymptotePlot_id_", ids[i], "_kde.png")), cap="Asym for KDE"))
-
-      } else { 
-        resAsym[[i]]$kdeMsg <- "Something went wrong, possibly not enough points"
-        res$write(rhrAlert("Something went wrong, possibly not enough points", "warning"))
-      }
-    }
+  if (config$config$verbose) {
+    cat("Generated HTML output \n", file=stderr())
   }
 
 } else {

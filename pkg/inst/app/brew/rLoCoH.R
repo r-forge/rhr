@@ -2,87 +2,75 @@
 res <- Response$new()
 if (config$todo$doLocoh) {
 
-    locoh <- config$estimator$locoh
-    locohLevels <- rhrCorrectLevels(locoh$level)
+  alog <- c(alog, catPro("Init locoh", pre=cath2("Local convex hull")))
+
+  for (subcon in seq_along(ares$LoCoH)) {
+    subconParams <- ares$LoCoH[[subcon]]$params
 
 
-    resLocohs <- lapply(datSub, function(x) {
-      ## determine k for each animal 
-      if (locoh$n) {
-        if (locoh$type == "k") {
-          locoh$nValue <- sqrt(nrow(x))
-        } else if (locoh$type == "a") {
-          locoh$nValue <- max(dist(x[, c("lon", "lat")]))
-        }
-      } 
-      if (config$config$useGM) {
-        dat <- SpatialPoints(x[, c("lon", "lat")])
-        proj4string(dat) <- CRS(paste0("+init=epsg:", config$config$epsg))
-      } else {
-        dat <- x[, c("lon", "lat")]
-      }
+    for (animal in seq_along(ares$LoCoH[[subcon]]$animals)) {
+      alog <- c(alog, catPro(paste0("starting with locoh for ", ares$LoCoH[[subcon]]$animals[[animal]]$name)))
 
-      try(rhrLoCoH(dat[, c('lon', 'lat')], level=locohLevels, type=locoh$type, n=locoh$nValue))
-    })
+       allgood <- tryCatch({
 
-    ids <- names(datSub)
+         ## figure out bandwidth
+         if (subconParams$n) {
+           if (subconParams$type == "k") {
+             subconParams$nValue <- sqrt(nrow(x))
+           } else if (subconParams$type == "a") {
+             subconParams$nValue <- max(dist(datSub[[animal]][, c("lon", "lat")]))
+           }
+         } 
 
-    locohFilenamePlots <- paste0("rhr_Locoh_id_", ids, ".png")
-    locohFilenameSHP   <- paste0("rhr_Locoh_id_", ids, ".shp")
-    locohFilenameKML   <- paste0("rhr_Locoh_id_", ids, ".kml")
-    locohFilenameRda   <- paste0("rhr_Locoh_id_", ids, ".rda")
-    locohPlots         <- list()
+         locoh <- rhrLoCoH(datSub[[animal]][, c("lon", "lat")], level=subconParams$level,
+                           type=subconParams$type, n=subconParams$nValue)
 
+         p <- grid.grabExpr(plot(locoh, what="iso", useGE=config$config$useGM))
 
-    for (i in seq_along(resLocohs)) {
+         ares$LoCoH[[subcon]]$animals[[animal]]$plots <- list()
+         ares$LoCoH[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_LoCoH_iso_id_",
+                                                                    ares$LoCoH[[subcon]]$animals[[animal]]$name, ".png"),
+                                                                  grob=p,
+                                                                  caption=paste0("LoCoH ", ids[animal]))
 
-      if (!is(resLocohs[[i]], "try-error")) {
-
-        p <- plot(resLocohs[[i]], useGE=config$config$useGM, what="iso", draw=FALSE)
-
-        png(file=file.path(imagepath, locohFilenamePlots[i]))
-
-
-        print(p)
-        dev.off()
-        locohPlots[[i]] <- grid.grabExpr(print(p))
-
-        ## Save RDS
-        saveRDS(isopleths(resLocohs[[i]]), file=file.path(datapath, locohFilenameRda[i]))
-
-        ## Save Shp
-        writePolyShape(isopleths(resLocohs[[i]]), fn=file.path(datapath, locohFilenameSHP[i]))
-
-        ## KML
-        if (config$config$expKML) {
-          tlocoh <- isopleths(resLocohs[[i]])
-          proj4string(tlocoh) <- CRS(paste0("+init=epsg:", config$config$epsg))
-          tlocoh <- spTransform(tlocoh, CRS("+proj=longlat +ellps=sphere +no_defs"))
-          writeOGR(tlocoh, file.name=file.path(datapath, locohFilenameKML[i]), layer="level", driver="KML") 
-        }
-      }
-    }
-
-
-    res$write(p(paste0("Local Convex Hull is a hull based method, where minimum convex polygons are calculated for each point with a given set of neighbors. There are different methods available to determine which neighbors to be used.")))
-
-    for (i in seq_along(resLocohs)) {
-      res$write(h3(paste0("Locoh for ", ids[i])))
-
-      if (!is(resLocohs[[i]], "try-error")) {
-         res$write(p(paste0("Local Convex Hull type of <code>", resLocohs[[i]]$parameters$type, "</code> was calculated with value of <code>",  formatC(round(resLocohs[[i]]$parameters$n, 2), big.mark=",", format="f", drop0trailing = TRUE), "</code>.")))
-
-
-        res$write(img(paste0(imageurl, locohFilenamePlots[i]), cap=""))
-
-        tt <- data.frame(isopleths(resLocohs[[i]]))
-        tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
+         ## Extra params
+         ares$LoCoH[[subcon]]$animals[[animal]]$extraParams <- list(nValue=subconParams$nValue)
+         
+         ## Table
+         tt <- rhrArea(locoh)
+         tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit,
+                                                 config$config$outUnit), 2), big.mark=",", format="f", drop0trailing = TRUE)
+         tt <- tt[, c("level", "area")]
          names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
-        res$write(toHTML(data.frame(tt)))
+         ares$LoCoH[[subcon]]$animals[[animal]]$tables <- list()
+         ares$LoCoH[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Kernel density estimation areas")
+
+         ## Results
+         ares$LoCoH[[subcon]]$animals[[animal]]$res <- locoh
+
+         ## Write data
+         ares$LoCoH[[subcon]]$animals[[animal]]$data <- list()
+         ares$LoCoH[[subcon]]$animals[[animal]]$data$vect <- list()
+         ares$LoCoH[[subcon]]$animals[[animal]]$data$vect[[1]] <- list(data=isopleths(locoh),
+                                                                     filename=paste0("rhr_locoh_iso_id_",
+                                                                       ares$LoCoH[[subcon]]$animals[[animal]]$name))
+
+      }, error=function(e) return(e))
+
+      if (inherits(allgood, "error")) {
+        ares$LoCoH[[subcon]]$animals[[animal]]$exit <- 1
+        ares$LoCoH[[subcon]]$animals[[animal]]$error <- allgood
       } else {
-        rhrAlert("Something went wrong, did you provide enough points?", class="error")
+        ares$LoCoH[[subcon]]$animals[[animal]]$exit <- 0
       }
     }
+  }
+
+
+  
+  alog <- c(alog, catPro("generating html output for locoh"))
+
+  showResultHTML(ares$LoCoH, config$background$locoh)
 
 } else {
   res$write(rhrAlert("LoCoH not requested"))
