@@ -17,7 +17,9 @@ if (config$todo$doCA) {
 
         allgood <- tryCatch({
 
-          ca <- rhrCoreArea(ares$KDE[[subcon]]$animals[[animal]]$res)
+          est <- readRDS(file.path(datapath, paste0(paste0("rhr_KDE_id_", ares$KDE[[subcon]]$animals[[animal]]$name, ".rds"))))
+
+          ca <- rhrCoreArea(est)
 
           r1 <- data.frame(rasterToPoints(ca$rast))
           names(r1)[1:3] <- c("x", "y", "z")
@@ -34,22 +36,30 @@ if (config$todo$doCA) {
           ares$CA[[subcon]]$animals[[animal]]$plots <- list()
           ares$CA[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_CA_plot1_id_",
                                                                     ares$CA[[subcon]]$animals[[animal]]$name, ".png"),
-                                                                  grob=p1,
                                                                   caption=paste0("CA ", ids[animal]))
+
+          png(file=file.path(imagepath, ares$CA[[subcon]]$animals[[animal]]$plots[[1]]$filename))
+          grid.draw(p1)
+          dev.off()
 
           ares$CA[[subcon]]$animals[[animal]]$plots[[2]] <- list(filename=paste0("rhr_CA_plot2_id_",
                                                                     ares$CA[[subcon]]$animals[[animal]]$name, ".png"),
-                                                                  grob=p2,
                                                                   caption=paste0("CA ", ids[animal]))
-          ## res
-          ares$CA[[subcon]]$animals[[animal]]$res <- ca
 
-          ## data
-          ares$CA[[subcon]]$animals[[animal]]$data <- list()
-          ares$CA[[subcon]]$animals[[animal]]$data$rast <- list()
-          ares$CA[[subcon]]$animals[[animal]]$data$rast[[1]] <- list(data=ca$rast,
-                                                                      filename=paste0("rhr_CA_id_",
-                                                                        ares$CA[[subcon]]$animals[[animal]]$name))
+          png(file=file.path(imagepath, ares$CA[[subcon]]$animals[[animal]]$plots[[2]]$filename))
+          grid.draw(p2)
+          dev.off()
+
+          ## results
+          saveRDS(ca, file=file.path(datapath, paste0(paste0("rhr_CA_id_", ares$CA[[subcon]]$animals[[animal]]$name, ".rds"))))
+
+          ## Write ud
+          writeRast(ca$rast,
+                    basename=file.path(datapath, paste0("rhr_CA_id_", ares$CA[[subcon]]$animals[[animal]]$name)))
+
+
+         rm(ca, p1, p2)
+         gc(); gc()
 
         }, error=function(e) return(e))
 

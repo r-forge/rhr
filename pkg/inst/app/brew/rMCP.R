@@ -12,33 +12,38 @@ if (config$todo$doMCP) {
 
       allgood <- tryCatch({
 
-        mcp <- rhrMCP(datSub[[animal]][, c("lon", "lat")], level=subconParams$level)
+        mcp <- rhrMCP(datSub[[animal]], level=subconParams$level)
 
         ## Plot
-        p <-grid.grabExpr(plot(mcp, useGE=config$config$useGM, what="iso"), warp=TRUE)
+        p <- grid.grabExpr(plot(mcp, useGE=config$config$useGM, what="iso"), warp=TRUE)
+
 
         ares$MCP[[subcon]]$animals[[animal]]$plots <- list()
         ares$MCP[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_MCP_id_",
                                                                   ares$MCP[[subcon]]$animals[[animal]]$name, ".png"),
-                                                                grob=p,
                                                                 caption=paste0("Minimum Convex Polygon for animal ", ids[animal]))
+
+        png(file=file.path(imagepath, ares$MCP[[subcon]]$animals[[animal]]$plots[[1]]$filename))
+        grid.draw(p)
+        dev.off()
         
         ## Tables
         tt <- rhrArea(mcp)
         tt$area <- formatC(round(rhrConvertUnit(tt$area, config$config$inUnit, config$config$outUnit), 2),
                            big.mark=",", format="f", drop0trailing = TRUE)
+        names(tt) <- c("Level", paste0("Area [", config$config$outUnit, "]"))
         ares$MCP[[subcon]]$animals[[animal]]$tables <- list()
         ares$MCP[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Mininum Convex Polygon areas")
 
-        ## Data
-        ares$MCP[[subcon]]$animals[[animal]]$data <- list()
-        ares$MCP[[subcon]]$animals[[animal]]$data$vect <- list()
-        ares$MCP[[subcon]]$animals[[animal]]$data$vect[[1]] <- list(data=isopleths(mcp),
-                                                                    filename=paste0("rhr_MCP_iso_id_",
-                                                                      ares$MCP[[subcon]]$animals[[animal]]$name))
-
         ## results
-        ares$MCP[[subcon]]$animals[[animal]]$res <- mcp
+        saveRDS(mcp, file=file.path(datapath, paste0(paste0("rhr_MCP_id_", ares$MCP[[subcon]]$animals[[animal]]$name, ".rds"))))
+
+        ## Write iso
+        writeVect(isopleths(mcp),
+                  basename=file.path(datapath, paste0("rhr_MCP_iso_id_", ares$MCP[[subcon]]$animals[[animal]]$name)))
+        
+        rm(mcp, p)
+        gc(); gc()
 
       }, error=function(e) return(e))
 

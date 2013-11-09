@@ -3,10 +3,9 @@
 #' 
 #'
 #' @param dat a data.frame with at least 2 columns. The first column contains the x-coordinates, the second column contains the y-coordinates 
-#' @param n the number of bootstrap iterations.
+#' @param n the number of simulated trajectories.
 #' @useDynLib rhr
 #' @export
-#' @author Johannes Signer
 #' @return object of class \code{RhrFidelity}, which is a list of length 4. \code{msd.dat} and \code{li.dat} is the mean square distance and linearity for the real date. \code{msd.sim} and \code{li.sim} are the mean square distances and linearities for the simulated trajectories. 
 #' @examples
 #' # simulated data
@@ -20,14 +19,24 @@
 
 rhrFidelity <- function(dat, n=100) {
 
-  # --------------------------------------------------------------------------- #
-  # Some argument checking
-  # Check how many arguments where provided
+  ## --------------------------------------------------------------------------- #
+  ## Some argument checking
+  ## Check how many arguments where provided
 
-  # is dat correct?
+  ## is dat correct?
   if (nrow(dat) < 2) {
     stop("dat needs to have 2 columns: x, y")
   }
+
+  ## Coordinates
+  if(!is(dat, "data.frame")) {
+    if(inherits(dat, "SpatialPoints")) {
+      dat <- data.frame(coordinates(dat))
+    } else {
+      stop(paste0("xy should be of class data.frame or SpatialPoints. The provided xy is of class ", class(xy)))
+    }
+  }
+
   res <- fidelityBase(dat[,1], dat[,2], n)
 
   attr(res, "class") <- "RhrFidelity"
@@ -47,36 +56,39 @@ rhrFidelity <- function(dat, n=100) {
 fidelityBase <- function(x, y, n) {
   res <- list()
 
-  # Calculates cumulative distances
-  # calculate the the successive distances between each fix
+  ## Calculates cumulative distances
+  ## calculate the the successive distances between each fix
   d <- cumdist(x, y)
 
-  # simulate n random walks
+  ## resample
+  d <- sample(d, length(d))
+
+  ## simulate n random walks
   a <- replicate(n, random_walk(x[1], y[1], d, runif(length(d), 0, 360)), simplify=FALSE)
 
-  # msd 
+  ## msd 
   msd.dat <- msd(x, y)
   msd.sim <- sapply(a, function(x) msd(x[,1], x[,2]))
 
-  # li
+  ## li
   li.dat <- li(x, y)
   li.sim <- sapply(a, function(x) li(x[,1], x[,2]))
 
-  # return
+  ## return
   return(list(msd.dat=msd.dat, li.dat=li.dat, msd.sim=msd.sim,
               li.sim=li.sim ))
 }
 
  
-# ---------------------------------------------------------------------------- #
-# cum distances
+## ---------------------------------------------------------------------------- #
+## cum distances
 
 cumdist <- function(x,y) {
   return(sqrt((x[-1] - x[-length(x)])^2 + (y[-1] - y[-length(y)])^2))
 }
 
-# ---------------------------------------------------------------------------- #
-# Everything in Cpp
+## ---------------------------------------------------------------------------- #
+## Everything in Cpp
 
 random_walk <- function(sx, sy, d, rA) {
   n   <- length(d)
@@ -92,8 +104,8 @@ random_walk <- function(sx, sy, d, rA) {
 }
 
 
-# ---------------------------------------------------------------------------- #
-# calculate msd
+## ---------------------------------------------------------------------------- #
+## calculate msd
 
 msd <- function(x, y) {
   mx  <- mean(x)
@@ -101,8 +113,8 @@ msd <- function(x, y) {
   .Call("msdcpp", x, y, mx, my, PACKAGE="rhr")
 }
 
-# ---------------------------------------------------------------------------- #
-# calculate li
+## ---------------------------------------------------------------------------- #
+## calculate li
 
 li <- function(x, y) {
   d               <- cumdist(x,y)

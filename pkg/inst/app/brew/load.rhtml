@@ -2,6 +2,20 @@
 
 plog <- c()
 
+## filter, will remove all rows from dat with value == to excludeVal
+	
+changeToLongNames <- function(dat, longNames=config$config$longNames, filter=TRUE, excludeVal=-1) {
+  for (i in 1:nrow(dat)) {
+    if (dat[i, 1] %in% longNames$short) {
+      dat[i, 1] <- longNames[[2]][longNames[[1]] == dat[i, 1]]
+    } 
+  }
+  if (filter) {
+    dat <- dat[dat[, 2] != excludeVal,]
+  }
+  dat
+}
+
 catPro <- function(x, configuration=config, withTS=TRUE, pre=NULL) {
 	if (configuration$config$verbose) {
 	  if (withTS) {
@@ -113,6 +127,17 @@ cath2 <- function(x) {
                     <option value='comma'>Comma (,)</option>
                     <option value='semi'>Semi colon (;)</option>
                     <option value='tab'>Tabulator (\t)</option>
+                    <option value='pipe'>Pipe (|)</option>
+                  </select>  
+                </div>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="hasHeader">Header</label>
+                <div class="controls">
+                  <select id="hasHeader" name="hasHeader">
+                    <option value='TRUE'>Data comes with header</option>
+                    <option value='FALSE'>There is no header</option>
                   </select>  
                 </div>
               </div>
@@ -147,26 +172,29 @@ cath2 <- function(x) {
             res <- Rook::Response$new()
 
             if (!is.null(req$POST())) {
-              name		<- req$POST()[['uploadPath']]
+              nameInputFile	<- req$POST()[['uploadPath']]
               sep		<- req$POST()[['uploadSep']]
               skip		<- as.numeric(req$POST()[['uploadSkip']])
+	      hasHeader         <- as.logical(req$POST()[['hasHeader']])
               sepDec	<- req$POST()[['uploadSepDec']]
 
-              if (!is.null(name)) {
+			   cat(hasHeader, "\n", file=stderr())
+
+              if (!is.null(nameInputFile)) {
 
 
 plog <- c(plog, catPro("trying to read data", pre=cath1("Reading data")))
 
-                totalN <- length(readLines(name$tempfile))
+                totalN <- length(readLines(nameInputFile$tempfile))
                 if (skip >= totalN) {
 	          rhrAlert(paste0("<b>Something went wrong:</b> you want to skip (", skip, ") more lines than there are in the file (", totalN, ")"), class="error")
                   stop()
                 }
 
-                str <- readLines(name$tempfile, n=60 + skip)
+                str <- readLines(nameInputFile$tempfile, n=60 + skip)
 
                 ## asign sep
-                sep <- switch(sep, comma=",", tab="\t", semi=";")
+                sep <- switch(sep, comma=",", tab="\t", semi=";", pipe="|")
 
                 ## asign decimal separator
                 sepDec <- switch(sepDec, comma=",", point=".")
@@ -174,6 +202,8 @@ plog <- c(plog, catPro("trying to read data", pre=cath1("Reading data")))
                 # test if a separator works for the Body
                 # each lines requires more than one field and same length
                 testBody <- function(str, sep) {
+	          ## escape pipe
+	          if (sep == "|") sep <- "\\|"
                   str <- strsplit(str, sep)
                   str <- head(sapply(str, length), -1)
                   all(str == str[1]) & (str[1] > 1)
@@ -187,8 +217,8 @@ plog <- c(plog, catPro("trying to read data", pre=cath1("Reading data")))
                   # everything is ok
 
                   tryCatch({
-                  dat <- read.table(name$tempfile,
-                                    sep=sep, skip=skip, dec=sepDec, header=TRUE,
+                  dat <- read.table(nameInputFile$tempfile,
+                                    sep=sep, skip=skip, dec=sepDec, header=hasHeader,
                                     stringsAsFactors=FALSE)
                 }, error=function(e) {
 	          rhrAlert(paste0('<b>Something went wrong:</b> ', e ), class="error")
@@ -197,7 +227,7 @@ plog <- c(plog, catPro("trying to read data", pre=cath1("Reading data")))
                 })
                 f <- c(NA, names(dat))
 
-                rhrAlert(paste0('<b>Data</b> (', name[1], ') successfully loaded'))
+                rhrAlert(paste0('<b>Data</b> (', nameInputFile[1], ') successfully loaded'))
 
                 # the frist lines of 
                 p("Current header of your is (fields are separated by <code>|</code>)")
@@ -256,19 +286,19 @@ plog <- c(plog, catPro("trying to read data", pre=cath1("Reading data")))
                 <td>none</td>
               </tr>
               <tr>
-                <td>Latitude</td>
+                <td>Longitude (x-coordinate)</td>
                 <td>
-                  <select id="sellat">
-                    <% cat(paste0('<option id="lat" value=', f, '>', f, '</option>')) %>
+                  <select id="sellon">
+                    <% cat(paste0('<option value=', f, '>', f, '</option>')) %>
                   </select>   
                 </td>
                 <td>none</td>
               </tr>
               <tr>
-                <td>Longitude</td>
+                <td>Latitude (y-coordinate)</td>
                 <td>
-                  <select id="sellon">
-                    <% cat(paste0('<option value=', f, '>', f, '</option>')) %>
+                  <select id="sellat">
+                    <% cat(paste0('<option id="lat" value=', f, '>', f, '</option>')) %>
                   </select>   
                 </td>
                 <td>none</td>
@@ -583,7 +613,7 @@ plog <- c(plog, catPro("trying to read data", pre=cath1("Reading data")))
               <fieldset>
 
                 <div class="control-group">
-                  <label class="control-label" for="modalSiteFidelityInputN">Number of bootstrap iterations</label>
+                  <label class="control-label" for="modalSiteFidelityInputN">Number of simulated trajectories</label>
                   <div class="controls">
                     <input type="text" id="modalSiteFidelityInputN" name="modalSiteFidelityInputN" value="1" class="left">
                   </div>

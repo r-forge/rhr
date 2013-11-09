@@ -17,6 +17,10 @@
 #' 
 #' @author Johannes Signer 
 
+#' @examples 
+#' \dontrun{
+#' }
+
 rhrHlscv <- function(xyz, range=c(0.1, 2), whichMin="global", rescale="unitvar", seqLength=100) {
 
   ## Some input validation

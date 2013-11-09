@@ -26,7 +26,8 @@ if (config$todo$doAsymptote) {
 
           allgood <- tryCatch({
             ## est asym 
-            asym <- rhrAsymptote(ares$MCP[[1]]$animals[[animal]]$res, ns=ns,
+            est <- readRDS(file.path(datapath, paste0(paste0("rhr_MCP_id_", ares$Asymptote[[subcon]]$animals[[animal]]$name, ".rds"))))
+            asym <- rhrAsymptote(est, ns=ns,
                                  nrep=as.numeric(subconParams$nIter),
                                  tolTotArea=as.numeric(subconParams$tolTotArea)/100,
                                  nTimes=as.numeric(subconParams$nTimes),
@@ -36,10 +37,13 @@ if (config$todo$doAsymptote) {
             p <- grid.grabExpr(print(plot(asym, draw=FALSE)))
 
             ares$Asymptote[[subcon]]$animals[[animal]]$plots <- list()
-            ares$Asymptote[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_Asymptote_mcp_id_",
+            ares$Asymptote[[subcon]]$animals[[animal]]$plots$kde <- list(filename=paste0("rhr_Asymptote_mcp_id_",
                                                                             ares$Asymptote[[subcon]]$animals[[animal]]$name, ".png"),
-                                                                          grob=p,
                                                                           caption=paste0("Asymptote for animal ", ids[animal]))
+
+            png(file=file.path(imagepath, ares$Asymptote[[subcon]]$animals[[animal]]$plots$kde$filename))
+            grid.draw(p)
+            dev.off()
         
             ## Table
             tt <- asym$asymptote
@@ -48,6 +52,12 @@ if (config$todo$doAsymptote) {
 
             ares$Asymptote[[subcon]]$animals[[animal]]$tables <- list()
             ares$Asymptote[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Asymptote")
+
+            ## results
+            saveRDS(asym, file=file.path(datapath, paste0(paste0("rhr_Asymptote_mcp_id_", ares$Asymptote[[subcon]]$animals[[animal]]$name, ".rds"))))
+
+            rm(asym, est, p)
+            gc(); gc()
 
           }, error=function(e) return(e))
 
@@ -69,7 +79,8 @@ if (config$todo$doAsymptote) {
 
           allgood <- tryCatch({
             ## est asym 
-            asym <- rhrAsymptote(ares$KDE[[1]]$animals[[animal]]$res, ns=ns,
+            est <- readRDS(file.path(datapath, paste0(paste0("rhr_KDE_id_", ares$Asymptote[[subcon]]$animals[[animal]]$name, ".rds"))))
+            asym <- rhrAsymptote(est, ns=ns,
                                  nrep=as.numeric(subconParams$nIter),
                                  tolTotArea=as.numeric(subconParams$tolTotArea)/100,
                                  nTimes=as.numeric(subconParams$nTimes),
@@ -79,11 +90,14 @@ if (config$todo$doAsymptote) {
             p <- grid.grabExpr(print(plot(asym, draw=FALSE)))
 
             ares$Asymptote[[subcon]]$animals[[animal]]$plots <- list()
-            ares$Asymptote[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_Asymptote_kde_id_",
+            ares$Asymptote[[subcon]]$animals[[animal]]$plots$mcp <- list(filename=paste0("rhr_Asymptote_kde_id_",
                                                                             ares$Asymptote[[subcon]]$animals[[animal]]$name, ".png"),
-                                                                          grob=p,
                                                                           caption=paste0("Asymptote for animal ", ids[animal]))
         
+            png(file=file.path(imagepath, ares$Asymptote[[subcon]]$animals[[animal]]$plots$mcp$filename))
+            grid.draw(p)
+            dev.off()
+
             ## Table
             tt <- asym$asymptote
             tt$ns <- ifelse(is.na(tt$ns), "not reached", tt$ns)
@@ -91,6 +105,12 @@ if (config$todo$doAsymptote) {
 
             ares$Asymptote[[subcon]]$animals[[animal]]$tables <- list()
             ares$Asymptote[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Asymptote")
+
+            ## results
+            saveRDS(asym, file=file.path(datapath, paste0(paste0("rhr_Asymptote_kde_id_", ares$Asymptote[[subcon]]$animals[[animal]]$name, ".rds"))))
+
+            rm(asym, est, p)
+            gc(); gc()
 
           }, error=function(e) return(e))
 

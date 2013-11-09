@@ -22,7 +22,7 @@ if (config$todo$doLocoh) {
            }
          } 
 
-         locoh <- rhrLoCoH(datSub[[animal]][, c("lon", "lat")], level=subconParams$level,
+         locoh <- rhrLoCoH(datSub[[animal]], level=subconParams$level,
                            type=subconParams$type, n=subconParams$nValue)
 
          p <- grid.grabExpr(plot(locoh, what="iso", useGE=config$config$useGM))
@@ -30,8 +30,11 @@ if (config$todo$doLocoh) {
          ares$LoCoH[[subcon]]$animals[[animal]]$plots <- list()
          ares$LoCoH[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_LoCoH_iso_id_",
                                                                     ares$LoCoH[[subcon]]$animals[[animal]]$name, ".png"),
-                                                                  grob=p,
                                                                   caption=paste0("LoCoH ", ids[animal]))
+         
+         png(file=file.path(imagepath, ares$LoCoH[[subcon]]$animals[[animal]]$plots[[1]]$filename))
+         grid.draw(p)
+         dev.off()
 
          ## Extra params
          ares$LoCoH[[subcon]]$animals[[animal]]$extraParams <- list(nValue=subconParams$nValue)
@@ -45,16 +48,17 @@ if (config$todo$doLocoh) {
          ares$LoCoH[[subcon]]$animals[[animal]]$tables <- list()
          ares$LoCoH[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Kernel density estimation areas")
 
-         ## Results
-         ares$LoCoH[[subcon]]$animals[[animal]]$res <- locoh
+         ## results
+         saveRDS(locoh, file=file.path(datapath, paste0(paste0("rhr_LoCoH_id_", ares$LoCoH[[subcon]]$animals[[animal]]$name, ".rds"))))
 
-         ## Write data
-         ares$LoCoH[[subcon]]$animals[[animal]]$data <- list()
-         ares$LoCoH[[subcon]]$animals[[animal]]$data$vect <- list()
-         ares$LoCoH[[subcon]]$animals[[animal]]$data$vect[[1]] <- list(data=isopleths(locoh),
-                                                                     filename=paste0("rhr_locoh_iso_id_",
-                                                                       ares$LoCoH[[subcon]]$animals[[animal]]$name))
+         ## Write iso
+         writeVect(isopleths(locoh),
+                   basename=file.path(datapath, paste0("rhr_LoCoH_id_", ares$LoCoH[[subcon]]$animals[[animal]]$name)))
+         
+         rm(locoh, p)
+         gc(); gc()
 
+         
       }, error=function(e) return(e))
 
       if (inherits(allgood, "error")) {

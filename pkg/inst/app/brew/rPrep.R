@@ -11,6 +11,21 @@ alog <- c()
 alog <- c(alog, catPro("Preparing analysis", pre=cath1("Starting with rhr analysis")))
 
 ## ============================================================================ # 
+## update Config
+
+## Add file name to config
+if (!is.null(datFromR)) {
+  config$inputFile$filename <- 'data loaded from R'
+} else {
+  config$inputFile$filename <- nameInputFile$filename
+  config$inputFile$hasHeader <- hasHeader
+  config$inputFile$sep <- sep
+  config$inputFile$decSep <- sepDec
+  config$inputFile$skip <- skip
+}
+
+
+## ============================================================================ # 
 ## Provide data
 
 ## Do subset
@@ -18,92 +33,6 @@ alog <- c(alog, catPro("Preparing analysis", pre=cath1("Starting with rhr analys
 
 alog <- c(alog, catPro("splitting data"))
 
-#if (config$config$dateTime) {
-#  ## Date and time was provided
-#  datSub <- datrm[datrm$timestamp >= ymd_hms(config$temporalBbxRestricted$tmin) &
-#                  datrm$timestamp <= ymd_hms(config$temporalBbxRestricted$tmax) &
-#                  datrm$lat >= config$spBbxRestricted$ymin &
-#                  datrm$lat <= config$spBbxRestricted$ymax &
-#                  datrm$lon >= config$spBbxRestricted$xmin &
-#                  datrm$lon <= config$spBbxRestricted$xmax, ]
-#} else {
-#  ## No date or time was provided
-#  datSub <- datrm[datrm$lat >= config$spBbxRestricted$ymin &
-#                  datrm$lat <= config$spBbxRestricted$ymax &
-#                  datrm$lon >= config$spBbxRestricted$xmin &
-#                  datrm$lon <= config$spBbxRestricted$xmax, ]
-#}
-#
-### Add the number of relocations to the config list
-#config$n$restrictedN <- nrow(datSub)
-#
-### subset only take the once that are requested
-#datSub <- datSub[datSub$id %in% config$animal$id[as.logical(config$animal$include)],]
-#
-### Split
-#datSub <- split(datSub, datSub$id)
-#
-### Make Spatial
-#allgood <- tryCatch({
-#  datSub <- lapply(datSub, function(x)
-#                   SpatialPointsDataFrame(x[, c("lon", "lat")], data=x,
-#                                          proj4string=CRS(paste0("+init=epsg:", config$config$inEpsg))))
-#
-#  if (is.na(config$config$outEpsg)) {
-#    if (config$config$verbose) {
-#      cat("* Reprojecting points \n", file=stderr())
-#    }
-#    ## Reporject
-#    datSub <- lapply(datSub, spTransform, CRS(paste0("+init=epsg:", config$config$outEpsg)))
-#
-#  }
-#}, error=function(e) e)
-#
-#
-#if (inherits(allgood, "error")) {
-#  log <- c(log, catPro("failed with projecting and/or transforming data"))
-#  } else {
-#  log <- c(log, catPro("succeeded with projecting and/or transomfing data"))
-#  }
-
-## Ids
-# ids <- names(datSub)
-
-## ============================================================================ # 
-## Deal with duplicates
-## There are three options
-## 1. Delete duplicates
-## 2. Add random noise
-## 3. Do nothing
-
-# alog <- c(alog, catPro("dealing with duplicates"))
-# 
-# if (config$config$duplicates == "jitter") {
-  # for (i in seq_along(datSub)) {
-    # x <- datSub[[i]]
-    # whichDubplicates <- duplicated(x[, c("lat", "lon")])
-    # x[whichDubplicates, 'lat'] <- jitter(x[whichDubplicates, 'lat'])
-    # x[whichDubplicates, 'lon'] <- jitter(x[whichDubplicates, 'lon'])
-    # datSub[[i]] <- x
-  # }
-# } else if (config$config$duplicates == "remove") {
-  # for (i in seq_along(datSub)) {
-    # x <- datSub[[i]]
-    # whichDubplicates <- duplicated(x[, c("lat", "lon")])
-    # datSub[[i]] <- x[!whichDubplicates,]
-  # }
-# }
-# 
-# ## Remove animals with less than 10 points
-# ## datSub <- datSub[sapply(datSub, nrow) >= 10]
-# 
-# 
-# ## Order data for each animal by timestamp if provided
-# if (config$config$dateTime) {
-  # for (i in seq_along(datSub)) {
-    # datSub[[i]] <- datSub[[i]][order(datSub[[i]]$timestamp), ]
-  # }
-# }
 
 ## ============================================================================ # 
 ## Validate and correct input
@@ -215,22 +144,29 @@ for (i in seq_along(ids)) {
   ares$animals[[i]]$summary$nMissingCases <- sum(!complete.cases(datSub[[i]]))
 
 
+  ## Order
   if (config$config$dateTime) {
     datSub[[i]] <- datSub[[i]][order(datSub[[i]]$timestamp), ]
   }
 
   ## Make Spatial
   allgood <- tryCatch({
-    datSub[[i]] <- SpatialPointsDataFrame(datSub[[i]][, c("lon", "lat")], data=datSub[[i]],
-                                          proj4string=CRS(paste0("+init=epsg:", config$config$inEpsg))) 
-    if (is.na(config$config$outEpsg)) {
+    alog <- c(alog, catPro("projecting data"))
+    datSub[[i]] <- SpatialPointsDataFrame(datSub[[i]][, c("lon", "lat")], data=datSub[[i]])
+
+    if (config$config$inEpsg != -1) {
+      proj4string(datSub[[i]]) <- CRS(paste0("+init=epsg:", config$config$inEpsg))
+    }
+    if (config$config$outEpsg != -1) {
       ## Reporject
-      datSub[[i]] <- spTransform(datsub[[i]], CRS(paste0("+init=epsg:", config$config$outEpsg)))
+      alog <- c(alog, catPro(paste0("reprojecting data from ", config$config$inEpsg, " to ", config$config$outEpsg)))
+      datSub[[i]] <- spTransform(datSub[[i]], CRS(paste0("+init=epsg:", config$config$outEpsg)))
     }
   }, error=function(e) e)
 
   if (inherits(allgood, "error")) {
-    log <- c(log, catPro("failed with projecting and/or transforming data"))
+    log <- c(log, catPro(paste0("failed with projecting and/or transforming data",
+                                allgood$message)))
   } else {
     log <- c(log, catPro("succeeded with projecting and/or transomfing data"))
   }
@@ -240,13 +176,14 @@ for (i in seq_along(ids)) {
 }
 
 
+## ============================================================================ # 
 ## Go through contexts
 if (config$todo$doSiteFidelity) {
   ares$siteFidelity <- list()
   ares$siteFidelity[[1]] <- list()
 
   ## Subcontexts - none for site fidelity
-  ares$siteFidelity[[1]]$params <- c(list(context="Site Fidelity", subContext=NA),
+  ares$siteFidelity[[1]]$params <- c(list(context="Site Fidelity", subContext=NA, name="siteFidelity"),
                                     config$analysis$siteFidelity)
   ares$siteFidelity[[1]]$animals <- lapply(ids, brewResults)
   
@@ -265,7 +202,7 @@ if (config$todo$doTTSI) {
     
     ares$TTSI[[i]]$params <- c(list(context="Time to statistical independence (TTSI)",
                                            subContext=paste0("TTSI with ", ifelse(variesOver[i], "consecutive ",
-                                             "non consecutive "), "observations")),
+                                             "non consecutive "), "observations"), name="ttsi"),
                                     thisParams)
   
     ares$TTSI[[i]]$animals <- lapply(ids, brewResults)
@@ -278,7 +215,7 @@ if (config$todo$doMCP) {
   ares$MCP[[1]] <- list()
 
   ## Subcontexts - none for mcp
-  ares$MCP[[1]]$params <- c(list(context="Minimum Convex Polygon(MCP)", subContext=NA),
+  ares$MCP[[1]]$params <- c(list(context="Minimum Convex Polygon(MCP)", subContext=NA, name="mcp"),
                                     config$analysis$mcp)
   
   ares$MCP[[1]]$animals <- lapply(ids, brewResults)
@@ -302,7 +239,7 @@ if (config$todo$doKDE) {
       
       ares$KDE[[idx]]$params <- c(list(context="Kernel Density Estimation (KDE)",
                                              subContext=paste0("KDE with: ", variesOver0[i], " bandwidth and rescaling: ",
-                                               variesOver1[j])),
+                                               variesOver1[j]), name="kde"),
                                         thisParams)
       
       ares$KDE[[idx]]$animals <- lapply(ids, brewResults)
@@ -326,7 +263,7 @@ if (config$todo$doLocoh) {
       ares$LoCoH[[idx]] <- list()
       
       ares$LoCoH[[idx]]$params <- c(list(context="Local Convex Hull (LoCoH)",
-                                        subContext=paste0("LoCoH type: ", variesOver0[i])),
+                                        subContext=paste0("LoCoH type: ", variesOver0[i]), name="locoh"),
                                         thisParams)
       ares$LoCoH[[idx]]$animals <- lapply(ids, brewResults)
       idx <- idx + 1
@@ -347,7 +284,7 @@ if (config$todo$doAsymptote) {
       ares$Asymptote[[idx]] <- list()
       
       ares$Asymptote[[idx]]$params <- c(list(context="Asymptote",
-                                        subContext=paste0("Asymptote for: ", variesOver0[i])),
+                                        subContext=paste0("Asymptote for: ", variesOver0[i]), name="asymptote"),
                                         thisParams)
       ares$Asymptote[[idx]]$animals <- lapply(ids, brewResults)
       idx <- idx + 1
@@ -359,7 +296,7 @@ if (config$todo$doCA) {
   ares$CA[[1]] <- list()
 
   ## Subcontexts - none for CA
-  ares$CA[[1]]$params <- c(list(context="Core Area (CA)", subContext=NA),
+  ares$CA[[1]]$params <- c(list(context="Core Area (CA)", subContext=NA, name="ca"),
                                     config$analysis$ca)
   
   ares$CA[[1]]$animals <- lapply(ids, brewResults)
@@ -370,11 +307,41 @@ if (config$todo$doCA) {
 
 for (i in seq_along(ares$animals)) {
   res$write(h3(paste0("Animal: ", ares$animals[[i]]$summary$name)))
-  res$write(rhrToHTML(params2df(ares$animals[[i]]$summary[-1])))
+  res$write(rhrToHTML(changeToLongNames(params2df(ares$animals[[i]]$summary[-1]), config$config$longNames$animals)))
 }
 
 
 ## Functions
+
+writeVect <- function(x,
+                       basename="",
+                       formats=config$config$expVectExt,
+                       fn=paste0(basename, ".", config$config$expVectExt),
+                       driver=(config$config$expVectDriver)) {
+  for (f in seq_along(formats)) {
+    if (f == "kml") {
+      ## we need to convert SRS back to geographical
+      x <- spTransform(x, CRS("+init=epsg:4326"))
+    } 
+
+      writeOGR(obj=x,
+               dsn=fn[f], 
+               layer=basename(basename),
+               driver=driver[f])
+  }
+}
+
+writeRast <- function(x,
+                      basename="",
+                      formats=config$config$expRastDriver,
+                      fn=paste0(basename, ".", config$config$expRastExt)) {
+  for (f in seq_along(formats)) {
+    writeRaster(x=x,
+                filename=fn[f], 
+                formrat=formats[f])
+  }
+}
+
 showResultHTML <- function(context, des) {
 
   res$write(p(des))
@@ -392,7 +359,9 @@ showResultHTML <- function(context, des) {
     }
 
     ## Write parameters
-    res$write(rhrToHTML(params2df(context[[subcon]]$params[c(-1, -2)])))
+    ## We do not need the first three entries, because they are only used for internal reference
+    res$write(rhrToHTML(changeToLongNames(params2df(context[[subcon]]$params[c(-1, -2, -3)]),
+                                          config$config$longNames[[context[[subcon]]$params$name]])))
 
     
     for (animal in seq_along(context[[subcon]]$animals)) {
@@ -406,16 +375,13 @@ showResultHTML <- function(context, des) {
       if (thisAnimal$exit == 0) {
         ## Extra params
         if (!is.na(thisAnimal$extraParams)) {
-          res$write(rhrToHTML(params2df(thisAnimal$extraParams)))
+          res$write(rhrToHTML(changeToLongNames(params2df(thisAnimal$extraParams),
+                                                config$config$longNames[[context[[subcon]]$params$name]])))
         }
 
         ## Plots
         if (!is.na(thisAnimal$plots)) {
           for (p in seq_along(thisAnimal$plots)) {
-            ## Write the plot
-            png(file=file.path(imagepath, thisAnimal$plots[[p]]$filename))
-            grid.draw(thisAnimal$plots[[p]]$grob)
-            dev.off()
 
             ## include the plot
             res$write(img(paste0(imageurl, thisAnimal$plots[[p]]$filename),

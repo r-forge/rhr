@@ -9,7 +9,7 @@
   first column contains the x-coordinates, the second
   column contains the y-coordinates}
 
-  \item{n}{the number of bootstrap iterations.}
+  \item{n}{the number of simulated trajectories.}
 }
 \value{
   object of class \code{RhrFidelity}, which is a list of
@@ -30,8 +30,5 @@ rhrFidelity(dat, n=500)
 # Example Data
 data(datSH)
 res <- rhrFidelity(datSH[, 2:3])
-}
-\author{
-  Johannes Signer
 }
 

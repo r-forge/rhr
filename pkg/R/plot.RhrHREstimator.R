@@ -61,14 +61,14 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
     if (useGE) {
       warning("GE for UD is not yet implemented")
       pUD <- ggplot(data=df) +
-        geom_tile(aes(x=x, y=y, fill=ud)) +
+        geom_raster(aes(x=x, y=y, fill=ud)) +
           coord_equal() + scale_x_continuous(expand=c(0,0)) +
             scale_fill_gradient(low="darkgreen", high="white") + 
               scale_y_continuous(expand=c(0,0)) + labs(x=NULL, y=NULL) + theme_bw() +
                 coord_fixed()
     } else {
       pUD <- ggplot(data=df) +
-        geom_tile(aes(x=x, y=y, fill=ud)) +
+        geom_raster(aes(x=x, y=y, fill=ud)) +
           coord_equal() + scale_x_continuous(expand=c(0,0)) +
             scale_fill_gradient(low="darkgreen", high="white") + 
               scale_y_continuous(expand=c(0,0)) + labs(x=NULL, y=NULL) + theme_bw() +
@@ -109,7 +109,7 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
           labs(colour="Level", x="lon", y="lat") +
             geom_path(size=0.2, colour="black", data=tempolDF, aes(x=long, y=lat, group=group)) +
               scale_color_manual(values=terrain.colors(10)) +
-                theme_bw() + coord_fixed()
+                theme_bw() 
 
     } else {
       ## fortify poly
@@ -123,8 +123,7 @@ plot.RhrHREstimator <- function(x, what=c("ud", "iso"), draw=TRUE, useGE=FALSE, 
           geom_path(size=3, alpha=0.4) + 
             labs(colour=paste0("Levels of ", x$parameters$estimator), x="lon", y="lat") +
               geom_path(size=0.2, colour="black") +
-                scale_color_manual(values=terrain.colors(10)) + theme_bw() +
-                  coord_fixed()
+                scale_color_manual(values=terrain.colors(10)) + theme_bw() 
     }
   }
 

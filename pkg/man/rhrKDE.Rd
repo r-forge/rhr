@@ -24,7 +24,7 @@
   \item{yrange}{numeric vector specifying min and max y for
   the output grid.}
 
-  \item{increaseExtend}{numeric value by which the x and y
+  \item{increaseExtent}{numeric value by which the x and y
   range are extended, see also \code{?extendrange}.}
 
   \item{trast}{a \code{RasterLayer} used as an template for
@@ -77,7 +77,7 @@
   xrange, yrange, increaseExtent, buffer, res, gridsize}.
   The size of the grid can be set either through a template
   raster (\code{traster}), \code{xrange} and \code{yrange}
-  or \code{increaseExtend}. \code{traster} takes precedence
+  or \code{increaseExtent}. \code{traster} takes precedence
   over \code{xrange} and \code{yrange}, \code{buffer} and
   \code{grid}. If none of the previous arguments are
   provided, \code{xrange} and \code{yrange} are taken from

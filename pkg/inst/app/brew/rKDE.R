@@ -21,7 +21,7 @@ if (config$todo$doKDE) {
            h <- subconParams$bandwidth
          }
 
-         kde <- rhrKDE(datSub[[animal]][, c("lon", "lat")], h=h, buffer=as.numeric(subconParams$buffer),
+         kde <- rhrKDE(datSub[[animal]], h=h, buffer=as.numeric(subconParams$buffer),
                        rescale=subconParams$rescale, res=as.numeric(subconParams$resolution), levels=subconParams$level)
 
          ud <- ud(kde)
@@ -33,23 +33,29 @@ if (config$todo$doKDE) {
          ares$KDE[[subcon]]$animals[[animal]]$plots <- list()
          ares$KDE[[subcon]]$animals[[animal]]$plots[[1]] <- list(filename=paste0("rhr_KDE_ud_id_",
                                                                     ares$KDE[[subcon]]$animals[[animal]]$name, ".png"),
-                                                                  grob=pud,
                                                                   caption=paste0("KDE ", ids[animal]))
+         png(file=file.path(imagepath, ares$KDE[[subcon]]$animals[[animal]]$plots[[1]]$filename))
+         grid.draw(pud)
+         dev.off()
 
          ares$KDE[[subcon]]$animals[[animal]]$plots[[2]] <- list(filename=paste0("rhr_KDE_iso_id_",
                                                                     ares$KDE[[subcon]]$animals[[animal]]$name, ".png"),
-                                                                  grob=piso,
                                                                   caption=paste0("KDE ", ids[animal]))
 
-         ## results
-         ares$KDE[[subcon]]$animals[[animal]]$res <- kde
+         png(file=file.path(imagepath, ares$KDE[[subcon]]$animals[[animal]]$plots[[2]]$filename))
+         grid.draw(piso)
+         dev.off()
 
          ## Extra params
          kp <- parameters(kde)
          ekp <- list(hx=kp$h[1], hy=kp$h[2])
 
+         
+
          if (kp$method == "lscv") {
-           ekp <- c(ekp, list(converged=kp$converged))
+           ekp <- c(ekp, list(converged=as.character(kp$converged)))
+           ares$KDE[[subcon]]$params$lscvWhichMin <- "global"
+           ares$KDE[[subcon]]$params$lscvFailure="smallest"
          }
            
          ares$KDE[[subcon]]$animals[[animal]]$extraParams <- ekp
@@ -63,16 +69,20 @@ if (config$todo$doKDE) {
          ares$KDE[[subcon]]$animals[[animal]]$tables <- list()
          ares$KDE[[subcon]]$animals[[animal]]$tables[[1]] <- list(table=tt, caption="Kernel density estimation areas")
 
-         ## Data
-         ares$KDE[[subcon]]$animals[[animal]]$data <- list()
-         ares$KDE[[subcon]]$animals[[animal]]$data$vect <- list()
-         ares$KDE[[subcon]]$animals[[animal]]$data$vect[[1]] <- list(data=iso,
-                                                                     filename=paste0("rhr_KDE_iso_id_",
-                                                                       ares$KDE[[subcon]]$animals[[animal]]$name))
-         ares$KDE[[subcon]]$animals[[animal]]$data$rast <- list()
-         ares$KDE[[subcon]]$animals[[animal]]$data$rast[[1]] <- list(data=ud,
-                                                                     filename=paste0("rhr_KDE_ud_id_",
-                                                                       ares$KDE[[subcon]]$animals[[animal]]$name))
+         ## results
+         saveRDS(kde, file=file.path(datapath, paste0(paste0("rhr_KDE_id_", ares$KDE[[subcon]]$animals[[animal]]$name, ".rds"))))
+
+         ## Write iso
+         writeVect(isopleths(kde),
+                   basename=file.path(datapath, paste0("rhr_KDE_iso_id_", ares$KDE[[subcon]]$animals[[animal]]$name)))
+                   
+         ## Write ud
+         writeRast(ud(kde),
+                   basename=file.path(datapath, paste0("rhr_KDE_ud_id_", ares$KDE[[subcon]]$animals[[animal]]$name)))
+
+
+         rm(kde, piso, pud)
+         gc(); gc()
 
       }, error=function(e) return(e))
 

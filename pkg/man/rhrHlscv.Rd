@@ -42,6 +42,10 @@
   returned, else the local minimum with the largest
   candidate bandwidth is returned.
 }
+\examples{
+\dontrun{
+}
+}
 \author{
   Johannes Signer
 }

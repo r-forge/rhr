@@ -3,12 +3,6 @@
 
 RcppExport SEXP randomWalkcpp(SEXP ssx, SEXP ssy, SEXP ssinA, SEXP ccosA, SEXP dd, SEXP rrx, SEXP rry) {
 BEGIN_RCPP
-  // sx: start x 
-  // sy: start y 
-  // n: number of rows
-  // rA: random angles
-  // ry: ry
-  // rx: rx
   Rcpp::NumericVector sx(ssx);
   Rcpp::NumericVector sy(ssy);
   Rcpp::NumericVector sinA(ssinA);

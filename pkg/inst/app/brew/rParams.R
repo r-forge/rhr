@@ -89,7 +89,8 @@ showResultGrid <- function(context, name) {
     sz[[length(sz) + 1]] <- global$h3$size
 
     ## Write parameters
-    params <- params2df(context[[subcon]]$params[c(-1, -2)])
+    params <- changeToLongNames(params2df(context[[subcon]]$params[c(-1, -2, -3)]),
+                                config$config$longNames[[context[[subcon]]$params$name]])
     obj[[length(obj) + 1]] <- dfGrob(params, bodyFont="mono")
     sz[[length(sz) + 1]] <- global$line$size * nrow(params) + 5
 
@@ -103,7 +104,8 @@ showResultGrid <- function(context, name) {
       if (thisAnimal$exit == 0) {
         ## Extra params
         if (!is.na(thisAnimal$extraParams)) {
-          params <- params2df(thisAnimal$extraParams)
+          params <- changeToLongNames(params2df(thisAnimal$extraParams),
+                                      config$config$longNames[[context[[subcon]]$params$name]])
           obj[[length(obj) + 1]] <- dfGrob(params, bodyFont="mono")
           sz[[length(sz) + 1]] <- global$line$size * nrow(params) + 5
         }
@@ -112,8 +114,8 @@ showResultGrid <- function(context, name) {
         if (!is.na(thisAnimal$plots)) {
           for (p in seq_along(thisAnimal$plots)) {
             ## Write the plot
-            obj[[length(obj) + 1]]  <- thisAnimal$plots[[p]]$grob
-            sz[[length(sz) + 1]] <- 80
+            obj[[length(obj) + 1]]  <- rasterGrob(readPNG(file.path(imagepath, thisAnimal$plots[[p]]$filename)))
+            sz[[length(sz) + 1]] <- 100
             
           }
         }
@@ -165,7 +167,7 @@ showAnimalsGrid <- function(animals, name) {
     sz[[length(sz) + 1]] <- global$h3$size
 
     ## Write parameters
-    params <- params2df(animal$summary[-1])
+    params <- changeToLongNames(params2df(animal$summary[-1]), config$config$longNames$animals)
     obj[[length(obj) + 1]] <- dfGrob(params, bodyFont="mono")
     sz[[length(sz) + 1]] <- global$line$size * nrow(params) + 5
 
@@ -179,13 +181,13 @@ repItems <- list()
 repH <- c()
 
 ## ---------------------------------------------------------------------------- # 
-## From estimator
+## For animals
 m <- showAnimalsGrid(ares$animals, "Information about animals") 
 repItems <- c(repItems, m$obj)
 repH <- c(repH, m$size)
 
 ## ---------------------------------------------------------------------------- # 
-## From estimator
+## For estimators
 
 ## Site fidelity
 name <- "Site fidelity"

@@ -1,8 +1,8 @@
 Package: rhr
 Type: Package
 Title: Package to estimate home ranges through a graphical user interface.
-Version: 0.03.1
-Date: 2013-11-04
+Version: 0.04
+Date: 2013-11-08
 Author: Johannes Signer
 Maintainer: Johannes Signer <jmsigner@gmail.com>
 Description: In this package several methods to analyze animal movement data
@@ -29,7 +29,8 @@ Depends:
     reshape2,
     ggmap,
     mapproj,
-    maptools
+    maptools,
+    png
 LinkingTo: Rcpp
 Collate:
     'fidelity.R'

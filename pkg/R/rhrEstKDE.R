@@ -7,7 +7,7 @@
 #' @param h character ("href" or "hlscv") specifying the method to estimate the bandwidth or numeric value specifying the bandwidth.
 #' @param xrange numeric vector specifying min and max x for the output grid.
 #' @param yrange numeric vector specifying min and max y for the output grid.
-#' @param increaseExtend numeric value by which the x and y range are extended, see also \code{?extendrange}.
+#' @param increaseExtent numeric value by which the x and y range are extended, see also \code{?extendrange}.
 #' @param trast a \code{RasterLayer} used as an template for the output grid.
 #' @param buffer numeric value to buffer the bounding box of points in map units from which the extent of the output grid will be retrieved.
 #' @param res numeric value specifying the resolution for the output grid. 
@@ -18,7 +18,7 @@
 #' @param lscvSearch numeric vector of length 2, specifying lower and uper bound for candidate bandwidth (as portion of reference bandwidth) for estimating bandwidth with least squre cross validation.
 #' @param lscvWhichMin character value, specifying how candidate bandwidths are chosen with least squre cross validation. Possible values are: \code{global} or \code{local} minimum.
 
-#' @details The size and resolution of the resulting utilization distribution (UD) grid is influenced by \code{traster, xrange, yrange, increaseExtent, buffer, res, gridsize}. The size of the grid can be set either through a template raster (\code{traster}), \code{xrange} and \code{yrange} or \code{increaseExtend}. \code{traster} takes precedence over \code{xrange} and \code{yrange}, \code{buffer} and \code{grid}. If none of the previous arguments are provided, \code{xrange} and \code{yrange} are taken from the data.
+#' @details The size and resolution of the resulting utilization distribution (UD) grid is influenced by \code{traster, xrange, yrange, increaseExtent, buffer, res, gridsize}. The size of the grid can be set either through a template raster (\code{traster}), \code{xrange} and \code{yrange} or \code{increaseExtent}. \code{traster} takes precedence over \code{xrange} and \code{yrange}, \code{buffer} and \code{grid}. If none of the previous arguments are provided, \code{xrange} and \code{yrange} are taken from the data.
 #'
 #' The resolution of the resulting UD grid can be set through either \code{res} or \code{gridsize}. \code{res} takes precedence over \code{gridsize}. If none of the previous arguments is provided the grid is set by default to a 100 by 100 grid.
 
@@ -69,14 +69,6 @@ rhrKDE <- function(xy,
                    gridsize=NULL) {
 
   argsIn <- as.list(environment())[-1]
-  projString <- CRS(NA)  # contains the projection information
-
-  ## Input checks
-  if (ncol(xy) > 2) {
-    xy <- xy[, 1:2]
-    warning("xy has more than 2 columns, only the first two are used")
-  }
-
   
   ## Coordinates
   if(!is(xy, "data.frame")) {
@@ -86,7 +78,16 @@ rhrKDE <- function(xy,
     } else {
       stop(paste0("xy should be of class data.frame or SpatialPoints. The provided xy is of class ", class(xy)))
     }
+  } else {
+    projString <- CRS(NA)  # contains the projection information
+    ## Input checks
+    if (ncol(xy) > 2) {
+      xy <- xy[, 1:2]
+      warning("xy has more than 2 columns, only the first two are used")
+    }
   }
+
+
 
   names(xy) <- c("x", "y")
 
@@ -129,8 +130,8 @@ rhrKDE <- function(xy,
 
     } else if (!is.null(increaseExtent)) {
       ## figure out range from extent, i.e. extent input range by factor
-      xrange <- extendrange(xy[ , "x"], increaseExtend)
-      yrange <- extendrange(xy[ , "y"], increaseEextend)
+      xrange <- extendrange(range(xy[ , "x"]), f=increaseExtent)
+      yrange <- extendrange(range(xy[ , "y"]), f=increaseExtent)
 
     } else if (!is.null(buffer)) {
       ## figure out range from buffer, i.e. input range + buffer
@@ -225,7 +226,7 @@ rhrKDE <- function(xy,
   out <- rhrHREstimator(xy, call=match.call(),
                         params=list(name="kde", method=hres$method, levels=levels,
                           h=hres$h, 
-                          converged=hres$convergenced,
+                          converged=hres$converged,
                           ud=ud,
                           cud=cud,
                           args=argsIn,

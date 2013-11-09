@@ -14,6 +14,9 @@ if (!is.null(a <- req$POST()[['doAnimal']])) config$animal$include <- fromJSON(a
 
 res <- Response$new()
 
+if (!is.numeric(datrm$lat) | !is.numeric(datrm$lon)) {
+  res$write(cat(paste0('<div class="alert alert-error"><b>Coordinates</b> are not numeric. Did you select the correct column and decimal field seperator?</div>')))
+}
   # subset time & space
 if (config$config$dateTime) {
   datSub <- datrm[datrm$timestamp >= ymd_hms(config$temporalBbxRestricted$tmin) &
@@ -53,7 +56,7 @@ res$write(cat('<button type="button" id="btnCheckAll1" class="btn btn-mini">Chec
 res$write(cat('<button type="button" id="btnUncheckAll1" class="btn btn-mini">Uncheck All</button>'))
 res$write(cat('</div><br><br>'))
 
-# Wrte animals
+## Write animals
 res$write(cat(paste0('<table class="table table-striped"><tr><th>include</th><th>id</th><th>n (total)</th><th>n (current)</th></tr>',
                    paste0('<tr><td><input type="checkbox" name="selectAnimal" value="', config$animal$id, '"',
                           ifelse(config$animal$include, 'checked="checked"', '' ), '><td>',
@@ -70,7 +73,8 @@ res$write(cat('<button type="button" id="btnUncheckAll" class="btn btn-mini">Unc
 res$write(cat('</div><br><br>'))
 
 res$write(cat('<button type="button" id="restrictionApply" class="btn btn-primary">Apply Restriction</button>'))
-# res$write(cat('<button type="button" id="restrictionReset" class="btn">Reset</button>'))
+
+## res$write(cat('<button type="button" id="restrictionReset" class="btn">Reset</button>'))
 res$finish()
 
 rm(datSub)
